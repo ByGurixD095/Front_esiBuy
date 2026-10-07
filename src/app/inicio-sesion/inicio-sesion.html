@@ -1,0 +1,46 @@
+<app-marco-pagina [volver]="true">
+  <h1 class="esi-titulo">accede a tu cuenta</h1>
+
+  <section class="inicio-sesion esi-tarjeta">
+    <h2>Iniciar sesión</h2>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <div class="esi-campo">
+        <label for="usuario">Correo electrónico</label>
+        <input
+          id="usuario"
+          type="email"
+          formControlName="usuario"
+          autocomplete="username"
+          placeholder="nombre@correo.es"
+        />
+      </div>
+
+      <div class="esi-campo">
+        <label for="contrasena">Contraseña</label>
+        <span class="grupo">
+          <input
+            id="contrasena"
+            [type]="mostrarContrasena() ? 'text' : 'password'"
+            formControlName="contrasena"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="grupo-boton"
+            [attr.aria-pressed]="mostrarContrasena()"
+            (click)="alternarContrasena()"
+          >
+            {{ mostrarContrasena() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </span>
+      </div>
+
+      <button type="submit" class="esi-boton" [disabled]="form.invalid">Iniciar sesión</button>
+
+      <p class="aviso">
+        Tras varios intentos fallidos se bloquea el acceso durante unos minutos.
+      </p>
+    </form>
+  </section>
+</app-marco-pagina>

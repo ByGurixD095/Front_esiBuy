@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.pagina {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-family: var(--esi-font-title);
+  font-weight: 700;
+  font-size: clamp(28px, 5vw, 32px);
+  line-height: 1.2;
+  color: var(--esi-text);
+}
+
+.registro {
+  box-sizing: border-box;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

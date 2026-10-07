@@ -1,0 +1,67 @@
+<app-marco-pagina panel="Panel de administración">
+  <div class="pagina">
+    <h1>nuevo administrador</h1>
+
+    <section class="registro esi-tarjeta">
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+        <div class="esi-campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" formControlName="nombre" autocomplete="given-name" />
+          @if (esInvalido('nombre')) {
+          <small class="esi-ayuda esi-error">El nombre es obligatorio.</small>
+          }
+        </div>
+
+        <div class="esi-campo">
+          <label for="apellidos">Apellidos</label>
+          <input id="apellidos" type="text" formControlName="apellidos" autocomplete="family-name" />
+          @if (esInvalido('apellidos')) {
+          <small class="esi-ayuda esi-error">Los apellidos son obligatorios.</small>
+          }
+        </div>
+
+        <div class="esi-campo">
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" formControlName="email" autocomplete="email" />
+          @if (esInvalido('email')) {
+          <small class="esi-ayuda esi-error">Introduce un correo electrónico válido.</small>
+          }
+        </div>
+
+        <div class="esi-campo">
+          <label for="contrasena">Contraseña</label>
+          <input
+            id="contrasena"
+            type="password"
+            formControlName="contrasena"
+            autocomplete="new-password"
+            aria-describedby="ayuda-contrasena"
+          />
+          <small
+            id="ayuda-contrasena"
+            class="esi-ayuda"
+            [class.esi-error]="esInvalido('contrasena')"
+          >
+            De 8 a 64 caracteres, con mayúscula, minúscula, número y símbolo.
+          </small>
+        </div>
+
+        <div class="esi-campo">
+          <label for="sede">Sede (opcional)</label>
+          <input id="sede" type="text" formControlName="sede" />
+        </div>
+
+        @if (mensajeExito()) {
+        <p class="exito esi-alerta esi-alerta--ok" role="status">{{ mensajeExito() }}</p>
+        }
+        @if (mensajeError()) {
+        <p class="error-general esi-alerta esi-alerta--error" role="alert">{{ mensajeError() }}</p>
+        }
+
+        <button type="submit" class="esi-boton" [disabled]="form.invalid || enviando()">
+          Crear administrador
+        </button>
+      </form>
+    </section>
+  </div>
+</app-marco-pagina>

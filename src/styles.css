@@ -1,1 +1,133 @@
-/* You can add global styles to this file, and also import other style files */
+/* Sistema visual de EsiBuy: tokens + piezas compartidas (tarjeta, campo, botón, alerta) */
+:root {
+  --esi-navy: #1a2b4a;
+  --esi-orange: #f0883a;
+  --esi-bg: #e8ecf1;
+  --esi-card: #ffffff;
+  --esi-text: #1c2430;
+  --esi-text-2: #3b4757;
+  --esi-muted: #5d6b7e;
+  --esi-border: #bcc7d6;
+  --esi-divider: #e1e6ed;
+  --esi-surface: #f6f8fb;
+  --esi-active-bg: #e8eef7;
+  --esi-footer-text: #c9d4e6;
+
+  --esi-ok-bg: #e3f4e9;
+  --esi-ok-fg: #1b6b3a;
+  --esi-warn-bg: #fdf1d6;
+  --esi-warn-fg: #7a4d00;
+  --esi-error-bg: #fbe4e4;
+  --esi-error-fg: #8f1f1f;
+  --esi-danger: #a32424;
+  --esi-info-bg: #e1ecfb;
+  --esi-info-fg: #1e4a8a;
+
+  --esi-radius: 8px;
+  --esi-radius-card: 12px;
+  --esi-shadow: 0 1px 3px rgba(20, 35, 60, 0.12);
+
+  --esi-font-title: 'Playfair Display', Georgia, serif;
+  --esi-font-body: Roboto, system-ui, sans-serif;
+}
+
+.esi-tarjeta {
+  background: var(--esi-card);
+  border-radius: var(--esi-radius-card);
+  box-shadow: var(--esi-shadow);
+  padding: 28px;
+}
+
+.esi-titulo {
+  margin: 0 0 28px;
+  text-align: center;
+  font-family: var(--esi-font-title);
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 40px);
+  line-height: 1.2;
+  color: var(--esi-text);
+}
+
+.esi-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.esi-campo input {
+  width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--esi-border);
+  border-radius: var(--esi-radius);
+  background: #fff;
+  color: var(--esi-text);
+  font: inherit;
+  font-weight: 400;
+}
+
+.esi-campo input:focus-visible {
+  outline: 2px solid var(--esi-navy);
+  outline-offset: 1px;
+}
+
+.esi-campo input.ng-invalid.ng-touched {
+  border-color: var(--esi-danger);
+}
+
+.esi-ayuda {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--esi-muted);
+}
+
+.esi-ayuda.esi-error {
+  color: var(--esi-danger);
+}
+
+.esi-boton {
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: var(--esi-radius);
+  background: var(--esi-navy);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.15s, opacity 0.15s;
+}
+
+.esi-boton:hover:enabled {
+  filter: brightness(1.2);
+}
+
+.esi-boton:focus-visible {
+  outline: 2px solid var(--esi-orange);
+  outline-offset: 2px;
+}
+
+.esi-boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.esi-alerta {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--esi-radius);
+  font-size: 14px;
+}
+
+.esi-alerta--ok {
+  background: var(--esi-ok-bg);
+  color: var(--esi-ok-fg);
+}
+
+.esi-alerta--error {
+  background: var(--esi-error-bg);
+  color: var(--esi-error-fg);
+}
