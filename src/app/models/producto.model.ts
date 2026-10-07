@@ -3,12 +3,14 @@ export interface ProductoDTO {
   referencia: string;
   numStock: number;
   precioCent: number;
-  descripcion: string;
+  descripcion?: string | null;
   categoria: string;
-  urlImagen: string;
+  urlImagen?: string | null;
+  descuento: number;
+  descuentoPremium: number;
+  activo: boolean;
 }
 
 export interface Producto extends ProductoDTO {
   id: string;
-  activo: boolean;
 }

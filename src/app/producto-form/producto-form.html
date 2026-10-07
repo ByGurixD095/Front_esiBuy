@@ -1,85 +1,177 @@
-<section class="form-shell" aria-labelledby="form-title">
-  <div class="form-heading">
-    <p class="eyebrow">Catálogo · Nuevo producto</p>
-    <h1 id="form-title">Añade un producto a esibuy</h1>
-    <p class="intro">Completa los datos del producto. El precio se enviará a la API en céntimos.</p>
-  </div>
+<div class="page-shell">
+  <header class="site-header">
+    <a class="brand" routerLink="/products" aria-label="EsiBuy, inicio">
+      <span>Esi</span><strong>Buy</strong>
+    </a>
 
-  <form [formGroup]="productoForm" (ngSubmit)="enviarFormulario()" novalidate>
-    <div class="form-grid">
-      <label>
-        <span>Nombre</span>
-        <input type="text" formControlName="nombre" placeholder="Ej. Auriculares inalámbricos" />
-        @if (productoForm.controls.nombre.invalid && productoForm.controls.nombre.touched) {
-          <small>El nombre es obligatorio y no puede superar 100 caracteres.</small>
-        }
-      </label>
+    <label class="search-box" aria-label="Buscar en EsiBuy">
+      <span aria-hidden="true">⌕</span>
+      <input type="search" placeholder="Búsqueda" />
+    </label>
 
-      <label>
-        <span>Referencia</span>
-        <input type="text" formControlName="referencia" placeholder="Ej. AUD-001" />
-        @if (productoForm.controls.referencia.invalid && productoForm.controls.referencia.touched) {
-          <small>Introduce una referencia de hasta 50 caracteres.</small>
-        }
-      </label>
+    <nav class="desktop-nav" aria-label="Navegación principal">
+      <a href="#inicio">Inicio</a>
+      <a href="#ventas">Mis Ventas</a>
+      <a href="#mensajes">Mensajes</a>
+      <a href="#favoritos">Favoritos</a>
+      <span class="avatar" aria-label="Perfil de usuario">D</span>
+      <a class="upload-link" routerLink="/products">Subir Producto</a>
+    </nav>
 
-      <label>
-        <span>Stock disponible</span>
-        <input type="number" min="0" step="1" formControlName="numStock" />
-        @if (productoForm.controls.numStock.invalid && productoForm.controls.numStock.touched) {
-          <small>El stock debe ser un número igual o mayor que cero.</small>
-        }
-      </label>
+    <button class="menu-button" type="button" aria-label="Abrir menú">☰</button>
+  </header>
 
-      <label>
-        <span>Precio (€)</span>
-        <input type="number" min="0" step="0.01" formControlName="precioEuros" />
-        @if (productoForm.controls.precioEuros.invalid && productoForm.controls.precioEuros.touched) {
-          <small>El precio debe ser igual o mayor que cero.</small>
-        }
-      </label>
+  <main class="product-page">
+    <div class="breadcrumb">Mis productos <span>/</span> Nuevo producto</div>
+    <form [formGroup]="productoForm" (ngSubmit)="enviarFormulario()" novalidate>
+      <div class="product-grid">
+        <section class="gallery-column" aria-labelledby="gallery-title">
+          <h2 id="gallery-title">Añadir imágenes</h2>
+          <p class="mobile-subtitle">Sube fotos de tu producto</p>
+          <div class="image-preview-box">
+            @if (productoForm.controls.urlImagen.value; as imageUrl) {
+              <img class="image-preview" [src]="imageUrl" alt="Vista previa del producto" />
+            } @else {
+              <span class="camera-icon" aria-hidden="true">▣</span>
+              <strong>Añadir imagen mediante URL</strong>
+              <span>La vista previa aparecerá aquí</span>
+            }
+          </div>
+        </section>
 
-      <label>
-        <span>Categoría</span>
-        <input type="text" formControlName="categoria" placeholder="Ej. Audio" />
-        @if (productoForm.controls.categoria.invalid && productoForm.controls.categoria.touched) {
-          <small>La categoría es obligatoria.</small>
-        }
-      </label>
+        <section class="details-column" aria-labelledby="form-title">
+          <div class="section-heading">
+            <p class="eyebrow">Publica algo nuevo</p>
+            <h1 id="form-title">Nuevo Producto</h1>
+            <p>Cuéntale a la comunidad qué estás vendiendo.</p>
+          </div>
 
-      <label>
-        <span>URL de imagen</span>
-        <input type="url" formControlName="urlImagen" placeholder="https://..." />
-        @if (productoForm.controls.urlImagen.invalid && productoForm.controls.urlImagen.touched) {
-          <small>Introduce una URL válida que empiece por http o https.</small>
-        }
-      </label>
+          <label class="field field-wide">
+            <span>Título del producto</span>
+            <input type="text" formControlName="nombre" maxlength="60" placeholder="Ej. Auriculares inalámbricos" [class.invalid-field]="formSubmitted() && productoForm.controls.nombre.invalid" />
+            <small class="counter">{{ productoForm.controls.nombre.value.length }}/60</small>
+            @if (productoForm.controls.nombre.invalid && productoForm.controls.nombre.touched) {
+              <small class="field-error">El título es obligatorio.</small>
+            }
+          </label>
 
-      <label class="full-width">
-        <span>Descripción</span>
-        <textarea rows="4" formControlName="descripcion" placeholder="Describe las características del producto"></textarea>
-        @if (productoForm.controls.descripcion.invalid && productoForm.controls.descripcion.touched) {
-          <small>La descripción es obligatoria y no puede superar 500 caracteres.</small>
-        }
-      </label>
-    </div>
+          <div class="field-row">
+            <label class="field">
+              <span>Precio (€)</span>
+              <div class="input-prefix"><span>€</span><input type="number" min="0.01" step="0.01" inputmode="decimal" formControlName="precioEuros" (input)="limitarPrecio($event)" [class.invalid-field]="formSubmitted() && productoForm.controls.precioEuros.invalid" /></div>
+              @if (formSubmitted() && productoForm.controls.precioEuros.invalid) {
+                <small class="field-error">Indica un precio mayor que 0 €.</small>
+              }
+            </label>
+            <label class="field">
+              <span>Referencia</span>
+              <input type="text" formControlName="referencia" readonly aria-describedby="reference-help" />
+              <small id="reference-help" class="field-hint">Generada automáticamente</small>
+            </label>
+          </div>
 
-    @if (submitError(); as errorMessage) {
-      <p class="feedback feedback-error" role="alert">{{ errorMessage }}</p>
-    }
+          <div class="field-row">
+            <label class="field">
+              <span>Stock disponible</span>
+              <input type="number" min="0" step="1" formControlName="numStock" [class.invalid-field]="formSubmitted() && productoForm.controls.numStock.invalid" />
+              @if (formSubmitted() && productoForm.controls.numStock.invalid) {
+                <small class="field-error">Indica un stock igual o superior a 0.</small>
+              }
+            </label>
+            <label class="field">
+              <span>Imagen (URL) · Opcional</span>
+              <input type="url" formControlName="urlImagen" placeholder="https://..." [class.invalid-field]="formSubmitted() && productoForm.controls.urlImagen.invalid" />
+              @if (formSubmitted() && productoForm.controls.urlImagen.invalid) {
+                <small class="field-error">Introduce una URL que empiece por http:// o https://.</small>
+              }
+            </label>
+          </div>
 
-    @if (createdProduct(); as product) {
-      <output class="feedback feedback-success">
-        Producto «{{ product.nombre }}» creado correctamente.
-      </output>
-    }
+          <div class="field-row">
+            <label class="field">
+              <span>Descuento (%)</span>
+              <input type="number" min="0" step="1" formControlName="descuento" (input)="limitarPorcentaje($event, 'descuento')" [class.invalid-field]="formSubmitted() && productoForm.controls.descuento.invalid" />
+              @if (formSubmitted() && productoForm.controls.descuento.invalid) {
+                <small class="field-error">Indica un descuento entre 0 y 100 %. El 100 % deja el producto gratis.</small>
+              }
+            </label>
+            <label class="field">
+              <span>Descuento premium (%)</span>
+              <input type="number" min="0" step="1" formControlName="descuentoPremium" (input)="limitarPorcentaje($event, 'descuentoPremium')" [class.invalid-field]="formSubmitted() && productoForm.controls.descuentoPremium.invalid" />
+              @if (formSubmitted() && productoForm.controls.descuentoPremium.invalid) {
+                <small class="field-error">Indica un descuento entre 0 y 100 %. El 100 % deja el producto gratis.</small>
+              }
+            </label>
+          </div>
 
-    <button type="submit" [disabled]="isSubmitting()">
-      @if (isSubmitting()) {
-        Guardando...
-      } @else {
-        Crear producto
-      }
-    </button>
-  </form>
-</section>
+          <label class="field field-wide">
+            <span>Descripción · Opcional</span>
+            <textarea rows="6" maxlength="500" formControlName="descripcion" placeholder="Describe las características, medidas y estado del producto" [class.invalid-field]="formSubmitted() && productoForm.controls.descripcion.invalid"></textarea>
+            <small class="counter">{{ productoForm.controls.descripcion.value.length }}/500</small>
+          </label>
+
+          <label class="field field-wide">
+            <span>Categoría</span>
+              <select formControlName="categoria" [class.invalid-field]="formSubmitted() && productoForm.controls.categoria.invalid">
+              <option value="" disabled>Selecciona una categoría</option>
+              <option>Tecnología</option>
+              <option>Moda</option>
+              <option>Hogar y Cocina</option>
+              <option>Deporte y Ocio</option>
+              <option>Libros</option>
+              <option>Otros</option>
+              <option>Papelería y Material Escolar</option>
+              <option>Salud y Cuidado Personal</option>
+              <option>Alimentación y Bebidas</option>
+              <option>Juguetes y Hobbies</option>
+              <option>Electrodomésticos</option>
+              <option>Bricolaje y Herramientas</option>
+              <option>Mascotas</option>
+            </select>
+            @if (formSubmitted() && productoForm.controls.categoria.invalid) {
+              <small class="field-error">Selecciona una categoría.</small>
+            }
+          </label>
+        </section>
+
+        <aside class="actions-column" aria-label="Envíos y acciones">
+          <section class="side-card">
+            <h2>Publicación</h2>
+            <label class="visibility-control">
+              <span>
+                <strong>Visible</strong>
+                <small>{{ productoForm.controls.activo.value ? 'Visible para todos los clientes' : 'Solo visible para ti' }}</small>
+              </span>
+              <input class="visually-hidden" type="checkbox" formControlName="activo" />
+              <span class="toggle" aria-hidden="true"></span>
+            </label>
+            <p class="secure-note">Puedes cambiar la visibilidad cuando quieras.</p>
+          </section>
+
+          @if (submitError(); as errorMessage) {
+            <p class="feedback feedback-error" role="alert">{{ errorMessage }}</p>
+          }
+          @if (formSubmitted() && productoForm.invalid) {
+            <p class="feedback feedback-error" role="alert">Revisa los datos del producto y los campos marcados en rojo.</p>
+          }
+          @if (creationSuccess()) {
+            @if (createdProduct(); as product) {
+              <output class="feedback feedback-success">{{ product.nombre }} se ha publicado correctamente.</output>
+            } @else {
+              <output class="feedback feedback-success">El producto se ha creado correctamente.</output>
+            }
+          }
+          @if (draftSaved()) {
+            <output class="feedback feedback-success">Borrador guardado.</output>
+          }
+
+          <button class="primary-action" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Publicando...' : 'Publicar Producto' }}
+          </button>
+          <button class="secondary-action" type="button" (click)="guardarBorrador()">Guardar Borrador</button>
+          <p class="secure-note">Tus datos están protegidos y solo se mostrarán a compradores verificados.</p>
+        </aside>
+      </div>
+    </form>
+  </main>
+</div>
