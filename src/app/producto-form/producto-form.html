@@ -1,0 +1,85 @@
+<section class="form-shell" aria-labelledby="form-title">
+  <div class="form-heading">
+    <p class="eyebrow">Catálogo · Nuevo producto</p>
+    <h1 id="form-title">Añade un producto a esibuy</h1>
+    <p class="intro">Completa los datos del producto. El precio se enviará a la API en céntimos.</p>
+  </div>
+
+  <form [formGroup]="productoForm" (ngSubmit)="enviarFormulario()" novalidate>
+    <div class="form-grid">
+      <label>
+        <span>Nombre</span>
+        <input type="text" formControlName="nombre" placeholder="Ej. Auriculares inalámbricos" />
+        @if (productoForm.controls.nombre.invalid && productoForm.controls.nombre.touched) {
+          <small>El nombre es obligatorio y no puede superar 100 caracteres.</small>
+        }
+      </label>
+
+      <label>
+        <span>Referencia</span>
+        <input type="text" formControlName="referencia" placeholder="Ej. AUD-001" />
+        @if (productoForm.controls.referencia.invalid && productoForm.controls.referencia.touched) {
+          <small>Introduce una referencia de hasta 50 caracteres.</small>
+        }
+      </label>
+
+      <label>
+        <span>Stock disponible</span>
+        <input type="number" min="0" step="1" formControlName="numStock" />
+        @if (productoForm.controls.numStock.invalid && productoForm.controls.numStock.touched) {
+          <small>El stock debe ser un número igual o mayor que cero.</small>
+        }
+      </label>
+
+      <label>
+        <span>Precio (€)</span>
+        <input type="number" min="0" step="0.01" formControlName="precioEuros" />
+        @if (productoForm.controls.precioEuros.invalid && productoForm.controls.precioEuros.touched) {
+          <small>El precio debe ser igual o mayor que cero.</small>
+        }
+      </label>
+
+      <label>
+        <span>Categoría</span>
+        <input type="text" formControlName="categoria" placeholder="Ej. Audio" />
+        @if (productoForm.controls.categoria.invalid && productoForm.controls.categoria.touched) {
+          <small>La categoría es obligatoria.</small>
+        }
+      </label>
+
+      <label>
+        <span>URL de imagen</span>
+        <input type="url" formControlName="urlImagen" placeholder="https://..." />
+        @if (productoForm.controls.urlImagen.invalid && productoForm.controls.urlImagen.touched) {
+          <small>Introduce una URL válida que empiece por http o https.</small>
+        }
+      </label>
+
+      <label class="full-width">
+        <span>Descripción</span>
+        <textarea rows="4" formControlName="descripcion" placeholder="Describe las características del producto"></textarea>
+        @if (productoForm.controls.descripcion.invalid && productoForm.controls.descripcion.touched) {
+          <small>La descripción es obligatoria y no puede superar 500 caracteres.</small>
+        }
+      </label>
+    </div>
+
+    @if (submitError(); as errorMessage) {
+      <p class="feedback feedback-error" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (createdProduct(); as product) {
+      <output class="feedback feedback-success">
+        Producto «{{ product.nombre }}» creado correctamente.
+      </output>
+    }
+
+    <button type="submit" [disabled]="isSubmitting()">
+      @if (isSubmitting()) {
+        Guardando...
+      } @else {
+        Crear producto
+      }
+    </button>
+  </form>
+</section>

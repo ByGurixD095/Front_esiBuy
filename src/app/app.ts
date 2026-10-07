@@ -5,8 +5,9 @@ import {
   AfterViewInit,
   OnDestroy,
   NgZone,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
 } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
 interface Particle {
   x: number;
@@ -26,9 +27,10 @@ interface Projected {
 @Component({
   selector: 'app-root',
   standalone: true,
+  imports: [RouterLink, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App implements AfterViewInit, OnDestroy {
   @ViewChild('renderCanvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
