@@ -68,7 +68,10 @@ describe('CrearCategoria', () => {
 
   it('muestra un mensaje de conflicto si el nombre ya existe', async () => {
     servicioFalso.crear.mockReturnValue(
-      throwError(() => new HttpErrorResponse({ status: 409 })),
+      throwError(() => new HttpErrorResponse({
+        status: 409,
+        error: { error: 'CONFLICT', message: 'Ya existe una categoría con ese nombre' },
+      })),
     );
     component.form.setValue({ nombre: 'Ropa', activo: true });
 
@@ -77,6 +80,33 @@ describe('CrearCategoria', () => {
 
     expect((fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent)
       .toContain('Ya existe una categoría con ese nombre');
+  });
+
+  it('muestra el mensaje de validación devuelto por el backend', async () => {
+    servicioFalso.crear.mockReturnValue(
+      throwError(() => new HttpErrorResponse({
+        status: 400,
+        error: { error: 'VALIDATION_ERROR', message: 'El nombre contiene caracteres no válidos' },
+      })),
+    );
+    component.form.setValue({ nombre: 'Ropa', activo: true });
+
+    component.enviar();
+    await fixture.whenStable();
+
+    expect(component.mensajeError()).toBe('El nombre contiene caracteres no válidos');
+  });
+
+  it('explica si el backend no tiene el endpoint de categorías', async () => {
+    servicioFalso.crear.mockReturnValue(
+      throwError(() => new HttpErrorResponse({ status: 404 })),
+    );
+    component.form.setValue({ nombre: 'Ropa', activo: true });
+
+    component.enviar();
+    await fixture.whenStable();
+
+    expect(component.mensajeError()).toContain('endpoint para crear categorías');
   });
 
   it('no llama al servicio si el formulario es inválido', () => {

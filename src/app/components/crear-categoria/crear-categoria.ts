@@ -62,11 +62,18 @@ export class CrearCategoria {
     if (error.status === 0) {
       return 'No se ha podido conectar con el servidor.';
     }
+    const mensaje = error.error?.message ?? error.error?.mensaje ?? error.error?.detail;
+    if (typeof mensaje === 'string' && mensaje.trim()) {
+      return mensaje;
+    }
     if (error.status === 409) {
       return 'Ya existe una categoría con ese nombre.';
     }
     if (error.status === 400) {
       return 'El nombre de la categoría no puede estar vacío.';
+    }
+    if (error.status === 404) {
+      return 'El servidor no tiene disponible el endpoint para crear categorías.';
     }
     return 'No se ha podido crear la categoría. Inténtalo de nuevo.';
   }
