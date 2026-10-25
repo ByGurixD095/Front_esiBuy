@@ -1,0 +1,43 @@
+<app-marco-pagina panel="Panel de administración" [volver]="true">
+  <div class="pagina">
+    <p class="esi-eyebrow">Categorías</p>
+    <h1 class="esi-titulo">Nueva <em>categoría.</em></h1>
+
+    <section class="registro esi-tarjeta" aria-labelledby="crear-categoria-titulo">
+      <h2 id="crear-categoria-titulo">Datos de la categoría</h2>
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+        <div class="esi-campo">
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            autocomplete="off"
+            aria-describedby="ayuda-nombre"
+          />
+          @if (esInvalido()) {
+          <small id="ayuda-nombre" class="esi-ayuda esi-error">
+            El nombre es obligatorio.
+          </small>
+          }
+        </div>
+
+        <label class="estado">
+          <input type="checkbox" formControlName="activo" />
+          <span>Categoría activa</span>
+        </label>
+
+        @if (mensajeExito()) {
+        <p class="esi-alerta esi-alerta--ok" role="status">{{ mensajeExito() }}</p>
+        }
+        @if (mensajeError()) {
+        <p class="esi-alerta esi-alerta--error" role="alert">{{ mensajeError() }}</p>
+        }
+
+        <button type="submit" class="esi-boton" [disabled]="form.invalid || enviando()">
+          {{ enviando() ? 'Creando…' : 'Crear categoría' }}
+        </button>
+      </form>
+    </section>
+  </div>
+</app-marco-pagina>

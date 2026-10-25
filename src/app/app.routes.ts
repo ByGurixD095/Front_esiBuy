@@ -18,6 +18,7 @@ import { AdminEditarUsuario } from './components/admin-editar-usuario/admin-edit
 import { ProductoDetalle } from './components/producto-detalle/producto-detalle';
 import { guestGuard } from './guards/guest.guard';
 import { MetodosPagoComponent } from './components/metodos-pago/metodos-pago';
+import { CrearCategoria } from './components/crear-categoria/crear-categoria';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', component: Inicio },
@@ -51,6 +52,11 @@ export const routes: Routes = [
   {
     path: 'admin/usuarios/:id/editar',
     component: AdminEditarUsuario,
+    canActivate: [roleGuard(['ADMINISTRADOR'])],
+  },
+  {
+    path: 'admin/categorias/nueva',
+    component: CrearCategoria,
     canActivate: [roleGuard(['ADMINISTRADOR'])],
   },
   { path: 'login', component: InicioSesion, canActivate: [guestGuard] },
