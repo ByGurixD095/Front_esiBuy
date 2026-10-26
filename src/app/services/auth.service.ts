@@ -151,7 +151,7 @@ export class AuthService {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.removeItem('esiBuy.rol');
       sessionStorage.removeItem('esiBuy.email');
-      sessionStorage.removeItem('esiBuy.expiresAt'); // NUEVO
+      sessionStorage.removeItem('esiBuy.expiresAt');
     }
     this.sessionCheckedSignal.set(true);
   }
@@ -162,23 +162,6 @@ export class AuthService {
     }
     const message = error.error?.message ?? error.error?.mensaje;
     return typeof message === 'string' && message.length > 0 ? message : fallback;
-  }
-
-  isAccessTokenExpired(): boolean {
-    if (typeof sessionStorage === 'undefined') return false;
-    const expStr = sessionStorage.getItem('esiBuy.expiresAt');
-    if (!expStr) return true;
-    // Damos un margen de seguridad de 5 segundos antes de la caducidad real
-    return Date.now() > (parseInt(expStr, 10) - 5000);
-  }
-
-  private getTokenExpiration(token: string): number {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000; // Convertir a milisegundos
-    } catch (e) {
-      return 0;
-    }
   }
 
 private storeSessionIfComplete(respuesta: LoginResponse): void {
@@ -192,13 +175,6 @@ private storeSessionIfComplete(respuesta: LoginResponse): void {
       sessionStorage.setItem('esiBuy.rol', respuesta.rol);
       if (respuesta.email) {
         sessionStorage.setItem('esiBuy.email', respuesta.email);
-      }
-      // NUEVO: Guardar la fecha exacta de caducidad del token
-      if (respuesta.accessToken) {
-        const exp = this.getTokenExpiration(respuesta.accessToken);
-        if (exp > 0) {
-          sessionStorage.setItem('esiBuy.expiresAt', exp.toString());
-        }
       }
     }
   }

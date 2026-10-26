@@ -46,6 +46,8 @@ The production build uses `https://back-esibuy.onrender.com` as its API URL. To 
 
 The frontend sends cookies with API requests and, in production, automatically fetches a CSRF token before each `POST`, `PUT`, `PATCH`, or `DELETE` request. Local development skips CSRF because the backend `dev` profile disables it. The production backend must remain configured with the Firebase origin in `CORS_ALLOWED_ORIGINS`, credentials enabled, and HTTPS cookies.
 
+Firebase Hosting sends `Cache-Control: no-cache` for app navigation so browsers revalidate the HTML after each deployment, while Angular's fingerprinted JavaScript and CSS assets can be cached for a year. This avoids users needing a forced refresh to receive a newly deployed frontend.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
