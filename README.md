@@ -71,6 +71,20 @@ the frontend reports when the backend requires either step.
 Administrators can create a category at `/admin/categorias/nueva` using
 `POST /admin/categorias`. Category names must be unique.
 
+## Checkout and orders
+
+Customers manage saved shipping addresses at `/account/direcciones` through
+`/users/me/direcciones`. Checkout requires one saved address and a saved payment
+method. Creating an order reserves stock and empties the cart; the customer
+then confirms the simulated payment with `POST /pedidos/{pedidoId}/pagar`.
+No payment provider or real charge is involved.
+
+Customer active orders and history are separate in `/pedidos`. Customers can
+cancel eligible unpaid or paid orders before any line is shipped and confirm
+delivery after all sellers have shipped their lines. Sellers use
+`/pedidos-vendedor` to view their own active lines, mark them as shipped, and
+consult their history.
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

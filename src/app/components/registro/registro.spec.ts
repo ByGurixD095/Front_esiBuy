@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { AuthService } from '../../services/auth.service';
+import { Categorias } from '../../services/categorias.service';
 import { Registro as RegistroService } from '../../services/registro-service/registro';
 import { AVATARES_VENDEDOR } from '../avatar-selector/avatar-selector';
 import { RegistroComponent } from './registro';
@@ -16,6 +17,7 @@ describe('RegistroComponent', () => {
     registrarCliente: vi.fn(),
     registrarVendedor: vi.fn(),
   };
+  const categoriasFalso = { listar: vi.fn() };
   const autenticacionFalsa = {
     login: vi.fn(),
     applyAuthenticationResponse: vi.fn(),
@@ -37,6 +39,10 @@ describe('RegistroComponent', () => {
   async function configurar(tipoRegistro: 'cliente' | 'vendedor'): Promise<void> {
     servicioFalso.registrarCliente.mockReset();
     servicioFalso.registrarVendedor.mockReset();
+    categoriasFalso.listar.mockReset();
+    categoriasFalso.listar.mockReturnValue(
+      of([{ id: 'categoria-1', nombre: 'Hogar' }]),
+    );
     autenticacionFalsa.login.mockReset();
     autenticacionFalsa.login.mockReturnValue(of(respuestaLoginOk));
     routerFalso.navigateByUrl.mockClear();
@@ -46,6 +52,7 @@ describe('RegistroComponent', () => {
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { data: { tipoRegistro } } } },
         { provide: RegistroService, useValue: servicioFalso },
+        { provide: Categorias, useValue: categoriasFalso },
         { provide: AuthService, useValue: autenticacionFalsa },
         { provide: Router, useValue: routerFalso },
       ],
@@ -139,6 +146,14 @@ describe('RegistroComponent', () => {
 
   it('valida y envía los campos obligatorios de vendedor', async () => {
     await configurar('vendedor');
+    expect(categoriasFalso.listar).toHaveBeenCalledOnce();
+    expect(
+      Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLSelectElement>(
+          '#categoriaPrincipalId option',
+        ),
+      ).map((opcion) => opcion.textContent?.trim()),
+    ).toEqual(['Selecciona una categoría', 'Hogar']);
     expect(component.form.valid).toBe(false);
     component.form.patchValue({
       nombre: 'Ana',

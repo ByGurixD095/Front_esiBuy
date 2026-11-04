@@ -147,14 +147,30 @@
 
                 <div class="esi-campo campo-completo">
                   <label for="categoriaPrincipalId">
-                    ID de la categoría principal <span class="requerido">Obligatorio</span>
+                    Categoría principal <span class="requerido">Obligatorio</span>
                   </label>
-                  <input
+                  <select
                     id="categoriaPrincipalId"
-                    type="text"
                     formControlName="categoriaPrincipalId"
                     required
-                  />
+                  >
+                    <option value="" disabled>
+                      {{ cargandoCategorias() ? 'Cargando categorías…' : 'Selecciona una categoría' }}
+                    </option>
+                    @for (categoria of categorias(); track categoria.id) {
+                      <option [value]="categoria.id">{{ categoria.nombre }}</option>
+                    }
+                  </select>
+                  @if (cargandoCategorias()) {
+                    <small class="esi-ayuda" role="status">Cargando las categorías disponibles…</small>
+                  } @else if (errorCategorias()) {
+                    <small class="esi-ayuda esi-error" role="alert">
+                      {{ errorCategorias() }}
+                      <button type="button" class="enlace-login" (click)="cargarCategorias()">Reintentar</button>
+                    </small>
+                  } @else if (categorias().length === 0) {
+                    <small class="esi-ayuda" role="status">Todavía no hay categorías disponibles.</small>
+                  }
                   @if (esInvalido('categoriaPrincipalId')) {
                     <small class="esi-ayuda esi-error"
                       >La categoría principal es obligatoria.</small
@@ -214,6 +230,7 @@
               [value]="form.controls.imagenPerfil.value"
               [esVendedor]="esVendedor"
               (valueChange)="form.controls.imagenPerfil.setValue($event)"
+              (fileSeleccionado)="archivoAvatar.set($event)"
             />
 
           <button type="submit" class="esi-boton" [disabled]="form.invalid || enviando()">

@@ -219,6 +219,7 @@
             [value]="form.controls.imagenPerfil.value"
             [esVendedor]="rol() === 'VENDEDOR'"
             (valueChange)="form.controls.imagenPerfil.setValue($event)"
+            (fileSeleccionado)="archivoAvatar.set($event)"
           />
 
         @if (mensajeExito()) {

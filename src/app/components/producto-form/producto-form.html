@@ -29,11 +29,11 @@
           <h2 id="gallery-title">Añadir imágenes</h2>
           <p class="mobile-subtitle">Sube fotos de tu producto</p>
           <div class="image-preview-box">
-            @if (productoForm.controls.urlImagen.value; as imageUrl) {
+            @if (imagenPreview() || productoForm.controls.urlImagen.value; as imageUrl) {
               <img class="image-preview" [src]="imageUrl" alt="Vista previa del producto" />
             } @else {
-              <span class="camera-icon" aria-hidden="true">▣</span>
-              <strong>Añadir imagen mediante URL</strong>
+              <span class="camera-icon" aria-hidden="true">📷</span>
+              <strong>Sube una imagen</strong>
               <span>La vista previa aparecerá aquí</span>
             }
           </div>
@@ -78,13 +78,16 @@
                 <small class="field-error">Indica un stock igual o superior a 0.</small>
               }
             </label>
-            <label class="field">
-              <span>Imagen (URL) · Opcional</span>
-              <input type="url" formControlName="urlImagen" placeholder="https://..." [class.invalid-field]="formSubmitted() && productoForm.controls.urlImagen.invalid" />
-              @if (formSubmitted() && productoForm.controls.urlImagen.invalid) {
-                <small class="field-error">Introduce una URL que empiece por http:// o https://.</small>
+            <div class="field">
+              <span>Imagen · Opcional</span>
+              <input id="imagen-producto-archivo" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" (change)="subirImagenProducto($event)" />
+              <label for="imagen-producto-archivo" class="file-upload-label">
+                {{ archivoSeleccionado() ? '📁 Cambiar imagen' : '📁 Seleccionar imagen' }}
+              </label>
+              @if (errorImagen()) {
+                <small class="field-error">{{ errorImagen() }}</small>
               }
-            </label>
+            </div>
           </div>
 
           <div class="field-row">
@@ -112,23 +115,16 @@
 
           <label class="field field-wide">
             <span>Categoría</span>
-              <select formControlName="categoria" [class.invalid-field]="formSubmitted() && productoForm.controls.categoria.invalid">
+            @if (errorCategorias(); as mensaje) {
+              <small class="field-error" role="alert">{{ mensaje }}</small>
+            }
+            <select formControlName="categoriaId" [class.invalid-field]="formSubmitted() && productoForm.controls.categoriaId.invalid">
               <option value="" disabled>Selecciona una categoría</option>
-              <option>Tecnología</option>
-              <option>Moda</option>
-              <option>Hogar y Cocina</option>
-              <option>Deporte y Ocio</option>
-              <option>Libros</option>
-              <option>Otros</option>
-              <option>Papelería y Material Escolar</option>
-              <option>Salud y Cuidado Personal</option>
-              <option>Alimentación y Bebidas</option>
-              <option>Juguetes y Hobbies</option>
-              <option>Electrodomésticos</option>
-              <option>Bricolaje y Herramientas</option>
-              <option>Mascotas</option>
+              @for (categoria of categoriasDisponibles(); track categoria.id) {
+                <option [value]="categoria.id">{{ categoria.nombre }}</option>
+              }
             </select>
-            @if (formSubmitted() && productoForm.controls.categoria.invalid) {
+            @if (formSubmitted() && productoForm.controls.categoriaId.invalid) {
               <small class="field-error">Selecciona una categoría.</small>
             }
           </label>

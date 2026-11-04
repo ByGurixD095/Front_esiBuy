@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, vi } from 'vitest';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import {
   AVATARES_PERFIL,
   AVATARES_VENDEDOR,
@@ -12,7 +14,10 @@ describe('AvatarSelector', () => {
   let component: AvatarSelector;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [AvatarSelector] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [AvatarSelector],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
     fixture = TestBed.createComponent(AvatarSelector);
     component = fixture.componentInstance;
     fixture.detectChanges();

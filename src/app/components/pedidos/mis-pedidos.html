@@ -1,0 +1,159 @@
+<app-marco-pagina panel="Mis pedidos">
+  <section class="orders-page" aria-labelledby="orders-title" [attr.aria-busy]="cargando()">
+    <div class="orders-heading">
+      <div>
+        <p class="eyebrow">Área de cliente</p>
+        <h1 id="orders-title">Mis pedidos</h1>
+        <p class="intro-copy">Consulta tus compras, su estado y los datos de entrega.</p>
+      </div>
+      <a class="continue-link" routerLink="/products">Volver al catálogo</a>
+    </div>
+
+    <div class="order-tabs" role="tablist" aria-label="Tipo de pedidos">
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'activos'"
+        [class.selected]="vista() === 'activos'"
+        (click)="cambiarVista('activos')"
+      >Pedidos en curso</button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'historico'"
+        [class.selected]="vista() === 'historico'"
+        (click)="cambiarVista('historico')"
+      >Historial</button>
+    </div>
+
+    @if (avisoAccion()) {
+      <p class="inline-notice" role="status">{{ avisoAccion() }}</p>
+    }
+
+    @if (cargando()) {
+      <section class="orders-state" role="status" aria-live="polite">
+        <span class="loader" aria-hidden="true"></span>
+        <h2>{{ vista() === 'activos' ? 'Cargando tus pedidos en curso' : 'Cargando tu historial' }}</h2>
+        <p>Estamos recuperando tus compras.</p>
+      </section>
+    } @else if (error()) {
+      <section class="orders-state error-state" role="alert">
+        <span class="state-symbol" aria-hidden="true">!</span>
+        <h2>No se han podido cargar tus pedidos</h2>
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-button" (click)="cargarPedidos()">Reintentar</button>
+      </section>
+    } @else if (pedidos().length === 0) {
+      <section class="orders-state empty-state" aria-live="polite">
+        <span class="empty-symbol" aria-hidden="true">○</span>
+        @if (vista() === 'activos') {
+          <h2>No tienes pedidos en curso</h2>
+          <p>Las compras pendientes de pago, envío o entrega aparecerán aquí.</p>
+          <a class="primary-link" routerLink="/products">Explorar el catálogo</a>
+        } @else {
+          <h2>Aún no tienes pedidos históricos</h2>
+          <p>Los pedidos finalizados o cancelados aparecerán aquí.</p>
+        }
+      </section>
+    } @else {
+      <div class="orders-list" [attr.aria-label]="vista() === 'activos' ? 'Pedidos en curso' : 'Historial de pedidos'">
+        @for (pedido of pedidos(); track pedido.id) {
+          <article class="order-card">
+            <header class="order-header">
+              <div>
+                <p class="order-label">Pedido</p>
+                <h2>{{ pedido.id }}</h2>
+                <p class="order-date">{{ formatearFecha(pedido.fechaPedido) }}</p>
+              </div>
+              <span class="order-status">{{ estadoLegible(pedido.estado) }}</span>
+            </header>
+
+            <div class="order-lines">
+              @for (linea of pedido.lineas; track linea.productoId) {
+                <div class="order-line">
+                  <div class="line-image">
+                    @if (linea.urlImagen) {
+                      <img [src]="linea.urlImagen" [alt]="linea.nombre" />
+                    } @else {
+                      <span aria-hidden="true">Sin imagen</span>
+                    }
+                  </div>
+                  <div class="line-info">
+                    <h3>{{ linea.nombre }}</h3>
+                    <p>
+                      {{ linea.cantidad }} {{ linea.cantidad === 1 ? 'unidad' : 'unidades' }}
+                      · {{ formatearPrecio(linea.precioUnitarioCent) }} / unidad
+                      @if (linea.referencia) {
+                        · Ref. {{ linea.referencia }}
+                      }
+                    </p>
+                    @if (vista() === 'activos' && pedido.estado !== 'EN_PROCESO' && pedido.estado !== 'CANCELADO') {
+                      <p class="line-shipping-status" [class.line-shipped]="linea.enviado">
+                        {{ linea.enviado ? 'Enviado por el vendedor' : 'Pendiente de envío' }}
+                      </p>
+                    }
+                  </div>
+                  <strong class="line-subtotal">{{ formatearPrecio(linea.subtotalCent) }}</strong>
+                </div>
+              }
+            </div>
+
+            <div class="order-details">
+              <section aria-label="Dirección de envío">
+                <h3>Envío</h3>
+                <p>
+                  {{ pedido.direccionEnvio.nombreCompleto }}<br />
+                  {{ pedido.direccionEnvio.direccion }}<br />
+                  {{ pedido.direccionEnvio.codigoPostal }} {{ pedido.direccionEnvio.ciudad }},
+                  {{ pedido.direccionEnvio.provincia }}<br />
+                  {{ pedido.direccionEnvio.pais }} · {{ pedido.direccionEnvio.telefono }}
+                </p>
+              </section>
+              <section aria-label="Método de pago">
+                <h3>Pago</h3>
+                <p>{{ pedido.aliasMetodoPago }} · {{ pedido.tipoMetodoPago }}</p>
+                @if (pedido.referenciaMetodoPago) {
+                  <p class="payment-reference">{{ pedido.referenciaMetodoPago }}</p>
+                }
+              </section>
+            </div>
+
+            @if (vista() === 'activos' && (puedePagar(pedido) || puedeCancelar(pedido) || puedeConfirmarEntrega(pedido))) {
+              <div class="order-actions">
+                @if (puedePagar(pedido)) {
+                  <button
+                    type="button"
+                    class="primary-action"
+                    [disabled]="pedidoActualizando() === pedido.id"
+                    (click)="pagarPedido(pedido)"
+                  >{{ pedidoActualizando() === pedido.id ? 'Confirmando…' : 'Confirmar pago simulado' }}</button>
+                }
+                @if (puedeCancelar(pedido)) {
+                  <button
+                    type="button"
+                    class="secondary-action"
+                    [disabled]="pedidoActualizando() === pedido.id"
+                    (click)="cancelarPedido(pedido)"
+                  >{{ pedidoActualizando() === pedido.id ? 'Actualizando…' : 'Cancelar pedido' }}</button>
+                }
+                @if (puedeConfirmarEntrega(pedido)) {
+                  <button
+                    type="button"
+                    class="primary-action"
+                    [disabled]="pedidoActualizando() === pedido.id"
+                    (click)="confirmarEntrega(pedido)"
+                  >{{ pedidoActualizando() === pedido.id ? 'Confirmando…' : 'Confirmar entrega' }}</button>
+                }
+              </div>
+            }
+
+            <footer class="order-total">
+              <span>Total del pedido</span>
+              <strong>{{ formatearPrecio(pedido.totalCent) }}</strong>
+            </footer>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</app-marco-pagina>

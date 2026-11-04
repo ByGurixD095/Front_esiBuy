@@ -37,6 +37,75 @@ describe('ListaDeseosService', () => {
     expect(resultado).toEqual(lista);
   });
 
+  it('consulta todas las listas del cliente con sus credenciales', () => {
+    const listas = [
+      { id: 'lista-1', idCliente: 'cliente-1', nombre: 'Para comprar', productosIds: [] },
+      { id: 'lista-2', idCliente: 'cliente-1', nombre: 'Regalos', productosIds: ['producto-1'] },
+    ];
+    let resultado: unknown;
+
+    servicio.listar().subscribe((respuesta) => (resultado = respuesta));
+
+    const peticion = http.expectOne('http://localhost:8080/listas-deseos');
+    expect(peticion.request.method).toBe('GET');
+    expect(peticion.request.withCredentials).toBe(true);
+    peticion.flush(listas);
+
+    expect(resultado).toEqual(listas);
+  });
+
+  it('consulta los productos de una lista codificando el identificador', () => {
+    const productos = [{ id: 'producto-1', nombre: 'Teclado' }];
+    let resultado: unknown;
+
+    servicio.obtenerProductos('lista con espacios').subscribe((respuesta) => (resultado = respuesta));
+
+    const peticion = http.expectOne(
+      'http://localhost:8080/listas-deseos/lista%20con%20espacios/productos',
+    );
+    expect(peticion.request.method).toBe('GET');
+    expect(peticion.request.withCredentials).toBe(true);
+    peticion.flush(productos);
+
+    expect(resultado).toEqual(productos);
+  });
+
+  it('añade un producto a la lista con credenciales y codifica los identificadores', () => {
+    const listaActualizada = {
+      id: 'lista con espacios',
+      idCliente: 'cliente-1',
+      nombre: 'Para comprar',
+      productosIds: ['producto/1'],
+    };
+    let resultado: unknown;
+
+    servicio.agregarProducto('lista con espacios', 'producto/1').subscribe((lista) => {
+      resultado = lista;
+    });
+
+    const peticion = http.expectOne(
+      'http://localhost:8080/listas-deseos/lista%20con%20espacios/productos/producto%2F1',
+    );
+    expect(peticion.request.method).toBe('POST');
+    expect(peticion.request.body).toEqual({});
+    expect(peticion.request.withCredentials).toBe(true);
+    peticion.flush(listaActualizada);
+
+    expect(resultado).toEqual(listaActualizada);
+  });
+
+  it('traduce errores del guardado en un mensaje comprensible', () => {
+    let error: ListaDeseosApiError | undefined;
+
+    servicio.agregarProducto('lista-1', 'producto-1').subscribe({ error: (e) => (error = e) });
+    http
+      .expectOne('http://localhost:8080/listas-deseos/lista-1/productos/producto-1')
+      .flush(null, { status: 404, statusText: 'Not Found' });
+
+    expect(error).toBeInstanceOf(ListaDeseosApiError);
+    expect(error?.message).toContain('No se ha encontrado la lista o el producto.');
+  });
+
   it('traduce un 403 a un mensaje de rol no permitido', () => {
     let error: ListaDeseosApiError | undefined;
 

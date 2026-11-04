@@ -141,12 +141,23 @@
   grid-column: 1 / -1;
 }
 
-.pagina-metodos form > .esi-boton {
+.acciones-formulario {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.acciones-formulario .esi-boton {
+  flex: 1;
   width: 100%;
   min-height: 52px;
-  margin-top: 18px;
   border-radius: 8px;
   font-size: 15px;
+}
+
+.acciones-formulario .boton-secundario {
+  flex: 0 0 auto;
+  width: auto;
 }
 
 @media (max-width: 600px) {
@@ -252,11 +263,18 @@
   text-align: left;
 }
 
-.boton-quitar {
+.acciones-metodo {
+  display: flex;
   grid-column: 3;
   grid-row: 1 / span 2;
+  align-items: center;
+  gap: 4px;
+}
+
+.boton-editar,
+.boton-quitar {
   padding: 8px 10px;
-  color: var(--esi-error-text);
+  color: var(--esi-ink);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 6px;
@@ -266,10 +284,23 @@
   font-weight: 700;
 }
 
-.boton-quitar:hover {
+.boton-editar:not(:disabled):hover {
+  color: var(--esi-orange-text);
+  background: var(--esi-orange-soft);
+}
+
+.boton-editar:disabled,
+.boton-quitar:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.boton-quitar:not(:disabled):hover {
+  color: var(--esi-error-text);
   background: var(--esi-error-bg);
 }
 
+.boton-editar:focus-visible,
 .boton-quitar:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 2px;
@@ -404,11 +435,8 @@
     height: 36px;
   }
 
-  .boton-quitar {
-    grid-column: 2;
-    grid-row: auto;
-    justify-self: start;
-    margin-left: -10px;
+  .boton-quitar,
+  .boton-editar {
     padding: 6px 10px;
   }
 
@@ -420,8 +448,19 @@
     flex-direction: column-reverse;
   }
 
+  .acciones-formulario {
+    flex-direction: column-reverse;
+  }
+
   .acciones-modal .esi-boton {
     width: 100%;
+  }
+
+  .acciones-metodo {
+    grid-column: 2;
+    grid-row: auto;
+    justify-self: start;
+    margin-left: -10px;
   }
 
   .modal-confirmacion {

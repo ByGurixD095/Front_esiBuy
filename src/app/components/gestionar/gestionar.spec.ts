@@ -26,7 +26,10 @@ describe('Gestionar', () => {
   it('al cliente le ofrece Favoritos y nada de administración', async () => {
     const el = await crear('CLIENTE');
 
-    expect(el.querySelector('a[href="/favoritos"]')?.textContent).toContain('Favoritos');
+    expect(el.querySelector('a[href="/favoritos"]')?.textContent).toContain('Mis favoritos');
+    expect(el.querySelector('a.opcion[href="/listas-deseos"]')?.textContent).toContain(
+      'Mis listas de deseos',
+    );
     expect(el.querySelector('a[href="/admin/usuarios"]')).toBeNull();
     expect(el.querySelector('a[href="/products/catalogo"]')).toBeNull();
     expect(el.querySelector('[role="alert"]')).toBeNull();
@@ -36,6 +39,7 @@ describe('Gestionar', () => {
     const el = await crear('VENDEDOR');
 
     expect(el.querySelector('a[href="/favoritos"]')).toBeNull();
+    expect(el.querySelector('a[href="/listas-deseos"]')).toBeNull();
     expect(el.querySelector('a[href="/products/catalogo"]')).not.toBeNull();
   });
 
@@ -45,5 +49,6 @@ describe('Gestionar', () => {
     expect(el.querySelector('a[href="/administradores/nuevo"]')).not.toBeNull();
     expect(el.querySelector('a[href="/admin/usuarios"]')).not.toBeNull();
     expect(el.querySelector('a[href="/favoritos"]')).toBeNull();
+    expect(el.querySelector('a[href="/listas-deseos"]')).toBeNull();
   });
 });

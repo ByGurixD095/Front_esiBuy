@@ -1,0 +1,203 @@
+:host {
+  display: block;
+}
+
+.addresses-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px 0 48px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--esi-orange-text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--esi-font-title);
+  font-size: clamp(34px, 5vw, 48px);
+  font-weight: 400;
+}
+
+.intro {
+  margin: 10px 0 26px;
+  color: var(--esi-soft-ink);
+}
+
+.addresses-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.address-list,
+.address-form-panel,
+.address-card {
+  border: 1px solid var(--esi-line);
+  border-radius: var(--esi-radius);
+  background: var(--esi-card);
+}
+
+.address-list,
+.address-form-panel {
+  padding: 22px;
+}
+
+h2 {
+  margin: 0 0 18px;
+  font-family: var(--esi-font-title);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.address-list > p {
+  color: var(--esi-soft-ink);
+}
+
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 16px;
+}
+
+.address-card h3,
+.address-card p {
+  margin: 0 0 5px;
+}
+
+.address-card p {
+  color: var(--esi-soft-ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.address-actions,
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.field input {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  border: 1px solid var(--esi-line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.primary-button,
+.secondary-button,
+.delete-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--esi-ink);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button {
+  color: white;
+  background: var(--esi-ink);
+}
+
+.secondary-button {
+  color: var(--esi-ink);
+  background: transparent;
+}
+
+.delete-button {
+  border-color: #9c3434;
+  color: #9c3434;
+  background: transparent;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.form-actions {
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.notice {
+  padding: 12px 14px;
+  border-radius: 8px;
+}
+
+.success {
+  color: #14532d;
+  background: #e8f4eb;
+}
+
+.error {
+  color: var(--esi-error-text);
+  background: var(--esi-error-bg);
+}
+
+.dialog-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 45%);
+}
+
+.confirm-dialog {
+  width: min(440px, 100%);
+  padding: 24px;
+  border-radius: var(--esi-radius);
+  background: var(--esi-card);
+}
+
+@media (max-width: 760px) {
+  .addresses-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .address-card {
+    flex-direction: column;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+}

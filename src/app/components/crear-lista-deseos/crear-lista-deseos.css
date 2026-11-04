@@ -9,6 +9,23 @@
   color: #5d6b7e;
 }
 
+.volver-listas {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #1a2b4a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.volver-listas:hover {
+  text-decoration: underline;
+}
+
+.volver-listas:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 3px;
+}
+
 .pagina-lista form {
   display: grid;
   gap: 1.25rem;

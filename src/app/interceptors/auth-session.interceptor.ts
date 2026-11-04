@@ -5,6 +5,7 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -23,9 +24,10 @@ const isRefreshableRequest = (request: HttpRequest<unknown>): boolean =>
 export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  const requestWithCookies = request.clone({ withCredentials: true });
+  const isApiRequest = request.url.startsWith(environment.apiUrl);
+  const finalRequest = isApiRequest ? request.clone({ withCredentials: true }) : request;
 
-  return next(requestWithCookies).pipe(
+  return next(finalRequest).pipe(
     catchError((error: HttpErrorResponse) => {
       const canRefresh =
         error.status === 401 &&
@@ -40,7 +42,7 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
         return refreshInProgress.pipe(
           filter((refreshing) => !refreshing),
           take(1),
-          switchMap(() => next(markAsRetried(requestWithCookies))),
+          switchMap(() => next(markAsRetried(finalRequest))),
           catchError((refreshError) => throwError(() => refreshError)),
         );
       }
@@ -49,7 +51,7 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
       return auth.refresh().pipe(
         switchMap(() => {
           refreshInProgress.next(false);
-          return next(markAsRetried(requestWithCookies));
+          return next(markAsRetried(finalRequest));
         }),
         catchError((refreshError) => {
           refreshInProgress.next(false);

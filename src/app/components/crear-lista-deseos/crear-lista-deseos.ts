@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   ListaDeseos,
   ListaDeseosApiError,
@@ -11,7 +12,7 @@ const NO_VACIO = /\S/;
 
 @Component({
   selector: 'app-crear-lista-deseos',
-  imports: [ReactiveFormsModule, MarcoPagina],
+  imports: [ReactiveFormsModule, RouterLink, MarcoPagina],
   templateUrl: './crear-lista-deseos.html',
   styleUrl: './crear-lista-deseos.css',
 })

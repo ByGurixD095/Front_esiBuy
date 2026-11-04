@@ -73,6 +73,7 @@
         <app-avatar-selector
           [value]="form.controls.imagenPerfil.value"
           (valueChange)="form.controls.imagenPerfil.setValue($event)"
+          (fileSeleccionado)="archivoAvatar.set($event)"
         />
 
         @if (mensajeExito()) {

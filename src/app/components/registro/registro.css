@@ -85,7 +85,8 @@ form {
   color: var(--esi-orange-text);
 }
 
-.esi-campo input {
+.esi-campo input,
+.esi-campo select {
   width: 100%;
   height: 48px;
   padding: 0 14px;
@@ -100,17 +101,20 @@ form {
   color: #747b7d;
 }
 
-.esi-campo input:hover:not(:focus) {
+.esi-campo input:hover:not(:focus),
+.esi-campo select:hover:not(:focus) {
   border-color: #85847b;
 }
 
-.esi-campo input:focus-visible {
+.esi-campo input:focus-visible,
+.esi-campo select:focus-visible {
   border-color: var(--esi-orange-text);
   outline-color: var(--esi-orange-text);
   box-shadow: 0 0 0 3px rgb(184 74 36 / 12%);
 }
 
-.esi-campo input.ng-invalid.ng-touched {
+.esi-campo input.ng-invalid.ng-touched,
+.esi-campo select.ng-invalid.ng-touched {
   border-color: var(--esi-error-text);
 }
 
@@ -182,7 +186,8 @@ form {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .esi-campo input {
+  .esi-campo input,
+  .esi-campo select {
     transition: none;
   }
 }

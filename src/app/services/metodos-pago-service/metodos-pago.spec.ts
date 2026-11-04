@@ -48,6 +48,25 @@ describe('MetodosPagoService', () => {
     expect(resultado).toEqual({ id: 'mp-2', ...datos });
   });
 
+  it('modifica un método de pago por su identificador', () => {
+    const datos = {
+      tipo: 'TARJETA' as const,
+      alias: 'Personal',
+      titular: 'Ana Pérez',
+      numeroTarjeta: '**** 1234',
+      caducidad: '12/2028',
+    };
+    let resultado: unknown;
+    servicio.modificar('mp-1', datos).subscribe((metodo) => (resultado = metodo));
+
+    const peticion = http.expectOne('http://localhost:8080/users/me/metodoPago/mp-1');
+    expect(peticion.request.method).toBe('PUT');
+    expect(peticion.request.body).toEqual(datos);
+    peticion.flush({ id: 'mp-1', tipo: 'TARJETA', referencia: '**** 1234', ...datos });
+
+    expect(resultado).toEqual({ id: 'mp-1', tipo: 'TARJETA', referencia: '**** 1234', ...datos });
+  });
+
   it('elimina un método de pago por su identificador', () => {
     let completado = false;
     servicio.eliminar('mp-1').subscribe(() => (completado = true));

@@ -1,0 +1,106 @@
+<app-marco-pagina panel="Direcciones de envío" [volver]="true">
+  <section class="addresses-page" aria-labelledby="addresses-title" [attr.aria-busy]="cargando()">
+    <p class="eyebrow">Área de cliente</p>
+    <h1 id="addresses-title">Direcciones de envío.</h1>
+    <p class="intro">Guarda y administra las direcciones que puedes seleccionar al tramitar un pedido.</p>
+
+    @if (mensaje()) {
+      <p class="notice success" role="status">{{ mensaje() }}</p>
+    }
+    @if (error()) {
+      <p class="notice error" role="alert">{{ error() }}</p>
+    }
+
+    <div class="addresses-layout">
+      <section class="address-list" aria-labelledby="saved-addresses-title">
+        <h2 id="saved-addresses-title">Mis direcciones</h2>
+        @if (cargando()) {
+          <p role="status">Cargando tus direcciones…</p>
+        } @else if (direcciones().length === 0) {
+          <p class="empty-state">Todavía no tienes direcciones guardadas. Añade una para usarla en el checkout.</p>
+        } @else {
+          @for (direccion of direcciones(); track direccion.id) {
+            <article class="address-card">
+              <div>
+                <h3>{{ direccion.nombreCompleto }}</h3>
+                <p>{{ direccion.direccion }}</p>
+                <p>{{ direccion.codigoPostal }} {{ direccion.ciudad }}, {{ direccion.provincia }}</p>
+                <p>{{ direccion.pais }} · {{ direccion.telefono }}</p>
+              </div>
+              <div class="address-actions">
+                <button type="button" class="secondary-button" [disabled]="guardando() || !!eliminandoId()" (click)="editar(direccion)">
+                  Modificar
+                </button>
+                <button
+                  type="button"
+                  class="delete-button"
+                  [disabled]="guardando() || !!eliminandoId()"
+                  (click)="solicitarEliminacion(direccion)"
+                >
+                  {{ eliminandoId() === direccion.id ? 'Eliminando…' : 'Eliminar' }}
+                </button>
+              </div>
+            </article>
+          }
+        }
+      </section>
+
+      <section class="address-form-panel" aria-labelledby="address-form-title">
+        <h2 id="address-form-title">{{ editando() ? 'Modificar dirección' : 'Añadir dirección' }}</h2>
+        <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+          <div class="fields">
+            <div class="field wide">
+              <label for="address-name">Nombre completo</label>
+              <input id="address-name" formControlName="nombreCompleto" autocomplete="name" maxlength="120" required />
+            </div>
+            <div class="field wide">
+              <label for="address-street">Dirección</label>
+              <input id="address-street" formControlName="direccion" autocomplete="street-address" maxlength="200" required />
+            </div>
+            <div class="field">
+              <label for="address-city">Ciudad</label>
+              <input id="address-city" formControlName="ciudad" autocomplete="address-level2" maxlength="100" required />
+            </div>
+            <div class="field">
+              <label for="address-province">Provincia</label>
+              <input id="address-province" formControlName="provincia" autocomplete="address-level1" maxlength="100" required />
+            </div>
+            <div class="field">
+              <label for="address-postal">Código postal</label>
+              <input id="address-postal" formControlName="codigoPostal" autocomplete="postal-code" maxlength="20" required />
+            </div>
+            <div class="field">
+              <label for="address-country">País</label>
+              <input id="address-country" formControlName="pais" autocomplete="country-name" maxlength="100" required />
+            </div>
+            <div class="field wide">
+              <label for="address-phone">Teléfono</label>
+              <input id="address-phone" type="tel" formControlName="telefono" autocomplete="tel" maxlength="30" required />
+            </div>
+          </div>
+          <div class="form-actions">
+            @if (editando()) {
+              <button type="button" class="secondary-button" [disabled]="guardando()" (click)="cancelarEdicion()">Cancelar</button>
+            }
+            <button type="submit" class="primary-button" [disabled]="guardando()">
+              {{ guardando() ? 'Guardando…' : editando() ? 'Guardar cambios' : 'Guardar dirección' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    @if (pendienteEliminar(); as direccion) {
+      <div class="dialog-backdrop">
+        <section class="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title">
+          <h2 id="delete-title">Eliminar dirección</h2>
+          <p>¿Quieres eliminar la dirección de <strong>{{ direccion.nombreCompleto }}</strong>?</p>
+          <div class="form-actions">
+            <button type="button" class="secondary-button" (click)="cancelarEliminacion()">Cancelar</button>
+            <button type="button" class="delete-button" (click)="confirmarEliminacion()">Eliminar</button>
+          </div>
+        </section>
+      </div>
+    }
+  </section>
+</app-marco-pagina>

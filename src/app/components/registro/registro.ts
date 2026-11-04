@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -10,9 +10,12 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService, LoginResponse } from '../../services/auth.service';
+import { Categoria, Categorias } from '../../services/categorias.service';
 import { Registro as RegistroService } from '../../services/registro-service/registro';
 import { AvatarSelector, avatarAleatorio } from '../avatar-selector/avatar-selector';
 import { MarcoPagina } from '../marco-pagina/marco-pagina';
+import { CloudinaryService } from '../../services/cloudinary.service';
+import { environment } from '../../../environments/environment';
 
 type TipoRegistro = 'cliente' | 'vendedor';
 
@@ -77,10 +80,13 @@ function validarDatosPersonales(control: AbstractControl): ValidationErrors | nu
   styleUrl: './registro.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegistroComponent {
+export class RegistroComponent implements OnInit {
   private readonly registroService = inject(RegistroService);
   private readonly authService = inject(AuthService);
+  private readonly categoriasService = inject(Categorias);
   private readonly router = inject(Router);
+  private readonly cloudinary = inject(CloudinaryService);
+  readonly archivoAvatar = signal<File | null>(null);
   readonly tipo: TipoRegistro =
     inject(ActivatedRoute).snapshot.data['tipoRegistro'] === 'vendedor' ? 'vendedor' : 'cliente';
   readonly esVendedor = this.tipo === 'vendedor';
@@ -90,6 +96,9 @@ export class RegistroComponent {
   readonly cuentaCreada = signal(false);
   readonly puedeReintentarLogin = signal(false);
   readonly fechaMaxima = this.fechaDeHoy();
+  readonly categorias = signal<Categoria[]>([]);
+  readonly cargandoCategorias = signal(false);
+  readonly errorCategorias = signal('');
 
   readonly form = new FormGroup({
     nombre: new FormControl('', {
@@ -159,6 +168,31 @@ export class RegistroComponent {
     this.form.updateValueAndValidity();
   }
 
+  ngOnInit(): void {
+    if (this.esVendedor) {
+      this.cargarCategorias();
+    }
+  }
+
+  cargarCategorias(): void {
+    this.cargandoCategorias.set(true);
+    this.errorCategorias.set('');
+    this.categoriasService.listar().subscribe({
+      next: (categorias) => {
+        this.categorias.set(categorias);
+        this.cargandoCategorias.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.errorCategorias.set(
+          error.status === 0
+            ? 'No se ha podido conectar con el servidor para cargar las categorías.'
+            : `No se han podido cargar las categorías (HTTP ${error.status}).`,
+        );
+        this.cargandoCategorias.set(false);
+      },
+    });
+  }
+
   enviar(): void {
     if (this.enviando() || this.cuentaCreada()) {
       return;
@@ -170,9 +204,6 @@ export class RegistroComponent {
         : { noCoinciden: true },
     );
 
-    if (!this.form.controls.imagenPerfil.value.trim()) {
-      this.form.controls.imagenPerfil.setValue(avatarAleatorio(this.esVendedor));
-    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -182,7 +213,28 @@ export class RegistroComponent {
     this.mensajeError.set('');
     this.enviando.set(true);
 
+    const archivo = this.archivoAvatar();
+    if (archivo) {
+      this.cloudinary.subirImagen(archivo, environment.carpetaAvatares).subscribe({
+        next: (url) => this.ejecutarRegistro(url),
+        error: () => {
+          this.mensajeError.set('Error al subir la imagen de perfil.');
+          this.enviando.set(false);
+        }
+      });
+    } else {
+      let imagenFinal = this.form.controls.imagenPerfil.value.trim();
+      if (!imagenFinal || imagenFinal.startsWith('data:image')) {
+        imagenFinal = avatarAleatorio(this.esVendedor);
+      }
+      this.ejecutarRegistro(imagenFinal);
+    }
+  }
+
+  private ejecutarRegistro(imagenFinal: string): void {
     const datos = this.form.getRawValue();
+    datos.imagenPerfil = imagenFinal;
+
     const peticion = this.esVendedor
       ? this.registroService.registrarVendedor({
           nombre: datos.nombre,

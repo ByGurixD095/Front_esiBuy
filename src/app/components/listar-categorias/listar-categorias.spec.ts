@@ -9,7 +9,7 @@ import { ListarCategorias } from './listar-categorias';
 
 describe('ListarCategorias', () => {
   let fixture: ComponentFixture<ListarCategorias>;
-  const servicioFalso = { listar: vi.fn(), eliminar: vi.fn() };
+  const servicioFalso = { listar: vi.fn(), eliminar: vi.fn(), actualizar: vi.fn() };
   const authFalso = { isAuthenticated: () => true, hasRole: () => true };
 
   async function crear(): Promise<void> {
@@ -33,6 +33,7 @@ describe('ListarCategorias', () => {
   beforeEach(() => {
     servicioFalso.listar.mockReset();
     servicioFalso.eliminar.mockReset();
+    servicioFalso.actualizar.mockReset();
   });
 
   it('se crea y pide las categorías al servicio', async () => {
@@ -91,7 +92,7 @@ describe('ListarCategorias', () => {
     await crear();
 
     const alerta = html().querySelector('[role="alert"]');
-    expect(alerta?.textContent).toContain('No tienes permisos para ver las categorías');
+    expect(alerta?.textContent).toContain('No se han podido cargar las categorías');
 
     servicioFalso.listar.mockReturnValue(of([{ id: 'c1', nombre: 'Hogar' }]));
     (alerta?.querySelector('button') as HTMLButtonElement).click();
@@ -108,6 +109,65 @@ describe('ListarCategorias', () => {
     expect(html().querySelector('[role="alert"]')?.textContent).toContain(
       'No se ha podido conectar con el servidor',
     );
+  });
+
+  it('filtra categorías por nombre sin distinguir mayúsculas', async () => {
+    servicioFalso.listar.mockReturnValue(
+      of([
+        { id: 'c1', nombre: 'Hogar' },
+        { id: 'c2', nombre: 'Ropa' },
+      ]),
+    );
+    await crear();
+
+    const buscador = html().querySelector('.busqueda-categorias input') as HTMLInputElement;
+    buscador.value = 'hog';
+    buscador.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(html().querySelectorAll('.elemento').length).toBe(1);
+    expect(html().textContent).toContain('Hogar');
+    expect(html().querySelector('.contador')?.textContent).toContain('1 categoría');
+    expect(html().querySelector('.contador')?.textContent).toContain('de 2');
+  });
+
+  it('pagina las categorías y vuelve a la primera página al buscar', async () => {
+    servicioFalso.listar.mockReturnValue(
+      of(Array.from({ length: 10 }, (_, indice) => ({
+        id: `c${indice + 1}`,
+        nombre: `Categoría ${indice + 1}`,
+      }))),
+    );
+    await crear();
+
+    expect(html().querySelectorAll('.elemento').length).toBe(8);
+    expect(html().querySelector('.paginacion')?.textContent).toContain('Página 1 de 2');
+
+    (html().querySelector('.paginacion button:last-child') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(html().querySelectorAll('.elemento').length).toBe(2);
+    expect(html().querySelector('.paginacion')?.textContent).toContain('Página 2 de 2');
+
+    const buscador = html().querySelector('.busqueda-categorias input') as HTMLInputElement;
+    buscador.value = 'Categoría 1';
+    buscador.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(html().querySelectorAll('.elemento').length).toBe(2);
+    expect(html().querySelector('.paginacion')).toBeNull();
+  });
+
+  it('muestra un estado vacío cuando la búsqueda no encuentra categorías', async () => {
+    servicioFalso.listar.mockReturnValue(of([{ id: 'c1', nombre: 'Hogar' }]));
+    await crear();
+
+    const buscador = html().querySelector('.busqueda-categorias input') as HTMLInputElement;
+    buscador.value = 'jardín';
+    buscador.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(html().querySelectorAll('.elemento').length).toBe(0);
+    expect(html().textContent).toContain('No hay coincidencias');
   });
 
   describe('eliminar categoría (HU 30)', () => {
@@ -131,6 +191,25 @@ describe('ListarCategorias', () => {
 
       expect(botonEliminar('Hogar')).toBeTruthy();
       expect(botonEliminar('Ropa')).toBeTruthy();
+    });
+
+    it('permite cambiar el nombre y conserva la categoría en la lista', async () => {
+      servicioFalso.actualizar.mockReturnValue(of({ id: 'c1', nombre: 'Casa' }));
+      await crear();
+      (html().querySelector('button[aria-label="Modificar la categoría Hogar"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      const input = html().querySelector('.edicion input') as HTMLInputElement;
+      input.value = 'Casa';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      (html().querySelector('.edicion button') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      expect(servicioFalso.actualizar).toHaveBeenCalledWith('c1', { nombre: 'Casa' });
+      expect(html().textContent).toContain('Casa');
+      expect(html().textContent).not.toContain('Hogar');
+      expect(html().textContent).toContain('La categoría se ha cambiado a «Casa».');
     });
 
     it('pide confirmación antes de eliminar y no llama al servicio todavía', async () => {
@@ -187,8 +266,14 @@ describe('ListarCategorias', () => {
       fixture.detectChanges();
       pulsar('.confirmacion-eliminar');
 
-      expect(html().querySelector('[role="alert"]')?.textContent).toContain('productos que la usan');
+      expect(dialogo()?.textContent).toContain('No se puede eliminar todavía');
+      expect(dialogo()?.textContent).toContain('Cambia esos productos a otra categoría');
+      expect(dialogo()?.querySelector('[role="alert"]')?.textContent).toContain('productos que la usan');
       expect(html().querySelectorAll('.elemento').length).toBe(2);
+      expect(dialogo()).not.toBeNull();
+      expect(dialogo()?.querySelector('.confirmacion-eliminar')).toBeNull();
+
+      pulsar('.confirmacion-cancelar');
       expect(dialogo()).toBeNull();
     });
 

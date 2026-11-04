@@ -19,7 +19,7 @@ export type EstadoProducto = 'todos' | 'activos' | 'inactivos';
 
 export interface FiltrosProductos {
   busqueda?: string;
-  categoria?: string;
+  categoriaId?: string;
   precioMinCent?: number | null;
   precioMaxCent?: number | null;
   soloOfertas?: boolean;
@@ -31,7 +31,9 @@ function paramsDeFiltros(filtros: FiltrosProductos, pagina: number, tamanoPagina
   let params = new HttpParams();
 
   if (filtros.busqueda?.trim()) params = params.set('busqueda', filtros.busqueda.trim());
-  if (filtros.categoria && filtros.categoria !== 'Todas' && filtros.categoria !== 'TODAS') params = params.set('categoria', filtros.categoria);
+  if (filtros.categoriaId && filtros.categoriaId !== 'Todas' && filtros.categoriaId !== 'TODAS') {
+    params = params.set('categoriaId', filtros.categoriaId);
+  }
   if (filtros.precioMinCent != null) params = params.set('precioMinCent', filtros.precioMinCent);
   if (filtros.precioMaxCent != null) params = params.set('precioMaxCent', filtros.precioMaxCent);
   if (filtros.soloOfertas) params = params.set('soloOfertas', true);
@@ -43,12 +45,15 @@ function paramsDeFiltros(filtros: FiltrosProductos, pagina: number, tamanoPagina
 // Garantiza el filtrado aunque el backend ignore algún parámetro.
 export function filtrarProductos(productos: Producto[], filtros: FiltrosProductos): Producto[] {
   const texto = filtros.busqueda?.trim().toLowerCase();
-  const categoria = filtros.categoria && filtros.categoria !== 'Todas' && filtros.categoria !== 'TODAS' ? filtros.categoria : null;
+  const categoriaId =
+    filtros.categoriaId && filtros.categoriaId !== 'Todas' && filtros.categoriaId !== 'TODAS'
+      ? filtros.categoriaId
+      : null;
 
   const filtrados = productos.filter(
     (p) =>
       (!texto || p.nombre.toLowerCase().includes(texto) || p.referencia.toLowerCase().includes(texto)) &&
-      (!categoria || p.categoria === categoria) &&
+      (!categoriaId || p.categoriaId === categoriaId) &&
       (filtros.precioMinCent == null || p.precioCent >= filtros.precioMinCent) &&
       (filtros.precioMaxCent == null || p.precioCent <= filtros.precioMaxCent) &&
       (!filtros.soloOfertas || p.descuento > 0) &&

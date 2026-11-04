@@ -46,6 +46,7 @@
 .account-link, .cart-link { color: #e2e8f0; font: 14px Arial, sans-serif; text-decoration: none; }
 .account-link:hover, .cart-link:hover { color: #ff9f43; }
 .cart-link span { color: #ff9f43; font-size: 1rem; vertical-align: -0.08em; }
+.cart-link .cart-count { display: inline-grid; min-width: 20px; height: 20px; margin-left: 5px; padding: 0 5px; place-items: center; border-radius: 999px; color: #0d162d; background: #ff9f43; font: 700 11px Arial, sans-serif; vertical-align: middle; }
 .sell-link { padding: 0.62rem 0.85rem; border: 1px solid #f8fafc; color: #f8fafc; font: 0.68rem Arial, sans-serif; text-decoration: none; }
 .sell-link:hover { border-color: #ff6b00; color: #fff; background: #ff6b00; }
 .search-field { position: relative; display: flex; align-items: center; width: min(29vw, 340px); margin-left: auto; }
@@ -121,11 +122,22 @@ h1 em { color: var(--orange); font-style: italic; }
 .seller strong { color: var(--ink); font-weight: 500; }
 .product-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.9rem; }
 .product-actions { display: grid; justify-items: end; gap: 0.55rem; }
-.add-cart-button { min-height: 36px; padding: 0.5rem 0.75rem; border: 1px solid var(--ink); border-radius: 4px; color: #fff; background: var(--ink); font: 700 0.68rem Arial, sans-serif; cursor: pointer; }
-.add-cart-button:hover:not(:disabled) { border-color: var(--orange); background: var(--orange); }
+.add-wishlist-button { padding: .25rem 0; border: 0; color: var(--teal); background: transparent; font: 700 0.66rem Arial, sans-serif; text-decoration: underline; cursor: pointer; }
+.add-cart-button { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; padding: 0.5rem 0.75rem; border: 1px solid var(--ink); border-radius: 4px; color: #fff; background: var(--ink); font: 700 0.68rem Arial, sans-serif; text-decoration: none; cursor: pointer; }
+.add-cart-button:hover { border-color: var(--orange); background: var(--orange); }
+.add-cart-button:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 .add-cart-button:disabled { opacity: 0.6; cursor: wait; }
 .cart-feedback { padding: 0.85rem 1rem; margin: 0 0 1rem; border-left: 3px solid var(--teal); color: var(--ink); background: #e8f1ed; font: 0.85rem Arial, sans-serif; }
 .cart-feedback-error { border-color: #a52c2c; color: #7f1d1d; background: #fbe4e4; }
+.wishlist-dialog-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 1rem; background: rgba(13, 22, 45, 0.68); }
+.wishlist-dialog { width: min(100%, 440px); padding: 1.5rem; background: var(--card); box-shadow: 0 20px 60px #0004; }
+.wishlist-dialog > p { margin: 0.8rem 0 1.2rem; color: var(--soft-ink); font: 0.82rem/1.5 Arial, sans-serif; }
+.wishlist-select-label { display: block; margin-bottom: 0.4rem; color: var(--soft-ink); font: 700 0.7rem Arial, sans-serif; }
+.wishlist-dialog select, .wishlist-dialog input { width: 100%; min-height: 42px; padding: 0.55rem; border: 1px solid var(--line); color: var(--ink); background: #fff; font: 0.82rem Arial, sans-serif; }
+.wishlist-dialog-actions { display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1.5rem; }
+.wishlist-action, .wishlist-cancel { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; padding: 0.6rem 0.9rem; border: 1px solid var(--ink); color: #fff; background: var(--ink); font: 700 0.7rem Arial, sans-serif; text-decoration: none; cursor: pointer; }
+.wishlist-cancel { color: var(--ink); background: transparent; }
+.wishlist-create-toggle { margin-top: 1.2rem; border: 0; color: var(--teal); background: transparent; font: 700 0.72rem Arial, sans-serif; text-decoration: underline; cursor: pointer; }
 .product-pricing { display: grid; justify-items: start; gap: 0.2rem; }
 .discount-note { color: #b42318; font: 700 0.62rem Arial, sans-serif; }
 .price-block { display: flex; align-items: baseline; gap: 0.5rem; }
@@ -200,8 +212,8 @@ h1 em { color: var(--orange); font-style: italic; }
 @media (max-width: 680px) {
   .search-field { width: auto; flex: 1; margin-left: 0; }
   .header-actions { gap: 0.45rem; }
-  .cart-link { font-size: 0; }
-  .cart-link span { font-size: 1.3rem; }
+  .cart-link { font-size: 14px; }
+  .cart-link .cart-count { font-size: 11px; }
   .sell-link { padding: 0.5rem; font-size: 0; }
   .sell-link span { font-size: 1.2rem; }
   .search-field kbd { display: none; }

@@ -7,8 +7,26 @@
       @if (auth.isAuthenticated()) {
         <a class="account-link" routerLink="/account">Mi cuenta</a>
         @if (esCliente()) {
-          <a class="account-link" routerLink="/cart">Mi cesta</a>
+          <a
+            class="account-link cart-link"
+            routerLink="/cart"
+            [attr.aria-label]="
+              cantidadCarrito() === null
+                ? 'Mi cesta'
+                : 'Mi cesta, ' +
+                  cantidadCarrito() +
+                  (cantidadCarrito() === 1 ? ' producto' : ' productos')
+            "
+          >
+            Mi cesta
+            @if (cantidadCarrito() !== null) {
+              <span class="cart-count">{{ cantidadCarrito() }}</span>
+            }
+          </a>
           <a class="account-link" routerLink="/favoritos">Mis favoritos</a>
+          <a class="account-link" routerLink="/listas-deseos">Mis listas</a>
+          <a class="account-link" routerLink="/pedidos">Mis pedidos</a>
+          <a class="account-link" routerLink="/account/direcciones">Direcciones</a>
         }
         @if (auth.hasRole(['ADMINISTRADOR', 'VENDEDOR'])) {
           <a class="account-link" routerLink="/manage">Gestionar</a>
@@ -46,13 +64,21 @@
       </aside>
     </div>
 
-    <app-panel-filtros-productos [productos]="productos()" (filtrosChange)="aplicarFiltros($event)" />
-
+    <app-panel-filtros-productos [productos]="productos()" [categoriasDisponibles]="categoriasDisponibles()" (filtrosChange)="aplicarFiltros($event)" />
+    @if (errorCategorias(); as mensaje) {
+      <p class="cart-feedback cart-feedback-error" role="alert">
+        {{ mensaje }}
+        <button type="button" class="state-action" (click)="cargarCategorias()">Reintentar</button>
+      </p>
+    }
     @if (mensajeCarrito(); as mensaje) {
       <p class="cart-feedback" role="status">{{ mensaje }}</p>
     }
     @if (errorCarrito(); as mensaje) {
       <p class="cart-feedback cart-feedback-error" role="alert">{{ mensaje }}</p>
+    }
+    @if (mensajeListaDeseos(); as mensaje) {
+      <p class="cart-feedback" role="status">{{ mensaje }}</p>
     }
 
     @if (cargando()) {
@@ -115,10 +141,9 @@
                 </button>
               }
             </div>
-            <a class="product-info-link" [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver detalles de ' + producto.nombre">
-              <div class="product-info">
+            <div class="product-info">
               <p class="product-category">{{ producto.categoria }}</p>
-              <h2>{{ producto.nombre }}</h2>
+              <h2><a class="product-info-link" [routerLink]="['/products', producto.id]">{{ producto.nombre }}</a></h2>
               @if (producto.descripcion) { <p class="description">{{ producto.descripcion }}</p> }
               <div class="product-meta">
                 <span>Stock: <strong>{{ producto.numStock }}</strong></span>
@@ -143,15 +168,21 @@
                   @if (esCliente()) {
                     <button
                       type="button"
+                      class="add-wishlist-button"
+                      [attr.aria-label]="'Añadir ' + producto.nombre + ' a una lista de deseos'"
+                      (click)="abrirSelectorLista(producto)"
+                    >Añadir a lista de deseos</button>
+                    <button
+                      type="button"
                       class="add-cart-button"
                       [disabled]="estaAnadiendoAlCarrito(producto.id)"
+                      [attr.aria-label]="'Añadir ' + producto.nombre + ' a la cesta'"
                       (click)="anadirAlCarrito(producto)"
                     >{{ estaAnadiendoAlCarrito(producto.id) ? 'Añadiendo...' : 'Añadir a la cesta' }}</button>
                   }
                 </div>
               </div>
-              </div>
-            </a>
+            </div>
           </article>
         }
       </div>
@@ -164,6 +195,94 @@
       }
     }
   </section>
+
+  @if (productoListaPendiente(); as productoPendiente) {
+    <div class="wishlist-dialog-backdrop">
+      <section
+        class="wishlist-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wishlist-dialog-title"
+        (keydown.escape)="cancelarSeleccionLista()"
+      >
+        <h2 id="wishlist-dialog-title">Guardar en una lista</h2>
+        <p>Selecciona dónde quieres guardar «{{ productoPendiente.nombre }}».</p>
+
+        @if (cargandoListasDeseos()) {
+          <p role="status">Cargando tus listas de deseos…</p>
+        } @else if (listasDeseos().length === 0 && errorListaDeseos(); as mensajeError) {
+          <p class="cart-feedback cart-feedback-error" role="alert">{{ mensajeError }}</p>
+          <button type="button" class="wishlist-action" (click)="cargarListasDeseos()">Reintentar</button>
+        } @else if (listasDeseos().length === 0) {
+          <p role="status">Todavía no tienes listas de deseos.</p>
+        } @else {
+          <label class="wishlist-select-label" for="wishlist-select">Lista de deseos</label>
+          <select
+            id="wishlist-select"
+            [value]="listaDeseosSeleccionadaId()"
+            (change)="seleccionarListaDeseos($event)"
+          >
+            @for (lista of listasDeseos(); track lista.id) {
+              <option [value]="lista.id">{{ lista.nombre }}</option>
+            }
+          </select>
+          @if (errorListaDeseos(); as mensajeError) {
+            <p class="cart-feedback cart-feedback-error" role="alert">{{ mensajeError }}</p>
+          }
+          <div class="wishlist-dialog-actions">
+            <button type="button" class="wishlist-cancel" [disabled]="guardandoEnLista()" (click)="cancelarSeleccionLista()">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="wishlist-action"
+              [disabled]="guardandoEnLista() || !listaDeseosSeleccionadaId()"
+              (click)="confirmarAnadirALista()"
+            >
+              {{ guardandoEnLista() ? 'Guardando…' : 'Añadir producto' }}
+            </button>
+          </div>
+        }
+        @if (!mostrandoNuevaLista()) {
+          <button
+            type="button"
+            class="wishlist-create-toggle"
+            [disabled]="guardandoEnLista()"
+            (click)="alternarFormularioNuevaLista()"
+          >Crear nueva lista</button>
+        } @else {
+          <div class="wishlist-create-form">
+            <label class="wishlist-select-label" for="wishlist-new-name">Nombre de la nueva lista</label>
+            <input
+              id="wishlist-new-name"
+              type="text"
+              maxlength="100"
+              [value]="nombreNuevaLista()"
+              [disabled]="guardandoEnLista()"
+              (input)="actualizarNombreNuevaLista($event)"
+            />
+            @if (errorListaDeseos(); as mensajeError) {
+              <p class="cart-feedback cart-feedback-error" role="alert">{{ mensajeError }}</p>
+            }
+            <div class="wishlist-dialog-actions">
+              <button
+                type="button"
+                class="wishlist-cancel"
+                [disabled]="guardandoEnLista()"
+                (click)="alternarFormularioNuevaLista()"
+              >Volver</button>
+              <button
+                type="button"
+                class="wishlist-action"
+                [disabled]="guardandoEnLista() || !nombreNuevaLista().trim()"
+                (click)="crearListaYGuardarProducto()"
+              >{{ guardandoEnLista() ? 'Creando y guardando…' : 'Crear y guardar producto' }}</button>
+            </div>
+          </div>
+        }
+      </section>
+    </div>
+  }
 
   <footer class="catalog-footer"><span>© 2026 EsiBuy</span><span>Productos disponibles en tiempo real</span></footer>
 </main>

@@ -13,11 +13,19 @@
     @if (estaAutenticado()) {
     @if (tieneRol(['CLIENTE'])) {
     <a class="account-link" routerLink="/favoritos">Mis favoritos</a>
+    <a class="account-link" routerLink="/listas-deseos">Mis listas</a>
+    <a class="account-link" routerLink="/pedidos">Mis pedidos</a>
     <a class="account-link" routerLink="/cart">Mi cesta</a>
     }
     <a class="account-link" routerLink="/account">Mi cuenta</a>
     @if (tieneRol(['ADMINISTRADOR', 'VENDEDOR', 'CLIENTE'])) {
     <a class="account-link" routerLink="/manage">Gestionar</a>
+    }
+    @if (tieneRol(['CLIENTE'])) {
+    <a class="account-link" routerLink="/account/direcciones">Direcciones</a>
+    }
+    @if (tieneRol(['VENDEDOR'])) {
+    <a class="account-link" routerLink="/pedidos-vendedor">Pedidos de venta</a>
     }
     } @else {
     <a class="account-link" routerLink="/login">Iniciar sesión / Registro</a>

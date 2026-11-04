@@ -6,6 +6,7 @@
     <span class="header-context">Panel del vendedor</span>
     <nav class="header-actions" aria-label="Acciones del vendedor">
       <a routerLink="/products">Ver tienda</a>
+      <a routerLink="/pedidos-vendedor">Pedidos de venta</a>
       <a class="new-product-link" routerLink="/products/new">Añadir producto</a>
     </nav>
   </header>
@@ -47,7 +48,13 @@
       <p class="demo-result" role="status">{{ resultado }}</p>
     }
 
-    <app-panel-filtros-productos [productos]="productos()" [mostrarEstado]="true" (filtrosChange)="aplicarFiltros($event)" />
+    <app-panel-filtros-productos [productos]="productos()" [categoriasDisponibles]="categoriasDisponibles()" [mostrarEstado]="true" (filtrosChange)="aplicarFiltros($event)" />
+    @if (errorCategorias(); as mensaje) {
+      <p class="state-panel error-state" role="alert">
+        {{ mensaje }}
+        <button type="button" class="state-action" (click)="cargarCategorias()">Reintentar</button>
+      </p>
+    }
 
     @if (cargando()) {
       <section class="state-panel" aria-live="polite" aria-busy="true">
@@ -177,4 +184,3 @@
 
   <footer class="seller-footer"><span>© 2026 EsiBuy</span><span>Panel del vendedor</span></footer>
 </main>
-

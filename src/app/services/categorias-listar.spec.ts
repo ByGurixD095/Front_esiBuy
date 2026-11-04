@@ -18,10 +18,10 @@ describe('Categorias (listar)', () => {
 
   afterEach(() => http.verify());
 
-  it('envía un GET a /admin/categorias con las cookies', () => {
+  it('envía un GET público a /categorias', () => {
     servicio.listar().subscribe();
 
-    const peticion = http.expectOne(`${environment.apiUrl}/admin/categorias`);
+    const peticion = http.expectOne(`${environment.apiUrl}/categorias`);
     expect(peticion.request.method).toBe('GET');
     expect(peticion.request.withCredentials).toBe(true);
     peticion.flush([]);
@@ -36,7 +36,7 @@ describe('Categorias (listar)', () => {
 
     servicio.listar().subscribe((categorias) => (recibido = categorias));
 
-    http.expectOne(`${environment.apiUrl}/admin/categorias`).flush(respuesta);
+    http.expectOne(`${environment.apiUrl}/categorias`).flush(respuesta);
     expect(recibido).toEqual(respuesta);
   });
 });

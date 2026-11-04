@@ -36,6 +36,7 @@ describe('ProductService', () => {
         numStock: 3,
         precioCent: 1999,
         descripcion: 'Camiseta oficial',
+        categoriaId: 'c-ropa',
         categoria: 'Ropa',
         urlImagen: null,
         descuento: 10,
@@ -49,6 +50,7 @@ describe('ProductService', () => {
         numStock: 0,
         precioCent: 2990,
         descripcion: null,
+        categoriaId: 'c-papeleria',
         categoria: 'Papelería',
         urlImagen: null,
         descuento: 0,
@@ -62,6 +64,7 @@ describe('ProductService', () => {
         numStock: 4,
         precioCent: 1000,
         descripcion: null,
+        categoriaId: 'c-otros',
         categoria: 'Otros',
         urlImagen: null,
         descuento: 0,
@@ -99,6 +102,15 @@ describe('ProductService', () => {
       totalPages: 0,
       number: 1,
     });
+  });
+
+  it('filtra por identificador estable de categoría', () => {
+    service.obtenerDisponibles({ categoriaId: 'categoria-1' }).subscribe();
+
+    const request = httpTesting.expectOne(
+      (req) => req.urlWithParams === 'http://localhost:8080/products/disponibles?categoriaId=categoria-1&page=0&size=36',
+    );
+    request.flush({ content: [], totalElements: 0, totalPages: 0, number: 0 });
   });
 
   it('consulta la información pública del producto con credenciales', () => {

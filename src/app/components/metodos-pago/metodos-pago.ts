@@ -12,14 +12,30 @@ import { AuthService } from '../../services/auth.service';
 import {
   MetodoPago,
   MetodosPagoService,
+  RegistrarMetodoPagoRequest,
   TipoMetodoPago,
 } from '../../services/metodos-pago-service/metodos-pago';
 import { MarcoPagina } from '../marco-pagina/marco-pagina';
 
+type DatosFormularioMetodoPago = {
+  tipo: TipoMetodoPago;
+  alias: string;
+  nombreTitular: string;
+  numeroTarjeta: string;
+  caducidadMes: string;
+  caducidadAnio: string;
+  cvc: string;
+  correoPayPal: string;
+  prefijoBizum: string;
+  telefonoBizum: string;
+};
+
 const NO_VACIO = /\S/;
 const NUMERO_TARJETA = /^\d(?:[ -]?\d){12,18}$/;
+const NUMERO_TARJETA_O_REFERENCIA = /^(?:\d(?:[ -]?\d){12,18}|\*{4} ?\d{4})$/;
 const CVC = /^\d{3,4}$/;
 const TELEFONO = /^\d(?:[\s()-]?\d){7,11}$/;
+const TELEFONO_INTERNACIONAL = /^\+?\d{9,15}$/;
 const MESES = [
   { valor: '01', nombre: 'Enero' },
   { valor: '02', nombre: 'Febrero' },
@@ -65,6 +81,7 @@ export class MetodosPagoComponent implements OnInit {
   readonly errorEliminacion = signal('');
   readonly metodoPendienteEliminar = signal<MetodoPago | null>(null);
   readonly eliminando = signal(false);
+  readonly metodoEnEdicion = signal<MetodoPago | null>(null);
   readonly mesesCaducidad = MESES;
   readonly prefijosTelefonicos = PREFIJOS_TELEFONICOS;
   readonly aniosCaducidad = Array.from(
@@ -103,7 +120,7 @@ export class MetodosPagoComponent implements OnInit {
     this.form.controls.correoPayPal.reset('');
     this.form.controls.prefijoBizum.setValue('+34');
     this.form.controls.telefonoBizum.reset('');
-    this.actualizarValidadores(tipo);
+    this.actualizarValidadores(tipo, this.metodoEnEdicion() !== null);
     this.errorRegistro.set('');
     this.mensajeExito.set('');
   }
@@ -132,6 +149,12 @@ export class MetodosPagoComponent implements OnInit {
     }
 
     const datos = this.form.getRawValue();
+    const metodoEnEdicion = this.metodoEnEdicion();
+    if (metodoEnEdicion) {
+      this.modificar(metodoEnEdicion, datos);
+      return;
+    }
+
     const marcaTarjeta = datos.tipo === 'TARJETA' ? this.marcaTarjeta(datos.numeroTarjeta) : '';
     const ultimosCuatro =
       datos.tipo === 'TARJETA' ? datos.numeroTarjeta.replace(/\D/g, '').slice(-4) : '';
@@ -203,6 +226,109 @@ export class MetodosPagoComponent implements OnInit {
     });
   }
 
+  iniciarEdicion(metodo: MetodoPago): void {
+    const [caducidadMes = '', caducidadAnio = ''] = (metodo.caducidad ?? '').split('/');
+    this.metodoEnEdicion.set(metodo);
+    this.errorRegistro.set('');
+    this.mensajeExito.set('');
+    this.form.reset({
+      tipo: metodo.tipo,
+      alias: metodo.alias,
+      nombreTitular: metodo.titular ?? '',
+      numeroTarjeta: metodo.tipo === 'TARJETA' ? metodo.referencia : '',
+      caducidadMes,
+      caducidadAnio: caducidadAnio.length === 2 ? `20${caducidadAnio}` : caducidadAnio,
+      cvc: '',
+      correoPayPal: metodo.tipo === 'PAYPAL' ? metodo.referencia : '',
+      prefijoBizum: '+34',
+      telefonoBizum: metodo.tipo === 'BIZUM' ? metodo.referencia : '',
+    });
+    this.actualizarValidadores(metodo.tipo, true);
+  }
+
+  cancelarEdicion(): void {
+    this.metodoEnEdicion.set(null);
+    this.errorRegistro.set('');
+    this.mensajeExito.set('');
+    this.form.reset({
+      tipo: 'TARJETA',
+      alias: '',
+      nombreTitular: '',
+      numeroTarjeta: '',
+      caducidadMes: '',
+      caducidadAnio: '',
+      cvc: '',
+      correoPayPal: '',
+      prefijoBizum: '+34',
+      telefonoBizum: '',
+    });
+    this.actualizarValidadores('TARJETA', false);
+  }
+
+  private modificar(
+    metodo: MetodoPago,
+    datos: DatosFormularioMetodoPago,
+  ): void {
+    const marcaTarjeta = datos.tipo === 'TARJETA' ? this.marcaTarjeta(datos.numeroTarjeta) : '';
+    const ultimosCuatro =
+      datos.tipo === 'TARJETA' ? datos.numeroTarjeta.replace(/\D/g, '').slice(-4) : '';
+    const aliasPredeterminado =
+      datos.tipo === 'TARJETA'
+        ? `${marcaTarjeta} •••• ${ultimosCuatro}`
+        : datos.tipo === 'PAYPAL'
+          ? 'PayPal'
+          : 'Bizum';
+    const alias = datos.alias.trim() || aliasPredeterminado;
+    const datosModificacion: RegistrarMetodoPagoRequest =
+      datos.tipo === 'TARJETA'
+        ? {
+            tipo: datos.tipo,
+            alias,
+            titular: datos.nombreTitular.trim(),
+            numeroTarjeta: this.referenciaTarjeta(datos.numeroTarjeta),
+            caducidad: this.formatearCaducidad(datos.caducidadMes, datos.caducidadAnio),
+          }
+        : datos.tipo === 'PAYPAL'
+          ? {
+              tipo: datos.tipo,
+              alias,
+              titular: alias,
+              correoPayPal: datos.correoPayPal.trim(),
+            }
+          : {
+              tipo: datos.tipo,
+              alias,
+              titular: alias,
+              telefonoBizum: this.metodoEnEdicion()
+                ? datos.telefonoBizum.replace(/\s/g, '')
+                : `${datos.prefijoBizum}${datos.telefonoBizum.replace(/\D/g, '')}`,
+            };
+
+    if (datos.tipo === 'TARJETA') {
+      this.form.controls.numeroTarjeta.setValue(datosModificacion.numeroTarjeta ?? '');
+      this.form.controls.cvc.reset('');
+    }
+    this.guardando.set(true);
+    this.errorRegistro.set('');
+    this.mensajeExito.set('');
+    this.metodosPagoService.modificar(metodo.id, datosModificacion).subscribe({
+      next: (metodoModificado) => {
+        this.metodos.update((metodos) =>
+          metodos.map((actual) => (actual.id === metodo.id ? metodoModificado : actual)),
+        );
+        this.guardando.set(false);
+        this.cancelarEdicion();
+        this.mensajeExito.set(`Se ha actualizado «${metodoModificado.alias}» correctamente.`);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.guardando.set(false);
+        this.errorRegistro.set(
+          this.auth.errorMessage(error, 'No se ha podido modificar el método de pago.'),
+        );
+      },
+    });
+  }
+
   solicitarEliminacion(metodo: MetodoPago): void {
     this.errorEliminacion.set('');
     this.mensajeEliminacion.set('');
@@ -227,6 +353,9 @@ export class MetodosPagoComponent implements OnInit {
     this.metodosPagoService.eliminar(metodo.id).subscribe({
       next: () => {
         this.metodos.update((metodos) => metodos.filter((item) => item.id !== metodo.id));
+        if (this.metodoEnEdicion()?.id === metodo.id) {
+          this.cancelarEdicion();
+        }
         this.metodoPendienteEliminar.set(null);
         this.mensajeEliminacion.set(`Se ha eliminado «${metodo.alias}» correctamente.`);
         this.eliminando.set(false);
@@ -264,11 +393,17 @@ export class MetodosPagoComponent implements OnInit {
     );
   }
 
-  private actualizarValidadores(tipo: TipoMetodoPago): void {
+  private actualizarValidadores(tipo: TipoMetodoPago, editando = false): void {
     const controles = this.form.controls;
     const camposActivos =
       tipo === 'TARJETA'
-        ? ['nombreTitular', 'numeroTarjeta', 'caducidadMes', 'caducidadAnio', 'cvc']
+        ? [
+            'nombreTitular',
+            'numeroTarjeta',
+            'caducidadMes',
+            'caducidadAnio',
+            ...(editando ? [] : ['cvc']),
+          ]
         : tipo === 'PAYPAL'
           ? ['correoPayPal']
           : ['telefonoBizum'];
@@ -277,19 +412,24 @@ export class MetodosPagoComponent implements OnInit {
       if (nombre === 'tipo') {
         continue;
       }
-      control.setValidators(camposActivos.includes(nombre) ? this.validadoresPara(nombre) : []);
+      control.setValidators(
+        camposActivos.includes(nombre) ? this.validadoresPara(nombre, editando) : [],
+      );
       control.updateValueAndValidity({ emitEvent: false });
     }
     this.form.setValidators(tipo === 'TARJETA' ? this.noCaducada : null);
     this.form.updateValueAndValidity({ emitEvent: false });
   }
 
-  private validadoresPara(campo: string) {
+  private validadoresPara(campo: string, editando = false) {
     switch (campo) {
       case 'nombreTitular':
         return [Validators.required, Validators.pattern(NO_VACIO)];
       case 'numeroTarjeta':
-        return [Validators.required, Validators.pattern(NUMERO_TARJETA)];
+        return [
+          Validators.required,
+          Validators.pattern(editando ? NUMERO_TARJETA_O_REFERENCIA : NUMERO_TARJETA),
+        ];
       case 'caducidadMes':
         return [Validators.required];
       case 'caducidadAnio':
@@ -299,7 +439,10 @@ export class MetodosPagoComponent implements OnInit {
       case 'correoPayPal':
         return [Validators.required, Validators.email];
       case 'telefonoBizum':
-        return [Validators.required, Validators.pattern(TELEFONO)];
+        return [
+          Validators.required,
+          Validators.pattern(editando ? TELEFONO_INTERNACIONAL : TELEFONO),
+        ];
       default:
         return [];
     }

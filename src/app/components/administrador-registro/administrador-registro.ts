@@ -7,6 +7,8 @@ import { AbstractControl,
 import { MarcoPagina } from '../marco-pagina/marco-pagina';
 import { Administradores } from '../../services/crear-admin-service/administradores';
 import { AvatarSelector, avatarAleatorio } from '../avatar-selector/avatar-selector';
+import { CloudinaryService } from '../../services/cloudinary.service';
+import { environment } from '../../../environments/environment';
 
 // Misma política que AdministradorRegistroDTO del back
 const PATRON_CONTRASENA = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).+$/;
@@ -45,7 +47,8 @@ function validarDatosPersonales(control: AbstractControl): ValidationErrors | nu
 })
 export class AdministradorRegistro {
   private readonly administradores = inject(Administradores);
-
+  private readonly cloudinary = inject(CloudinaryService);
+  readonly archivoAvatar = signal<File | null>(null);
   readonly mensajeExito = signal('');
   readonly mensajeError = signal('');
   readonly enviando = signal(false);
@@ -82,30 +85,43 @@ export class AdministradorRegistro {
   });
 
   enviar(): void {
-    
-    this.form.controls.confirmarContrasena.setErrors(
-      this.form.controls.contrasena.value === this.form.controls.confirmarContrasena.value
-        ? null
-        : { noCoinciden: true },
-    );
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    if (!this.form.controls.imagenPerfil.value.trim()) {
-      this.form.controls.imagenPerfil.setValue(avatarAleatorio());
-    }
-
+    
     this.mensajeExito.set('');
     this.mensajeError.set('');
     this.enviando.set(true);
 
-    this.administradores.crear(this.form.getRawValue()).subscribe({
+    const archivo = this.archivoAvatar();
+    if (archivo) {
+      this.cloudinary.subirImagen(archivo, environment.carpetaAvatares).subscribe({
+        next: (url) => this.ejecutarRegistro(url),
+        error: () => {
+          this.mensajeError.set('Error al subir la imagen de perfil.');
+          this.enviando.set(false);
+        }
+      });
+    } else {
+      let imagenFinal = this.form.controls.imagenPerfil.value.trim();
+      if (!imagenFinal || imagenFinal.startsWith('data:image')) {
+        imagenFinal = avatarAleatorio(false);
+      }
+      this.ejecutarRegistro(imagenFinal);
+    }
+  }
+
+  private ejecutarRegistro(imagenFinal: string): void {
+    const datos = this.form.getRawValue();
+    datos.imagenPerfil = imagenFinal;
+
+    this.administradores.crear(datos).subscribe({
       next: (respuesta) => {
         this.enviando.set(false);
         this.mensajeExito.set(respuesta.mensaje);
         this.form.reset();
+        this.archivoAvatar.set(null);
       },
       error: (error: HttpErrorResponse) => {
         this.enviando.set(false);

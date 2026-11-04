@@ -11,6 +11,8 @@ import {
   TipoCliente,
 } from '../../services/perfil.service';
 import { AvatarSelector, avatarAleatorio } from '../avatar-selector/avatar-selector';
+import { CloudinaryService } from '../../services/cloudinary.service';
+import { environment } from '../../../environments/environment';
 
 const NO_VACIO = /\S/;
 const TELEFONO_PATTERN = /^\d{9}$/;
@@ -26,6 +28,8 @@ export class Cuenta {
   private readonly auth = inject(AuthService);
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
+  private readonly cloudinary = inject(CloudinaryService);
+  readonly archivoAvatar = signal<File | null>(null);
 
   readonly rol = this.auth.rol;
   readonly esPerfilEditable = computed(() => {
@@ -131,16 +135,38 @@ export class Cuenta {
       this.form.markAllAsTouched();
       return;
     }
-
     const rol = this.rol();
     if (rol !== 'ADMINISTRADOR' && rol !== 'CLIENTE' && rol !== 'VENDEDOR') {
       return;
     }
 
+    this.guardando.set(true);
+    this.mensajeError.set('');
+    this.mensajeExito.set('');
+
+    const archivo = this.archivoAvatar();
+    if (archivo) {
+      this.cloudinary.subirImagen(archivo, environment.carpetaAvatares).subscribe({
+        next: (url) => this.ejecutarGuardado(url, rol),
+        error: () => {
+          this.mensajeError.set('Error al subir la imagen de perfil.');
+          this.guardando.set(false);
+        }
+      });
+    } else {
+      let imagenFinal = this.form.controls.imagenPerfil.value.trim();
+      if (!imagenFinal || imagenFinal.startsWith('data:image')) {
+        imagenFinal = avatarAleatorio(rol === 'VENDEDOR');
+      }
+      this.ejecutarGuardado(imagenFinal, rol);
+    }
+  }
+
+  private ejecutarGuardado(imagenFinal: string, rol: string): void {
+    this.form.controls.imagenPerfil.setValue(imagenFinal);
     const valores = this.form.getRawValue();
-    const imagenPerfil = valores.imagenPerfil.trim() || avatarAleatorio(rol === 'VENDEDOR');
-    this.form.controls.imagenPerfil.setValue(imagenPerfil);
     const datosEspecificos: Partial<ActualizarPerfilRequest> = {};
+    
     if (rol === 'CLIENTE') {
       datosEspecificos.tipoCliente = valores.tipoCliente;
     } else if (rol === 'ADMINISTRADOR') {
@@ -149,20 +175,18 @@ export class Cuenta {
       datosEspecificos.nombreComercial = valores.nombreComercial.trim();
       datosEspecificos.categoriaPrincipalId = valores.categoriaPrincipalId.trim();
     }
+
     const datos: ActualizarPerfilRequest = {
       nombre: valores.nombre.trim(),
       apellidos: valores.apellidos.trim(),
       ...(valores.telefono.trim() ? { telefono: valores.telefono.trim() } : {}),
-      imagenPerfil,
+      imagenPerfil: imagenFinal,
       ...datosEspecificos,
     };
 
-    this.guardando.set(true);
-    this.mensajeError.set('');
-    this.mensajeExito.set('');
     this.perfilService.actualizarMiPerfil(datos).subscribe({
       next: () => {
-        this.aplicarCambiosLocales(datos, rol);
+        this.aplicarCambiosLocales(datos, rol as Rol);
         this.guardando.set(false);
         this.mensajeExito.set('Los datos de tu perfil se han actualizado.');
       },

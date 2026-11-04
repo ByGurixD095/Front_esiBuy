@@ -1,7 +1,28 @@
 <main class="detail-shell">
   <header class="detail-header">
     <a routerLink="/" class="brand">Esi<strong>Buy</strong></a>
-    <a routerLink="/products" class="back-link">← Volver al catálogo</a>
+    <nav class="detail-nav" aria-label="Navegación de productos">
+      <a routerLink="/products" class="back-link">← Volver al catálogo</a>
+      @if (esCliente()) {
+        <a
+          routerLink="/cart"
+          class="cart-link"
+          [attr.aria-label]="
+            cantidadEnCarrito() === null
+              ? 'Ir a mi cesta'
+              : 'Ir a mi cesta, ' +
+                cantidadEnCarrito() +
+                (cantidadEnCarrito() === 1 ? ' producto' : ' productos')
+          "
+          title="Mi cesta"
+        >
+          <span aria-hidden="true">🛒</span>
+          @if (cantidadEnCarrito() !== null) {
+            <span class="cart-count" aria-hidden="true">{{ cantidadEnCarrito() }}</span>
+          }
+        </a>
+      }
+    </nav>
   </header>
 
   @if (cargando()) {
@@ -52,7 +73,29 @@
         </p>
 
         <section class="purchase-panel" aria-label="Opciones de compra">
-          <button type="button" class="buy-button" disabled>Comprar ahora</button>
+          @if (esCliente()) {
+            <button
+              type="button"
+              class="buy-button"
+              [disabled]="anadiendoAlCarrito() || item.numStock < 1"
+              (click)="anadirAlCarrito()"
+            >
+              {{ anadiendoAlCarrito() ? 'Añadiendo...' : 'Añadir a la cesta' }}
+            </button>
+            <button type="button" class="buy-button wishlist-button" (click)="abrirSelectorLista()">
+              Guardar en lista de deseos
+            </button>
+            @if (mensajeCarrito(); as mensaje) {
+              <p class="cart-feedback" role="status">{{ mensaje }}</p>
+            }
+            @if (errorCarrito(); as mensaje) {
+              <p class="cart-feedback cart-feedback-error" role="alert">{{ mensaje }}</p>
+            }
+            @if (mensajeListaDeseos(); as mensaje) {
+              <p class="cart-feedback" role="status">{{ mensaje }}</p>
+            }
+          }
+          <button type="button" class="buy-button checkout-button" disabled>Comprar ahora</button>
           <p>La compra online todavía no está disponible en EsiBuy.</p>
         </section>
 
@@ -74,5 +117,91 @@
         }
       </div>
     </section>
+  }
+
+  @if (selectorListaAbierto()) {
+    <div class="wishlist-dialog-backdrop">
+      <section
+        class="wishlist-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wishlist-dialog-title"
+        (keydown.escape)="cancelarSelectorLista()"
+      >
+        <h2 id="wishlist-dialog-title">Guardar en una lista</h2>
+        <p>Selecciona dónde quieres guardar «{{ producto()?.nombre }}».</p>
+
+        @if (cargandoListasDeseos()) {
+          <p role="status">Cargando tus listas de deseos…</p>
+        } @else if (listasDeseos().length === 0 && errorListaDeseos(); as mensajeError) {
+          <p class="cart-feedback cart-feedback-error" role="alert">{{ mensajeError }}</p>
+          <button type="button" class="wishlist-action" (click)="cargarListasDeseos()">Reintentar</button>
+        } @else if (listasDeseos().length === 0) {
+          <p role="status">Todavía no tienes listas de deseos.</p>
+        } @else {
+          <label class="wishlist-select-label" for="detail-wishlist-select">Lista de deseos</label>
+          <select
+            id="detail-wishlist-select"
+            [value]="listaDeseosSeleccionadaId()"
+            (change)="seleccionarListaDeseos($event)"
+          >
+            @for (lista of listasDeseos(); track lista.id) {
+              <option [value]="lista.id">{{ lista.nombre }}</option>
+            }
+          </select>
+          @if (errorListaDeseos(); as mensajeError) {
+            <p class="cart-feedback cart-feedback-error" role="alert">{{ mensajeError }}</p>
+          }
+          <div class="wishlist-dialog-actions">
+            <button type="button" class="wishlist-cancel" [disabled]="guardandoEnLista()" (click)="cancelarSelectorLista()">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="wishlist-action"
+              [disabled]="guardandoEnLista() || !listaDeseosSeleccionadaId()"
+              (click)="confirmarAnadirALista()"
+            >{{ guardandoEnLista() ? 'Guardando…' : 'Guardar producto' }}</button>
+          </div>
+        }
+        @if (!mostrandoNuevaLista()) {
+          <button
+            type="button"
+            class="wishlist-create-toggle"
+            [disabled]="guardandoEnLista()"
+            (click)="alternarFormularioNuevaLista()"
+          >Crear nueva lista</button>
+        } @else {
+          <div class="wishlist-create-form">
+            <label class="wishlist-select-label" for="detail-wishlist-new-name">Nombre de la nueva lista</label>
+            <input
+              id="detail-wishlist-new-name"
+              type="text"
+              maxlength="100"
+              [value]="nombreNuevaLista()"
+              [disabled]="guardandoEnLista()"
+              (input)="actualizarNombreNuevaLista($event)"
+            />
+            @if (errorListaDeseos(); as mensajeError) {
+              <p class="cart-feedback cart-feedback-error" role="alert">{{ mensajeError }}</p>
+            }
+            <div class="wishlist-dialog-actions">
+              <button
+                type="button"
+                class="wishlist-cancel"
+                [disabled]="guardandoEnLista()"
+                (click)="alternarFormularioNuevaLista()"
+              >Volver</button>
+              <button
+                type="button"
+                class="wishlist-action"
+                [disabled]="guardandoEnLista() || !nombreNuevaLista().trim()"
+                (click)="crearListaYGuardarProducto()"
+              >{{ guardandoEnLista() ? 'Creando y guardando…' : 'Crear y guardar producto' }}</button>
+            </div>
+          </div>
+        }
+      </section>
+    </div>
   }
 </main>

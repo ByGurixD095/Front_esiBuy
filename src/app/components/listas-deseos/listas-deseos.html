@@ -1,0 +1,98 @@
+<app-marco-pagina panel="Listas de deseos">
+  <section class="pagina" aria-labelledby="listas-titulo" [attr.aria-busy]="cargandoListas() || cargandoProductos()">
+    @if (idLista(); as id) {
+      <a class="volver-listas" routerLink="/listas-deseos">← Volver a todas las listas</a>
+      <p class="esi-eyebrow">Área de cliente</p>
+      <h1 id="listas-titulo" class="esi-titulo">{{ listaSeleccionada()?.nombre || 'Lista de deseos' }}.</h1>
+
+      @if (cargandoListas() || cargandoProductos()) {
+        <p class="estado" role="status">Cargando los productos de la lista…</p>
+      } @else if (errorListas(); as mensaje) {
+        <section class="estado estado-error" role="alert">
+          <p>{{ mensaje }}</p>
+          <button type="button" class="esi-boton" (click)="cargar(id)">Reintentar</button>
+        </section>
+      } @else if (errorProductos(); as mensaje) {
+        <section class="estado estado-error" role="alert">
+          <p>{{ mensaje }}</p>
+          <button type="button" class="esi-boton" (click)="cargar(id)">Reintentar</button>
+        </section>
+      } @else if (productos().length === 0) {
+        <section class="estado" role="status">
+          <h2>Esta lista está vacía</h2>
+          <p>Aún no has añadido productos a esta lista de deseos.</p>
+        </section>
+      } @else {
+        <p class="contador" role="status">
+          {{ productos().length }} {{ productos().length === 1 ? 'producto' : 'productos' }}
+        </p>
+        <ul class="lista-productos">
+          @for (producto of productos(); track producto.id) {
+            <li class="tarjeta-producto" [class.inactivo]="!producto.activo">
+              <a class="imagen" [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver ' + producto.nombre">
+                @if (producto.urlImagen) {
+                  <img [src]="producto.urlImagen" [alt]="producto.nombre" loading="lazy" />
+                } @else {
+                  <span class="sin-imagen">Sin imagen</span>
+                }
+                @if (!producto.activo) {
+                  <span class="overlay-inactivo">No disponible</span>
+                }
+              </a>
+              <div class="datos">
+                <p class="categoria">{{ producto.categoria }}</p>
+                <h2><a [routerLink]="['/products', producto.id]">{{ producto.nombre }}</a></h2>
+                <p class="precio">
+                  @if (producto.descuento > 0) {
+                    <del>{{ formatearPrecio(producto.precioCent) }}</del>
+                  }
+                  <strong>{{ formatearPrecio(producto.precioCent, producto.descuento) }}</strong>
+                  @if (producto.descuento > 0) {
+                    <span class="descuento">-{{ producto.descuento }}%</span>
+                  }
+                </p>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    } @else {
+      <p class="esi-eyebrow">Área de cliente</p>
+      <h1 id="listas-titulo" class="esi-titulo">Mis <em>listas de deseos.</em></h1>
+      <p class="descripcion">Consulta tus listas y descubre los productos que has guardado.</p>
+
+      @if (cargandoListas()) {
+        <p class="estado" role="status">Cargando tus listas de deseos…</p>
+      } @else if (errorListas(); as mensaje) {
+        <section class="estado estado-error" role="alert">
+          <p>{{ mensaje }}</p>
+          <button type="button" class="esi-boton" (click)="cargar(null)">Reintentar</button>
+        </section>
+      } @else if (listas().length === 0) {
+        <section class="estado" role="status">
+          <h2>Todavía no tienes listas de deseos</h2>
+          <p>Crea una lista para guardar los productos que quieras consultar más tarde.</p>
+          <a class="esi-boton" routerLink="/listas-deseos/nueva">Crear lista</a>
+        </section>
+      } @else {
+        <div class="encabezado-listas">
+          <p class="contador" role="status">
+            {{ listas().length }} {{ listas().length === 1 ? 'lista creada' : 'listas creadas' }}
+          </p>
+          <a class="esi-boton" routerLink="/listas-deseos/nueva">Crear lista</a>
+        </div>
+        <ul class="lista-listas">
+          @for (lista of listas(); track lista.id) {
+            <li>
+              <a class="tarjeta-lista esi-tarjeta" [routerLink]="['/listas-deseos', lista.id]">
+                <span class="icono-lista" aria-hidden="true">♡</span>
+                <span class="nombre-lista">{{ lista.nombre }}</span>
+                <span class="abrir-lista" aria-hidden="true">→</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+</app-marco-pagina>

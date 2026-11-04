@@ -59,14 +59,26 @@
                     {{ referenciaVisible(metodo.referencia, metodo.tipo) }}
                   </p>
                 }
-                <button
-                  type="button"
-                  class="boton-quitar"
-                  [attr.aria-label]="'Eliminar ' + metodo.alias"
-                  (click)="solicitarEliminacion(metodo)"
-                >
-                  Eliminar
-                </button>
+                <div class="acciones-metodo">
+                  <button
+                    type="button"
+                    class="boton-editar"
+                    [disabled]="guardando() || eliminando()"
+                    [attr.aria-label]="'Modificar ' + metodo.alias"
+                    (click)="iniciarEdicion(metodo)"
+                  >
+                    Modificar
+                  </button>
+                  <button
+                    type="button"
+                    class="boton-quitar"
+                    [disabled]="guardando() || eliminando()"
+                    [attr.aria-label]="'Eliminar ' + metodo.alias"
+                    (click)="solicitarEliminacion(metodo)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </li>
             }
           </ul>
@@ -77,10 +89,16 @@
         class="seccion-metodos panel-metodos panel-registro"
         aria-labelledby="registro-titulo"
       >
-        <p class="esi-eyebrow">Añadir nuevo</p>
-        <h2 id="registro-titulo">Registrar un método de pago</h2>
+        <p class="esi-eyebrow">{{ metodoEnEdicion() ? 'Modificar método' : 'Añadir nuevo' }}</p>
+        <h2 id="registro-titulo">
+          {{ metodoEnEdicion() ? 'Modificar un método de pago' : 'Registrar un método de pago' }}
+        </h2>
         <p class="subtitulo-formulario">
-          Los datos sensibles de la tarjeta no se guardan completos.
+          @if (metodoEnEdicion()) {
+            Actualiza los datos del método seleccionado. Los datos sensibles de la tarjeta no se guardan completos.
+          } @else {
+            Los datos sensibles de la tarjeta no se guardan completos.
+          }
         </p>
         <form [formGroup]="form" (ngSubmit)="registrar()" autocomplete="off" novalidate>
           <div class="campos">
@@ -132,9 +150,18 @@
                   maxlength="23"
                   required
                 />
+                @if (metodoEnEdicion()) {
+                  <small class="esi-ayuda">
+                    Por seguridad solo se conserva la referencia enmascarada; puedes mantenerla o introducir otra tarjeta.
+                  </small>
+                }
                 @if (esInvalido('numeroTarjeta')) {
                   <small class="esi-ayuda esi-error">
-                    Introduce un número de tarjeta válido, de 13 a 19 dígitos.
+                    @if (metodoEnEdicion()) {
+                      Introduce una tarjeta válida o conserva la referencia enmascarada.
+                    } @else {
+                      Introduce un número de tarjeta válido, de 13 a 19 dígitos.
+                    }
                   </small>
                 }
               </div>
@@ -174,20 +201,22 @@
                 }
               </div>
 
-              <div class="esi-campo">
-                <label for="cvc">CVC</label>
-                <input
-                  id="cvc"
-                  type="text"
-                  formControlName="cvc"
-                  autocomplete="new-password"
-                  maxlength="4"
-                  required
-                />
-                @if (esInvalido('cvc')) {
-                  <small class="esi-ayuda esi-error">Introduce un CVC de 3 o 4 dígitos.</small>
-                }
-              </div>
+              @if (!metodoEnEdicion()) {
+                <div class="esi-campo">
+                  <label for="cvc">CVC</label>
+                  <input
+                    id="cvc"
+                    type="text"
+                    formControlName="cvc"
+                    autocomplete="new-password"
+                    maxlength="4"
+                    required
+                  />
+                  @if (esInvalido('cvc')) {
+                    <small class="esi-ayuda esi-error">Introduce un CVC de 3 o 4 dígitos.</small>
+                  }
+                </div>
+              }
             } @else if (form.controls.tipo.value === 'PAYPAL') {
               <div class="esi-campo campo-completo">
                 <label for="correo-paypal">Correo de PayPal</label>
@@ -205,29 +234,42 @@
             } @else {
               <div class="esi-campo campo-completo">
                 <label for="telefono-bizum">Número de teléfono de Bizum</label>
-                <div class="telefono-bizum">
-                  <select
-                    id="prefijo-bizum"
-                    formControlName="prefijoBizum"
-                    aria-label="Prefijo internacional"
-                    autocomplete="off"
-                  >
-                    @for (prefijo of prefijosTelefonicos; track prefijo.valor) {
-                      <option [value]="prefijo.valor">
-                        {{ prefijo.valor }} {{ prefijo.pais }}
-                      </option>
-                    }
-                  </select>
+                @if (metodoEnEdicion()) {
                   <input
                     id="telefono-bizum"
                     type="tel"
                     inputmode="numeric"
                     formControlName="telefonoBizum"
                     autocomplete="off"
-                    placeholder="612 345 678"
+                    placeholder="+34612345678"
                     required
                   />
-                </div>
+                  <small class="esi-ayuda">Incluye el prefijo internacional, por ejemplo +34.</small>
+                } @else {
+                  <div class="telefono-bizum">
+                    <select
+                      id="prefijo-bizum"
+                      formControlName="prefijoBizum"
+                      aria-label="Prefijo internacional"
+                      autocomplete="off"
+                    >
+                      @for (prefijo of prefijosTelefonicos; track prefijo.valor) {
+                        <option [value]="prefijo.valor">
+                          {{ prefijo.valor }} {{ prefijo.pais }}
+                        </option>
+                      }
+                    </select>
+                    <input
+                      id="telefono-bizum"
+                      type="tel"
+                      inputmode="numeric"
+                      formControlName="telefonoBizum"
+                      autocomplete="off"
+                      placeholder="612 345 678"
+                      required
+                    />
+                  </div>
+                }
                 @if (esInvalido('telefonoBizum')) {
                   <small class="esi-ayuda esi-error">
                     Introduce el número sin prefijo, con entre 8 y 12 dígitos.
@@ -244,9 +286,25 @@
             <p class="esi-alerta esi-alerta--error" role="alert">{{ errorRegistro() }}</p>
           }
 
-          <button type="submit" class="esi-boton" [disabled]="form.invalid || guardando()">
-            {{ guardando() ? 'Registrando…' : 'Registrar método de pago' }}
-          </button>
+          <div class="acciones-formulario">
+            @if (metodoEnEdicion()) {
+              <button
+                type="button"
+                class="esi-boton boton-secundario"
+                [disabled]="guardando()"
+                (click)="cancelarEdicion()"
+              >
+                Cancelar
+              </button>
+            }
+            <button type="submit" class="esi-boton" [disabled]="form.invalid || guardando()">
+              @if (guardando()) {
+                Guardando…
+              } @else {
+                {{ metodoEnEdicion() ? 'Guardar cambios' : 'Registrar método de pago' }}
+              }
+            </button>
+          </div>
         </form>
       </section>
     </div>

@@ -37,6 +37,8 @@ describe('CrearListaDeseos', () => {
 
     expect(servicioFalso.crear).toHaveBeenCalledWith('Para comprar');
     expect(html().textContent).toContain('Se ha creado la lista «Para comprar».');
+    expect(html().querySelector('.volver-listas')?.getAttribute('href')).toBe('/listas-deseos');
+    expect(html().textContent).toContain('Volver a todas las listas');
   });
 
   it('no envía un nombre en blanco', async () => {

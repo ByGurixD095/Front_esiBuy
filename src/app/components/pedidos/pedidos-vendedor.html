@@ -1,0 +1,131 @@
+<app-marco-pagina panel="Pedidos de venta">
+  <section class="orders-page" aria-labelledby="seller-orders-title" [attr.aria-busy]="cargando()">
+    <div class="orders-heading">
+      <div>
+        <p class="eyebrow">Área de vendedor</p>
+        <h1 id="seller-orders-title">Pedidos de venta</h1>
+        <p class="intro-copy">Gestiona el envío de tus líneas y consulta las ventas históricas.</p>
+      </div>
+      <a class="continue-link" routerLink="/products/catalogo">Volver a mi catálogo</a>
+    </div>
+
+    <div class="order-tabs" role="tablist" aria-label="Tipo de pedidos de venta">
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="!historico()"
+        [class.selected]="!historico()"
+        (click)="cambiarVista(false)"
+      >Pedidos en curso</button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="historico()"
+        [class.selected]="historico()"
+        (click)="cambiarVista(true)"
+      >Historial</button>
+    </div>
+
+    @if (avisoAccion()) {
+      <p class="inline-notice" role="status">{{ avisoAccion() }}</p>
+    }
+
+    @if (cargando()) {
+      <section class="orders-state" role="status" aria-live="polite">
+        <span class="loader" aria-hidden="true"></span>
+        <h2>Cargando pedidos de venta</h2>
+        <p>Estamos recuperando las líneas asignadas a tu tienda.</p>
+      </section>
+    } @else if (error()) {
+      <section class="orders-state error-state" role="alert">
+        <span class="state-symbol" aria-hidden="true">!</span>
+        <h2>No se han podido cargar los pedidos</h2>
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-button" (click)="cargarPedidos()">Reintentar</button>
+      </section>
+    } @else if (pedidos().length === 0) {
+      <section class="orders-state empty-state" aria-live="polite">
+        <span class="empty-symbol" aria-hidden="true">○</span>
+        <h2>{{ historico() ? 'Aún no tienes ventas históricas' : 'No tienes pedidos en curso' }}</h2>
+        <p>
+          {{ historico()
+            ? 'Los pedidos finalizados o cancelados aparecerán aquí.'
+            : 'Los pedidos pagados que incluyen productos de tu tienda aparecerán aquí.' }}
+        </p>
+      </section>
+    } @else {
+      <div class="orders-list" [attr.aria-label]="historico() ? 'Historial de ventas' : 'Pedidos de venta en curso'">
+        @for (pedido of pedidos(); track pedido.id) {
+          <article class="order-card">
+            <header class="order-header">
+              <div>
+                <p class="order-label">Pedido de {{ pedido.nombreCliente || 'Cliente' }}</p>
+                <h2>{{ pedido.id }}</h2>
+                <p class="order-date">{{ formatearFecha(pedido.fechaPedido) }}</p>
+              </div>
+              <span class="order-status">{{ estadoLegible(pedido.estado) }}</span>
+            </header>
+
+            <div class="order-lines">
+              @for (linea of pedido.lineas; track linea.productoId) {
+                <div class="order-line">
+                  <div class="line-image">
+                    @if (linea.urlImagen) {
+                      <img [src]="linea.urlImagen" [alt]="linea.nombre" />
+                    } @else {
+                      <span aria-hidden="true">Sin imagen</span>
+                    }
+                  </div>
+                  <div class="line-info">
+                    <h3>{{ linea.nombre }}</h3>
+                    <p>
+                      Ref. {{ linea.referencia }} · {{ linea.cantidad }}
+                      {{ linea.cantidad === 1 ? 'unidad' : 'unidades' }}
+                    </p>
+                    <p class="line-shipping-status" [class.line-shipped]="linea.enviado">
+                      {{ linea.enviado ? 'Enviada' : 'Pendiente de envío' }}
+                    </p>
+                  </div>
+                  <strong class="line-subtotal">{{ formatearPrecio(linea.subtotalCent) }}</strong>
+                </div>
+              }
+            </div>
+
+            <div class="order-details">
+              <section aria-label="Dirección de envío">
+                <h3>Envío</h3>
+                <p>
+                  {{ pedido.direccionEnvio.nombreCompleto }}<br />
+                  {{ pedido.direccionEnvio.direccion }}<br />
+                  {{ pedido.direccionEnvio.codigoPostal }} {{ pedido.direccionEnvio.ciudad }},
+                  {{ pedido.direccionEnvio.provincia }}<br />
+                  {{ pedido.direccionEnvio.pais }} · {{ pedido.direccionEnvio.telefono }}
+                </p>
+              </section>
+              <section aria-label="Resumen de tus líneas">
+                <h3>Tus productos</h3>
+                <p>{{ pedido.lineas.length }} líneas · {{ formatearPrecio(pedido.totalCent) }}</p>
+              </section>
+            </div>
+
+            @if (puedeEnviar(pedido)) {
+              <div class="order-actions">
+                <button
+                  type="button"
+                  class="primary-action"
+                  [disabled]="pedidoActualizando() === pedido.id"
+                  (click)="marcarEnviado(pedido)"
+                >{{ pedidoActualizando() === pedido.id ? 'Actualizando…' : 'Marcar mis líneas como enviadas' }}</button>
+              </div>
+            }
+
+            <footer class="order-total">
+              <span>Subtotal de tus líneas</span>
+              <strong>{{ formatearPrecio(pedido.totalCent) }}</strong>
+            </footer>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</app-marco-pagina>

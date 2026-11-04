@@ -4,7 +4,7 @@ export interface ProductoDTO {
   numStock: number;
   precioCent: number;
   descripcion?: string | null;
-  categoria: string;
+  categoriaId: string;
   urlImagen?: string | null;
   descuento: number;
   descuentoPremium: number;
@@ -13,6 +13,7 @@ export interface ProductoDTO {
 // Deveria ir en el service al inicio
 export interface Producto extends ProductoDTO {
   id: string;
+  categoria: string;
 }
 
 export interface ProductInfo {
