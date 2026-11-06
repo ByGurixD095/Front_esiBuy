@@ -29,6 +29,9 @@ export class ListasDeseos implements OnInit {
   readonly cargandoProductos = signal(false);
   readonly errorListas = signal<string | null>(null);
   readonly errorProductos = signal<string | null>(null);
+  readonly listaPendienteEliminar = signal<ListaDeseos | null>(null);
+  readonly errorEliminacionLista = signal<string | null>(null);
+  readonly eliminandoLista = signal(false);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => this.cargar(params.get('id')));
@@ -40,6 +43,9 @@ export class ListasDeseos implements OnInit {
     this.cargandoProductos.set(false);
     this.errorListas.set(null);
     this.errorProductos.set(null);
+    this.listaPendienteEliminar.set(null);
+    this.errorEliminacionLista.set(null);
+    this.eliminandoLista.set(false);
     this.productos.set([]);
 
     this.listasService.listar().subscribe({
@@ -60,6 +66,37 @@ export class ListasDeseos implements OnInit {
     return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(
       precioFinal / 100,
     );
+  }
+
+  solicitarEliminacionLista(lista: ListaDeseos): void {
+    if (this.eliminandoLista()) return;
+    this.errorEliminacionLista.set(null);
+    this.listaPendienteEliminar.set(lista);
+  }
+
+  cancelarEliminacionLista(): void {
+    if (this.eliminandoLista()) return;
+    this.listaPendienteEliminar.set(null);
+    this.errorEliminacionLista.set(null);
+  }
+
+  confirmarEliminacionLista(): void {
+    const lista = this.listaPendienteEliminar();
+    if (!lista || this.eliminandoLista()) return;
+
+    this.errorEliminacionLista.set(null);
+    this.eliminandoLista.set(true);
+    this.listasService.eliminarLista(lista.id).subscribe({
+      next: () => {
+        this.listas.update((listas) => listas.filter((actual) => actual.id !== lista.id));
+        this.listaPendienteEliminar.set(null);
+        this.eliminandoLista.set(false);
+      },
+      error: (error: ListaDeseosApiError) => {
+        this.errorEliminacionLista.set(error.message);
+        this.eliminandoLista.set(false);
+      },
+    });
   }
 
   private cargarProductos(idLista: string): void {

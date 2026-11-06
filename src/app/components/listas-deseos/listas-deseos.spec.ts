@@ -17,7 +17,7 @@ const listasMock: ListaDeseos[] = [
 
 describe('ListasDeseos', () => {
   let fixture: ComponentFixture<ListasDeseos>;
-  const servicioFalso = { listar: vi.fn(), obtenerProductos: vi.fn() };
+  const servicioFalso = { listar: vi.fn(), obtenerProductos: vi.fn(), eliminarLista: vi.fn() };
   const authFalso = {
     isAuthenticated: () => true,
     hasRole: () => true,
@@ -43,6 +43,7 @@ describe('ListasDeseos', () => {
   beforeEach(() => {
     servicioFalso.listar.mockReset();
     servicioFalso.obtenerProductos.mockReset();
+    servicioFalso.eliminarLista.mockReset();
   });
 
   it('muestra todas las listas del cliente', async () => {
@@ -61,6 +62,33 @@ describe('ListasDeseos', () => {
 
     expect(html.textContent).toContain('Todavía no tienes listas de deseos');
     expect(html.querySelector('a[href="/listas-deseos/nueva"]')).not.toBeNull();
+  });
+
+  it('confirma antes de eliminar una lista y la quita tras la respuesta correcta', async () => {
+    servicioFalso.listar.mockReturnValue(of(listasMock));
+    servicioFalso.eliminarLista.mockReturnValue(of(void 0));
+    const html = await crear();
+
+    html.querySelector<HTMLButtonElement>('[aria-label="Eliminar la lista Regalos"]')?.click();
+    fixture.detectChanges();
+
+    expect(html.querySelector('[role="alertdialog"]')).not.toBeNull();
+    expect(html.textContent).toContain('¿Seguro que quieres eliminar esta lista?');
+    expect(html.textContent).toContain('«Regalos»');
+    expect(servicioFalso.eliminarLista).not.toHaveBeenCalled();
+
+    html.querySelector<HTMLButtonElement>('.acciones-modal .boton-secundario')?.click();
+    fixture.detectChanges();
+    expect(html.querySelector('[role="alertdialog"]')).toBeNull();
+    expect(servicioFalso.eliminarLista).not.toHaveBeenCalled();
+
+    html.querySelector<HTMLButtonElement>('[aria-label="Eliminar la lista Regalos"]')?.click();
+    fixture.detectChanges();
+    html.querySelector<HTMLButtonElement>('.acciones-modal .boton-peligro')?.click();
+    fixture.detectChanges();
+
+    expect(servicioFalso.eliminarLista).toHaveBeenCalledWith('lista-2');
+    expect(fixture.componentInstance.listas()).toEqual([listasMock[0]]);
   });
 
   it('muestra los productos de la lista seleccionada y permite volver', async () => {

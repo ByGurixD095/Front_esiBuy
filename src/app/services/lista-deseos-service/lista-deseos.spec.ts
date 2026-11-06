@@ -54,6 +54,15 @@ describe('ListaDeseosService', () => {
     expect(resultado).toEqual(listas);
   });
 
+  it('elimina una lista con DELETE y credenciales', () => {
+    servicio.eliminarLista('lista con espacios').subscribe();
+
+    const peticion = http.expectOne('http://localhost:8080/listas-deseos/lista%20con%20espacios');
+    expect(peticion.request.method).toBe('DELETE');
+    expect(peticion.request.withCredentials).toBe(true);
+    peticion.flush(null, { status: 204, statusText: 'No Content' });
+  });
+
   it('consulta los productos de una lista codificando el identificador', () => {
     const productos = [{ id: 'producto-1', nombre: 'Teclado' }];
     let resultado: unknown;
