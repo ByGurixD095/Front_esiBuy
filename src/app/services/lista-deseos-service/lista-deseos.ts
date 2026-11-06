@@ -44,6 +44,16 @@ export class ListaDeseosService {
       .pipe(catchError((error: HttpErrorResponse) => throwError(() => this.convertir(error, 'crear'))));
   }
 
+  modificarLista(idLista: string, nombre: string): Observable<ListaDeseos> {
+    return this.http
+      .put<ListaDeseos>(
+        `${this.apiUrl}/${encodeURIComponent(idLista)}`,
+        { nombre },
+        { withCredentials: true },
+      )
+      .pipe(catchError((error: HttpErrorResponse) => throwError(() => this.convertir(error, 'modificar'))));
+  }
+
   agregarProducto(idLista: string, idProducto: string): Observable<ListaDeseos> {
     return this.http
       .post<ListaDeseos>(
@@ -56,7 +66,7 @@ export class ListaDeseosService {
 
   private convertir(
     error: HttpErrorResponse,
-    accion: 'crear' | 'listar' | 'productos' | 'agregar',
+    accion: 'crear' | 'listar' | 'productos' | 'agregar' | 'modificar',
   ): ListaDeseosApiError {
     switch (error.status) {
       case 0:
@@ -66,10 +76,17 @@ export class ListaDeseosService {
             ? 'No se puede conectar con el servidor para crear la lista.'
             : accion === 'agregar'
               ? 'No se puede conectar con el servidor para guardar el producto en la lista.'
+              : accion === 'modificar'
+                ? 'No se puede conectar con el servidor para modificar la lista de deseos.'
               : 'No se puede conectar con el servidor para consultar tus listas de deseos.',
         );
       case 400:
-        return new ListaDeseosApiError(error.status, 'Introduce un nombre válido para la lista.');
+        return new ListaDeseosApiError(
+          error.status,
+          accion === 'modificar' || accion === 'crear'
+            ? 'Introduce un nombre válido para la lista.'
+            : 'No se ha podido completar la operación.',
+        );
       case 401:
         return new ListaDeseosApiError(
           error.status,
@@ -77,6 +94,8 @@ export class ListaDeseosService {
             ? 'Tu sesión ha caducado. Inicia sesión de nuevo para crear la lista.'
             : accion === 'agregar'
               ? 'Tu sesión ha caducado. Inicia sesión de nuevo para guardar productos en tus listas.'
+              : accion === 'modificar'
+                ? 'Tu sesión ha caducado. Inicia sesión de nuevo para modificar la lista.'
               : 'Tu sesión ha caducado. Inicia sesión de nuevo para consultar tus listas de deseos.',
         );
       case 403:
@@ -86,6 +105,8 @@ export class ListaDeseosService {
             ? 'Solo los clientes pueden crear listas de deseos.'
             : accion === 'agregar'
               ? 'Solo los clientes pueden guardar productos en listas de deseos.'
+              : accion === 'modificar'
+                ? 'Solo los clientes pueden modificar listas de deseos.'
               : 'Solo los clientes pueden consultar listas de deseos.',
         );
       case 404:
@@ -102,6 +123,8 @@ export class ListaDeseosService {
             ? 'No se ha podido crear la lista. Inténtalo de nuevo más tarde.'
             : accion === 'agregar'
               ? 'No se ha podido guardar el producto en la lista. Inténtalo de nuevo más tarde.'
+              : accion === 'modificar'
+                ? 'No se ha podido modificar la lista de deseos. Inténtalo de nuevo más tarde.'
               : 'No se han podido cargar tus listas de deseos. Inténtalo de nuevo más tarde.',
         );
     }

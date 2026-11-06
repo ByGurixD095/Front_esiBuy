@@ -83,16 +83,86 @@
         </div>
         <ul class="lista-listas">
           @for (lista of listas(); track lista.id) {
-            <li>
-              <a class="tarjeta-lista esi-tarjeta" [routerLink]="['/listas-deseos', lista.id]">
+            <li class="tarjeta-lista esi-tarjeta">
+              <a class="enlace-lista" [routerLink]="['/listas-deseos', lista.id]">
                 <span class="icono-lista" aria-hidden="true">♡</span>
                 <span class="nombre-lista">{{ lista.nombre }}</span>
-                <span class="abrir-lista" aria-hidden="true">→</span>
               </a>
+              <button
+                type="button"
+                class="boton-modificar-lista"
+                [disabled]="guardandoModificacion()"
+                [attr.aria-label]="'Modificar la lista ' + lista.nombre"
+                [attr.title]="'Modificar la lista ' + lista.nombre"
+                (click)="editarLista(lista)"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                </svg>
+              </button>
             </li>
           }
         </ul>
       }
     }
   </section>
+
+  @if (listaEnEdicion(); as lista) {
+    <div class="modal-fondo">
+      <section
+        class="modal-confirmacion esi-tarjeta"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modificar-lista-titulo"
+        aria-describedby="modificar-lista-descripcion"
+        [attr.aria-busy]="guardandoModificacion()"
+      >
+        <p class="esi-eyebrow">Editar lista</p>
+        <h2 id="modificar-lista-titulo">Cambiar nombre de la lista</h2>
+        <p id="modificar-lista-descripcion" class="texto-confirmacion">
+          Modifica el nombre de «{{ lista.nombre }}».
+        </p>
+        <form
+          class="formulario-modificar-lista"
+          (ngSubmit)="confirmarModificacion(nombreListaInput.value)"
+        >
+          <label for="nuevo-nombre-lista">Nombre de la lista</label>
+          <input
+            id="nuevo-nombre-lista"
+            #nombreListaInput
+            type="text"
+            [formControl]="formularioNombre.controls.nombre"
+            autocomplete="off"
+            [disabled]="guardandoModificacion()"
+            [attr.aria-invalid]="formularioNombre.controls.nombre.invalid && formularioNombre.controls.nombre.touched"
+          />
+          @if (formularioNombre.controls.nombre.invalid && formularioNombre.controls.nombre.touched) {
+            <p class="error-modal" role="alert">Escribe un nombre para la lista.</p>
+          }
+          @if (errorModificacion(); as mensaje) {
+            <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p>
+          }
+          <div class="acciones-modal">
+            <button
+              type="button"
+              class="esi-boton boton-secundario"
+              [disabled]="guardandoModificacion()"
+              (click)="cancelarModificacion()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="esi-boton"
+              [disabled]="guardandoModificacion()"
+              (click)="confirmarModificacion(nombreListaInput.value)"
+            >
+              {{ guardandoModificacion() ? 'Guardando…' : 'Guardar cambios' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+
 </app-marco-pagina>

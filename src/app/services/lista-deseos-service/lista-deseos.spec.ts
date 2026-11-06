@@ -54,6 +54,28 @@ describe('ListaDeseosService', () => {
     expect(resultado).toEqual(listas);
   });
 
+  it('modifica el nombre de una lista con PUT y credenciales', () => {
+    const listaActualizada = {
+      id: 'lista con espacios',
+      idCliente: 'cliente-1',
+      nombre: 'Favoritos',
+      productosIds: ['producto-1'],
+    };
+    let resultado: unknown;
+
+    servicio.modificarLista('lista con espacios', 'Favoritos').subscribe((lista) => {
+      resultado = lista;
+    });
+
+    const peticion = http.expectOne('http://localhost:8080/listas-deseos/lista%20con%20espacios');
+    expect(peticion.request.method).toBe('PUT');
+    expect(peticion.request.body).toEqual({ nombre: 'Favoritos' });
+    expect(peticion.request.withCredentials).toBe(true);
+    peticion.flush(listaActualizada);
+
+    expect(resultado).toEqual(listaActualizada);
+  });
+
   it('consulta los productos de una lista codificando el identificador', () => {
     const productos = [{ id: 'producto-1', nombre: 'Teclado' }];
     let resultado: unknown;
