@@ -323,7 +323,7 @@ export class Carrito implements OnInit {
   private mensajeParaError(error: HttpErrorResponse): string {
     if (error.status === 0) return 'No se puede conectar con el servidor. Inténtalo de nuevo.';
     if (error.status === 401) return 'Tu sesión ha caducado. Inicia sesión de nuevo para consultar la cesta.';
-    if (error.status === 403) return 'Solo los clientes pueden consultar y modificar su cesta.';
+    if (error.status === 403) return 'El servidor ha rechazado la petición (403). Comprueba tus permisos y el token de seguridad.';
     if (error.status === 404) return 'No se ha encontrado el carrito o el producto que intentas modificar.';
     if (error.status === 400) return 'La cantidad indicada no es válida.';
     return `No se ha podido actualizar el carrito (HTTP ${error.status}).`;

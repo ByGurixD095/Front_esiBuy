@@ -276,7 +276,7 @@ export class ProductoDetalle implements OnInit {
   private mensajeParaErrorCarrito(error: HttpErrorResponse): string {
     if (error.status === 0) return 'No se puede conectar con el servidor para añadir el producto.';
     if (error.status === 401) return 'Inicia sesión como cliente para añadir productos a la cesta.';
-    if (error.status === 403) return 'Solo los clientes pueden añadir productos a la cesta.';
+    if (error.status === 403) return 'El servidor ha rechazado la petición (403). Comprueba tus permisos y el token de seguridad.';
     if (error.status === 404) return 'El producto ya no está disponible.';
     return `No se ha podido añadir el producto a la cesta (HTTP ${error.status}).`;
   }

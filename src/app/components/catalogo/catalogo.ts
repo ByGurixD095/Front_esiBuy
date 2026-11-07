@@ -302,7 +302,7 @@ export class Catalogo implements OnInit {
   private mensajeParaErrorCarrito(status: number): string {
     if (status === 0) return 'No se puede conectar con el servidor para añadir el producto.';
     if (status === 401) return 'Inicia sesión como cliente para añadir productos a la cesta.';
-    if (status === 403) return 'Solo los clientes pueden añadir productos a la cesta.';
+    if (status === 403) return 'El servidor ha rechazado la petición (403). Comprueba tus permisos y el token de seguridad.';
     if (status === 404) return 'El producto ya no está disponible.';
     return `No se ha podido añadir el producto a la cesta (HTTP ${status}).`;
   }
