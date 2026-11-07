@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { ApiDiagnosticsService } from '../services/api-diagnostics.service';
 
 const RETRIED_AFTER_REFRESH = new HttpContextToken<boolean>(() => false);
 const refreshInProgress = new BehaviorSubject<boolean>(false);
@@ -24,11 +25,25 @@ const isRefreshableRequest = (request: HttpRequest<unknown>): boolean =>
 export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  const diagnostics = inject(ApiDiagnosticsService);
   const isApiRequest = request.url.startsWith(environment.apiUrl);
   const finalRequest = isApiRequest ? request.clone({ withCredentials: true }) : request;
+  const startedAt = Date.now();
+  const requestId = createRequestId();
 
   return next(finalRequest).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (isApiRequest) {
+        diagnostics.record({
+          timestamp: new Date().toISOString(),
+          requestId,
+          method: request.method,
+          endpoint: safeEndpoint(request.url),
+          status: error.status,
+          category: classifyError(error.status),
+          durationMs: Date.now() - startedAt,
+        });
+      }
       const canRefresh =
         error.status === 401 &&
         isRefreshableRequest(request) &&
@@ -68,6 +83,28 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
     }),
   );
 };
+
+function createRequestId(): string {
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function safeEndpoint(url: string): string {
+  try {
+    return new URL(url, globalThis.location?.origin).pathname;
+  } catch {
+    return url.split('?')[0];
+  }
+}
+
+function classifyError(status: number): string {
+  if (status === 0) return 'network-cors-or-cookie';
+  if (status === 401) return 'authentication-or-session';
+  if (status === 403) return 'authorization-or-csrf';
+  if (status >= 500) return 'api-server';
+  return 'http';
+}
 
 function markAsRetried(request: HttpRequest<unknown>): HttpRequest<unknown> {
   return request.clone({

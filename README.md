@@ -46,6 +46,12 @@ The production build uses `https://back-esibuy.onrender.com` as its API URL. To 
 
 The frontend sends cookies with API requests and, in production, automatically fetches a CSRF token before each `POST`, `PUT`, `PATCH`, or `DELETE` request. Local development skips CSRF because the backend `dev` profile disables it. The production backend must remain configured with the Firebase origin in `CORS_ALLOWED_ORIGINS`, credentials enabled, and HTTPS cookies.
 
+### Diagnóstico de errores de API en producción
+
+Los fallos de peticiones al API y de obtención del token CSRF aparecen en la consola del navegador como `[EsiBuy API]`. Cada entrada incluye fecha, método, ruta sin parámetros, estado HTTP, duración, identificador local y categoría. `status: 0` suele indicar conectividad, CORS o cookies; `401` apunta a sesión/autenticación; `403` a permisos o CSRF; y `5xx` a un error del servidor. No se registran cuerpos de petición/respuesta, cookies, tokens ni query strings.
+
+Para consultarlo: abre la aplicación publicada, pulsa F12, selecciona **Consola**, reproduce el fallo y copia las entradas `[EsiBuy API]`. También puedes inspeccionar la pestaña **Red** para ver la petición fallida y su respuesta. Los diagnósticos son locales al navegador y no sustituyen los logs del backend en Render; comparte los identificadores y la hora con quien tenga acceso a esos logs.
+
 Firebase Hosting revalidates the HTML and other non-hashed files whenever the browser requests them. Hashed JavaScript and CSS bundles can be cached for a year because each new build gets new filenames; reopening or reloading the site gets the current HTML and its matching bundles. The app shell displays the Angular route directly and does not include the old animated “EsiBuy · Equipo 5” screensaver.
 
 ## Running unit tests
