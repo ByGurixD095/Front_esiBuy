@@ -17,7 +17,12 @@ const listasMock: ListaDeseos[] = [
 
 describe('ListasDeseos', () => {
   let fixture: ComponentFixture<ListasDeseos>;
-  const servicioFalso = { listar: vi.fn(), obtenerProductos: vi.fn() };
+  const servicioFalso = {
+    listar: vi.fn(),
+    obtenerProductos: vi.fn(),
+    eliminarLista: vi.fn(),
+    eliminarProducto: vi.fn(),
+  };
   const authFalso = {
     isAuthenticated: () => true,
     hasRole: () => true,
@@ -43,6 +48,8 @@ describe('ListasDeseos', () => {
   beforeEach(() => {
     servicioFalso.listar.mockReset();
     servicioFalso.obtenerProductos.mockReset();
+    servicioFalso.eliminarLista.mockReset();
+    servicioFalso.eliminarProducto.mockReset();
   });
 
   it('muestra todas las listas del cliente', async () => {
@@ -61,6 +68,33 @@ describe('ListasDeseos', () => {
 
     expect(html.textContent).toContain('Todavía no tienes listas de deseos');
     expect(html.querySelector('a[href="/listas-deseos/nueva"]')).not.toBeNull();
+  });
+
+  it('confirma antes de eliminar una lista y la quita tras la respuesta correcta', async () => {
+    servicioFalso.listar.mockReturnValue(of(listasMock));
+    servicioFalso.eliminarLista.mockReturnValue(of(void 0));
+    const html = await crear();
+
+    html.querySelector<HTMLButtonElement>('[aria-label="Eliminar la lista Regalos"]')?.click();
+    fixture.detectChanges();
+
+    expect(html.querySelector('[role="alertdialog"]')).not.toBeNull();
+    expect(html.textContent).toContain('¿Seguro que quieres eliminar esta lista?');
+    expect(html.textContent).toContain('«Regalos»');
+    expect(servicioFalso.eliminarLista).not.toHaveBeenCalled();
+
+    html.querySelector<HTMLButtonElement>('.acciones-modal .boton-secundario')?.click();
+    fixture.detectChanges();
+    expect(html.querySelector('[role="alertdialog"]')).toBeNull();
+    expect(servicioFalso.eliminarLista).not.toHaveBeenCalled();
+
+    html.querySelector<HTMLButtonElement>('[aria-label="Eliminar la lista Regalos"]')?.click();
+    fixture.detectChanges();
+    html.querySelector<HTMLButtonElement>('.acciones-modal .boton-peligro')?.click();
+    fixture.detectChanges();
+
+    expect(servicioFalso.eliminarLista).toHaveBeenCalledWith('lista-2');
+    expect(fixture.componentInstance.listas()).toEqual([listasMock[0]]);
   });
 
   it('muestra los productos de la lista seleccionada y permite volver', async () => {
@@ -93,6 +127,55 @@ describe('ListasDeseos', () => {
     expect(html.querySelector('.volver-listas')?.textContent).toContain(
       'Volver a todas las listas',
     );
+  });
+
+  it('pide confirmación antes de eliminar el producto de la lista', async () => {
+    servicioFalso.listar.mockReturnValue(of(listasMock));
+    servicioFalso.obtenerProductos.mockReturnValue(
+      of([
+        {
+          id: 'producto-1',
+          nombre: 'Teclado',
+          referencia: 'REF-1',
+          numStock: 5,
+          precioCent: 12500,
+          categoriaId: 'tecnologia',
+          categoria: 'Tecnología',
+          urlImagen: null,
+          descuento: 0,
+          descuentoPremium: 0,
+          activo: true,
+        },
+      ]),
+    );
+    servicioFalso.eliminarProducto.mockReturnValue(of(void 0));
+    const html = await crear();
+    fixture.componentInstance.cargar('lista-2');
+    fixture.detectChanges();
+
+    html.querySelector<HTMLButtonElement>('[aria-label="Eliminar Teclado de la lista"]')?.click();
+    fixture.detectChanges();
+
+    expect(html.querySelector('[role="alertdialog"]')).not.toBeNull();
+    expect(html.textContent).toContain(
+      '¿Seguro que quieres eliminar el producto de la lista de deseos?',
+    );
+    expect(html.textContent).toContain('«Teclado»');
+    expect(servicioFalso.eliminarProducto).not.toHaveBeenCalled();
+
+    html.querySelector<HTMLButtonElement>('.acciones-modal .boton-secundario')?.click();
+    fixture.detectChanges();
+    expect(html.querySelector('[role="alertdialog"]')).toBeNull();
+    expect(servicioFalso.eliminarProducto).not.toHaveBeenCalled();
+
+    html.querySelector<HTMLButtonElement>('[aria-label="Eliminar Teclado de la lista"]')?.click();
+    fixture.detectChanges();
+    html.querySelector<HTMLButtonElement>('.acciones-modal .boton-peligro')?.click();
+    fixture.detectChanges();
+
+    expect(servicioFalso.eliminarProducto).toHaveBeenCalledWith('lista-2', 'producto-1');
+    expect(fixture.componentInstance.productos()).toEqual([]);
+    expect(html.textContent).toContain('Esta lista está vacía');
   });
 
   it('indica cuando la lista seleccionada no tiene productos', async () => {

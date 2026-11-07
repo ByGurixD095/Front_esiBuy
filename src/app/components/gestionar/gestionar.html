@@ -1,4 +1,4 @@
-<app-marco-pagina panel="Gestionar" [volver]="true">
+<app-marco-pagina panel="Gestionar">
   <section class="gestionar" aria-labelledby="gestionar-titulo">
     <p class="esi-eyebrow">Área de trabajo</p>
     <h1 id="gestionar-titulo" class="esi-titulo">Gestionar.</h1>
@@ -24,6 +24,10 @@
         <strong>Productos</strong>
         <span>Gestionar los productos de tu catálogo.</span>
       </a>
+      <a class="opcion esi-tarjeta" routerLink="/pedidos-vendedor">
+        <strong>Pedidos de venta</strong>
+        <span>Gestiona los envíos de tus productos vendidos.</span>
+      </a>
       }
       @if (auth.hasRole(['CLIENTE'])) {
       <a class="opcion esi-tarjeta" routerLink="/favoritos">
@@ -41,6 +45,14 @@
       <a class="opcion esi-tarjeta" routerLink="/listas-deseos/nueva">
         <strong>Crear lista de deseos</strong>
         <span>Crear una lista nueva con el nombre que quieras.</span>
+      </a>
+      <a class="opcion esi-tarjeta" routerLink="/pedidos">
+        <strong>Mis pedidos</strong>
+        <span>Consulta el estado de tus compras y tu historial.</span>
+      </a>
+      <a class="opcion esi-tarjeta" routerLink="/account/direcciones">
+        <strong>Direcciones de envío</strong>
+        <span>Gestiona tus direcciones para realizar pedidos.</span>
       </a>
       }
     </div>
