@@ -42,6 +42,10 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
           status: error.status,
           category: classifyError(error.status),
           durationMs: Date.now() - startedAt,
+          credentialsIncluded: finalRequest.withCredentials,
+          csrfHeaderPresent: [...finalRequest.headers.keys()].some((name) =>
+            name.toLowerCase().includes('csrf') || name.toLowerCase().includes('xsrf'),
+          ),
         });
       }
       const canRefresh =

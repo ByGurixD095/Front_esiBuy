@@ -8,6 +8,8 @@ export interface ApiDiagnostic {
   status: number;
   category: string;
   durationMs?: number;
+  credentialsIncluded?: boolean;
+  csrfHeaderPresent?: boolean;
 }
 
 /** Registro local y sanitizado para diagnosticar fallos del API desde DevTools. */
