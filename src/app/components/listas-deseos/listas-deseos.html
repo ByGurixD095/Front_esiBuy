@@ -116,6 +116,46 @@
     }
   </section>
 
+  @if (listaPendienteModificacion(); as lista) {
+    <div class="modal-fondo">
+      <section
+        class="modal-confirmacion esi-tarjeta"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modificar-lista-titulo"
+        [attr.aria-busy]="guardandoModificacion()"
+      >
+        <p class="esi-eyebrow">Modificar lista</p>
+        <h2 id="modificar-lista-titulo">Cambiar nombre</h2>
+        <form class="formulario-modificar-lista" [formGroup]="formularioNombre">
+          <label for="nuevo-nombre-lista">Nombre de la lista</label>
+          <input id="nuevo-nombre-lista" type="text" formControlName="nombre" />
+        </form>
+        @if (errorModificacion(); as mensaje) {
+          <p class="error-modal" role="alert">{{ mensaje }}</p>
+        }
+        <div class="acciones-modal">
+          <button
+            type="button"
+            class="esi-boton boton-secundario"
+            [disabled]="guardandoModificacion()"
+            (click)="cancelarModificacion()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="esi-boton"
+            [disabled]="guardandoModificacion()"
+            (click)="confirmarModificacion()"
+          >
+            {{ guardandoModificacion() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+
   @if (productoPendienteEliminacion(); as producto) {
     <div class="modal-fondo">
       <section

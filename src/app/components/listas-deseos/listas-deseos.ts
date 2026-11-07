@@ -33,6 +33,12 @@ export class ListasDeseos implements OnInit {
   readonly errorEliminacion = signal<string | null>(null);
   readonly productoPendienteEliminacion = signal<Producto | null>(null);
   readonly eliminandoProductoId = signal<string | null>(null);
+  readonly listaPendienteModificacion = signal<ListaDeseos | null>(null);
+  readonly guardandoModificacion = signal(false);
+  readonly errorModificacion = signal<string | null>(null);
+  readonly formularioNombre = new FormGroup({
+    nombre: new FormControl('', { nonNullable: true }),
+  });
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => this.cargar(params.get('id')));
@@ -67,6 +73,52 @@ export class ListasDeseos implements OnInit {
     return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(
       precioFinal / 100,
     );
+  }
+
+  editarLista(lista: ListaDeseos): void {
+    if (this.guardandoModificacion()) return;
+    this.errorModificacion.set(null);
+    this.formularioNombre.controls.nombre.setValue(lista.nombre);
+    this.listaPendienteModificacion.set(lista);
+  }
+
+  cancelarModificacion(): void {
+    if (this.guardandoModificacion()) return;
+    this.listaPendienteModificacion.set(null);
+    this.errorModificacion.set(null);
+  }
+
+  confirmarModificacion(): void {
+    const lista = this.listaPendienteModificacion();
+    if (!lista || this.guardandoModificacion()) return;
+
+    const nombre = this.formularioNombre.controls.nombre.value.trim();
+    if (!nombre) {
+      this.errorModificacion.set('Escribe un nombre para la lista.');
+      return;
+    }
+
+    this.errorModificacion.set(null);
+    this.guardandoModificacion.set(true);
+    this.listas.update((listas) =>
+      listas.map((actual) => (actual.id === lista.id ? { ...actual, nombre } : actual)),
+    );
+    this.listasService.modificarLista(lista.id, nombre).subscribe({
+      next: (listaActualizada) => {
+        this.listas.update((listas) =>
+          listas.map((actual) => (actual.id === lista.id ? listaActualizada : actual)),
+        );
+        this.listaPendienteModificacion.set(null);
+        this.guardandoModificacion.set(false);
+      },
+      error: (error: ListaDeseosApiError) => {
+        this.listas.update((listas) =>
+          listas.map((actual) => (actual.id === lista.id ? lista : actual)),
+        );
+        this.errorModificacion.set(error.message);
+        this.guardandoModificacion.set(false);
+      },
+    });
   }
 
   solicitarEliminacion(producto: Producto): void {

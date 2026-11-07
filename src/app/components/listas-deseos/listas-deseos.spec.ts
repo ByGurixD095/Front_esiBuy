@@ -17,7 +17,12 @@ const listasMock: ListaDeseos[] = [
 
 describe('ListasDeseos', () => {
   let fixture: ComponentFixture<ListasDeseos>;
-  const servicioFalso = { listar: vi.fn(), obtenerProductos: vi.fn(), eliminarProducto: vi.fn() };
+  const servicioFalso = {
+    listar: vi.fn(),
+    obtenerProductos: vi.fn(),
+    eliminarProducto: vi.fn(),
+    modificarLista: vi.fn(),
+  };
   const authFalso = {
     isAuthenticated: () => true,
     hasRole: () => true,
@@ -44,6 +49,7 @@ describe('ListasDeseos', () => {
     servicioFalso.listar.mockReset();
     servicioFalso.obtenerProductos.mockReset();
     servicioFalso.eliminarProducto.mockReset();
+    servicioFalso.modificarLista.mockReset();
   });
 
   it('muestra todas las listas del cliente', async () => {
@@ -81,7 +87,7 @@ describe('ListasDeseos', () => {
     expect(fixture.componentInstance.listas()[1].nombre).toBe('Ideas de regalo');
     expect(html.textContent).toContain('Ideas de regalo');
 
-    respuestaModificacion.next(listasMock[1]);
+    respuestaModificacion.next({ ...listasMock[1], nombre: 'Ideas de regalo' });
     respuestaModificacion.complete();
     fixture.detectChanges();
 
