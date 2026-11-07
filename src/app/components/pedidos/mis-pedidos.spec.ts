@@ -63,6 +63,7 @@ describe('MisPedidos', () => {
             nombre: 'Mochila',
             referencia: 'MCH-1',
             urlImagen: null,
+            enviado: false,
             precioUnitarioCent: 2599,
             cantidad: 2,
             subtotalCent: 5198,
