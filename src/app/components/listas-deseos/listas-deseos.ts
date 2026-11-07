@@ -53,12 +53,6 @@ export class ListasDeseos implements OnInit {
     this.cargandoProductos.set(false);
     this.errorListas.set(null);
     this.errorProductos.set(null);
-    this.listaPendienteEliminar.set(null);
-    this.errorEliminacionLista.set(null);
-    this.eliminandoLista.set(false);
-    this.errorEliminacion.set(null);
-    this.productoPendienteEliminacion.set(null);
-    this.eliminandoProductoId.set(null);
     this.productos.set([]);
 
     this.listasService.listar().subscribe({

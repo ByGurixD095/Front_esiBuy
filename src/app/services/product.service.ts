@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { PaginaProducto, ProductInfo, Producto, Valoracion } from '../models/producto.model';
+import { PaginaProducto, ProductInfo, Producto } from '../models/producto.model';
 
 export class ProductApiError extends Error {
   constructor(
@@ -93,14 +93,6 @@ export class ProductService {
       catchError((error: HttpErrorResponse) => {
         return throwError(() => new ProductApiError(error.status, mensajeParaInfoProducto(error)));
       }),
-    );
-  }
-
-  crearValoracion(id: string, estrellas: number, texto: string): Observable<Valoracion> {
-    return this.http.post<Valoracion>(
-      `${this.apiUrl}/${encodeURIComponent(id)}/valoraciones`,
-      { estrellas, texto },
-      { withCredentials: true },
     );
   }
 
