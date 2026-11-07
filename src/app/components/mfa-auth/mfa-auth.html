@@ -35,18 +35,22 @@
   <p class="tutorial">
     Introduce el código de seis dígitos de tu aplicación. También puedes usar un código de respaldo.
   </p>
+  @if (requiereEmailOtp()) {
+  <p class="tutorial">También hemos enviado un código adicional a tu correo para completar el 3FA.</p>
+  }
   <form [formGroup]="verifyForm" (ngSubmit)="enviarVerificacion()" novalidate>
     <div class="esi-campo">
       <label for="totp-code">Código TOTP o código de respaldo</label>
       <input id="totp-code" type="text" inputmode="numeric" formControlName="totpCode" autocomplete="one-time-code" />
     </div>
+    @if (requiereEmailOtp()) {
     <div class="esi-campo">
       <label for="email-otp-code">
         Código recibido por correo
-        @if (!requiereEmailOtp()) { <span>(opcional)</span> }
       </label>
       <input id="email-otp-code" type="text" inputmode="numeric" formControlName="emailOtpCode" autocomplete="one-time-code" />
     </div>
+    }
     @if (errorMessage()) {
     <p class="esi-alerta esi-alerta--error" role="alert">{{ errorMessage() }}</p>
     }

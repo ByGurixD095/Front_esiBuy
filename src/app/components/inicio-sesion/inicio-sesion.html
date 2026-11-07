@@ -59,7 +59,7 @@
       [mode]="fase()"
       [qrCodeUri]="qrCodeUri()"
       [manualSecretKey]="manualSecretKey()"
-      [requiereEmailOtp]="rolMfa() === 'ADMINISTRADOR' || rolMfa() === 'VENDEDOR'"
+      [requiereEmailOtp]="emailOtpRequired()"
       [backupCodes]="backupCodes()"
       [errorMessage]="mensajeError()"
       (confirmarConfiguracion)="confirmarConfiguracion($event)"

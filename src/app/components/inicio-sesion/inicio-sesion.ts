@@ -33,7 +33,7 @@ export class InicioSesion {
   readonly qrCodeUri = signal('');
   readonly manualSecretKey = signal('');
   readonly backupCodes = signal<string[]>([]);
-  readonly rolMfa = signal<Rol | null>(null);
+  readonly emailOtpRequired = signal(false);
 
   alternarContrasena(): void {
     this.mostrarContrasena.update((visible) => !visible);
@@ -53,7 +53,7 @@ export class InicioSesion {
       next: (respuesta) => {
         this.cargando.set(false);
         this.emailMfa.set(respuesta.email ?? usuario);
-        this.rolMfa.set(respuesta.rol);
+        this.emailOtpRequired.set(respuesta.emailOtpRequired ?? false);
 
         if (respuesta.mfaStatus === 'SUCCESS') {
           this.navegarTrasLogin(respuesta.rol);
@@ -143,6 +143,7 @@ export class InicioSesion {
     this.form.reset();
     this.mensajeError.set('');
     this.backupCodes.set([]);
+    this.emailOtpRequired.set(false);
   }
 
   private navegarTrasLogin(rol: Rol): void {

@@ -23,6 +23,7 @@ export interface LoginResponse {
   mfaStatus: MfaStatus;
   email: string | null;
   mfaSetupToken: string | null;
+  emailOtpRequired?: boolean;
 }
 
 export interface MfaSetupResponse {
