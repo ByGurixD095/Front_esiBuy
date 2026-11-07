@@ -95,8 +95,14 @@
               <p class="cart-feedback" role="status">{{ mensaje }}</p>
             }
           }
-          <button type="button" class="buy-button checkout-button" disabled>Comprar ahora</button>
-          <p>La compra online todavía no está disponible en EsiBuy.</p>
+          @if (esCliente()) {
+            <button
+              type="button"
+              class="buy-button checkout-button"
+              [disabled]="anadiendoAlCarrito() || item.numStock < 1"
+              (click)="comprarAhora()"
+            >{{ anadiendoAlCarrito() ? 'Procesando…' : 'Comprar ahora' }}</button>
+          }
         </section>
 
         @if (item.descuentoPremium > 0) {
