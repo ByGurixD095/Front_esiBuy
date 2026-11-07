@@ -7,9 +7,20 @@ export interface ApiDiagnostic {
   endpoint: string;
   status: number;
   category: string;
+  sourceOrigin?: string;
+  reason?: unknown;
   durationMs?: number;
   credentialsIncluded?: boolean;
   csrfHeaderPresent?: boolean;
+  csrfHeaderName?: string;
+  csrfTokenObtainedAt?: string | null;
+  csrfRenewedOrRetried?: boolean;
+  httpResponseReceived?: boolean;
+  csrfCookiePresent?: unknown;
+  accessTokenCookiePresent?: unknown;
+  authorities?: unknown;
+  requiredAuthority?: unknown;
+  errorType?: string;
 }
 
 /** Registro local y sanitizado para diagnosticar fallos del API desde DevTools. */
