@@ -12,12 +12,11 @@ import {
   ListaDeseosService,
 } from '../../services/lista-deseos-service/lista-deseos';
 import { PanelFiltrosProductos } from '../panel-filtros-productos/panel-filtros-productos';
-import { MarcoPagina } from '../marco-pagina/marco-pagina';
 import { FiltrosProductos, ProductApiError, ProductService, filtrarProductos } from '../../services/product.service';
 
 @Component({
   selector: 'app-catalogo',
-  imports: [RouterLink, PanelFiltrosProductos, MarcoPagina],
+  imports: [RouterLink, PanelFiltrosProductos],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

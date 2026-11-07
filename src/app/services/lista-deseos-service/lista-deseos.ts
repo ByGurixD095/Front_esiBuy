@@ -44,12 +44,6 @@ export class ListaDeseosService {
       .pipe(catchError((error: HttpErrorResponse) => throwError(() => this.convertir(error, 'crear'))));
   }
 
-  eliminarLista(idLista: string): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${encodeURIComponent(idLista)}`, { withCredentials: true })
-      .pipe(catchError((error: HttpErrorResponse) => throwError(() => this.convertir(error, 'eliminarLista'))));
-  }
-
   agregarProducto(idLista: string, idProducto: string): Observable<ListaDeseos> {
     return this.http
       .post<ListaDeseos>(
@@ -60,18 +54,9 @@ export class ListaDeseosService {
       .pipe(catchError((error: HttpErrorResponse) => throwError(() => this.convertir(error, 'agregar'))));
   }
 
-  eliminarProducto(idLista: string, idProducto: string): Observable<void> {
-    return this.http
-      .delete<void>(
-        `${this.apiUrl}/${encodeURIComponent(idLista)}/productos/${encodeURIComponent(idProducto)}`,
-        { withCredentials: true },
-      )
-      .pipe(catchError((error: HttpErrorResponse) => throwError(() => this.convertir(error, 'eliminar'))));
-  }
-
   private convertir(
     error: HttpErrorResponse,
-    accion: 'crear' | 'listar' | 'productos' | 'agregar' | 'eliminarLista' | 'eliminar',
+    accion: 'crear' | 'listar' | 'productos' | 'agregar',
   ): ListaDeseosApiError {
     switch (error.status) {
       case 0:
@@ -81,21 +66,10 @@ export class ListaDeseosService {
             ? 'No se puede conectar con el servidor para crear la lista.'
             : accion === 'agregar'
               ? 'No se puede conectar con el servidor para guardar el producto en la lista.'
-              : accion === 'eliminarLista'
-                ? 'No se puede conectar con el servidor para eliminar la lista de deseos.'
-              : accion === 'eliminar'
-                ? 'No se puede conectar con el servidor para eliminar el producto de la lista.'
               : 'No se puede conectar con el servidor para consultar tus listas de deseos.',
         );
       case 400:
-        return new ListaDeseosApiError(
-          error.status,
-          accion === 'eliminarLista'
-            ? 'No se ha podido eliminar la lista de deseos. Inténtalo de nuevo.'
-            : accion === 'eliminar'
-              ? 'No se ha podido eliminar el producto de la lista. Inténtalo de nuevo.'
-              : 'Introduce un nombre válido para la lista.',
-        );
+        return new ListaDeseosApiError(error.status, 'Introduce un nombre válido para la lista.');
       case 401:
         return new ListaDeseosApiError(
           error.status,
@@ -103,10 +77,6 @@ export class ListaDeseosService {
             ? 'Tu sesión ha caducado. Inicia sesión de nuevo para crear la lista.'
             : accion === 'agregar'
               ? 'Tu sesión ha caducado. Inicia sesión de nuevo para guardar productos en tus listas.'
-              : accion === 'eliminarLista'
-                ? 'Tu sesión ha caducado. Inicia sesión de nuevo para eliminar la lista de deseos.'
-              : accion === 'eliminar'
-                ? 'Tu sesión ha caducado. Inicia sesión de nuevo para eliminar productos de tus listas.'
               : 'Tu sesión ha caducado. Inicia sesión de nuevo para consultar tus listas de deseos.',
         );
       case 403:
@@ -116,19 +86,13 @@ export class ListaDeseosService {
             ? 'Solo los clientes pueden crear listas de deseos.'
             : accion === 'agregar'
               ? 'Solo los clientes pueden guardar productos en listas de deseos.'
-              : accion === 'eliminarLista'
-                ? 'Solo los clientes pueden eliminar listas de deseos.'
-              : accion === 'eliminar'
-                ? 'Solo los clientes pueden eliminar productos de listas de deseos.'
               : 'Solo los clientes pueden consultar listas de deseos.',
         );
       case 404:
         return new ListaDeseosApiError(
           error.status,
-          accion === 'agregar' || accion === 'eliminar'
+          accion === 'agregar'
             ? 'No se ha encontrado la lista o el producto. Actualiza tus listas e inténtalo de nuevo.'
-            : accion === 'eliminarLista'
-              ? 'No se ha encontrado la lista de deseos. Actualiza tus listas e inténtalo de nuevo.'
             : 'No se ha encontrado esta lista de deseos.',
         );
       default:
@@ -138,10 +102,6 @@ export class ListaDeseosService {
             ? 'No se ha podido crear la lista. Inténtalo de nuevo más tarde.'
             : accion === 'agregar'
               ? 'No se ha podido guardar el producto en la lista. Inténtalo de nuevo más tarde.'
-              : accion === 'eliminarLista'
-                ? 'No se ha podido eliminar la lista de deseos. Inténtalo de nuevo más tarde.'
-              : accion === 'eliminar'
-                ? 'No se ha podido eliminar el producto de la lista. Inténtalo de nuevo más tarde.'
               : 'No se han podido cargar tus listas de deseos. Inténtalo de nuevo más tarde.',
         );
     }
