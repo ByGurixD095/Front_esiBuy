@@ -28,14 +28,17 @@
                 "output": "/"
               },
               {
+                "glob": "404.html",
+                "input": "public",
+                "output": "/"
+              },
+              {
                 "glob": "**/*",
                 "input": "public",
                 "output": "/assets"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "outputMode": "static",
             "security": {
               "allowedHosts": []

@@ -26,27 +26,58 @@ import { ListasDeseos } from './components/listas-deseos/listas-deseos';
 import { MisPedidos } from './components/pedidos/mis-pedidos';
 import { DireccionesComponent } from './components/direcciones/direcciones';
 import { PedidosVendedor } from './components/pedidos/pedidos-vendedor';
+import { NotFound } from './components/not-found/not-found';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', component: Inicio },
   { path: 'products', component: Catalogo },
-  { path: 'products/catalogo', component: CatalogoVendedor, canActivate: [roleGuard(['VENDEDOR'])] },
+  {
+    path: 'products/catalogo',
+    component: CatalogoVendedor,
+    canActivate: [roleGuard(['VENDEDOR'])],
+  },
   { path: 'products/new', component: ProductoForm, canActivate: [roleGuard(['VENDEDOR'])] },
   { path: 'products/:id/editar', component: ProductoForm, canActivate: [roleGuard(['VENDEDOR'])] },
   { path: 'products/:id', component: ProductoDetalle },
   { path: 'register', component: RegistroInicio, canActivate: [guestGuard] },
-  { path: 'register/clientes', component: RegistroComponent, data: { tipoRegistro: 'cliente' }, canActivate: [guestGuard] },
-  { path: 'register/vendedor', component: RegistroComponent, data: { tipoRegistro: 'vendedor' }, canActivate: [guestGuard] },
+  {
+    path: 'register/clientes',
+    component: RegistroComponent,
+    data: { tipoRegistro: 'cliente' },
+    canActivate: [guestGuard],
+  },
+  {
+    path: 'register/vendedor',
+    component: RegistroComponent,
+    data: { tipoRegistro: 'vendedor' },
+    canActivate: [guestGuard],
+  },
   { path: 'cart', component: Carrito, canActivate: [roleGuard(['CLIENTE'])] },
   { path: 'pedidos', component: MisPedidos, canActivate: [roleGuard(['CLIENTE'])] },
   { path: 'pedidos-vendedor', component: PedidosVendedor, canActivate: [roleGuard(['VENDEDOR'])] },
-  { path: 'account/direcciones', component: DireccionesComponent, canActivate: [roleGuard(['CLIENTE'])] },
+  {
+    path: 'account/direcciones',
+    component: DireccionesComponent,
+    canActivate: [roleGuard(['CLIENTE'])],
+  },
   { path: 'favoritos', component: MisFavoritos, canActivate: [roleGuard(['CLIENTE'])] },
   { path: 'listas-deseos', component: ListasDeseos, canActivate: [roleGuard(['CLIENTE'])] },
-  { path: 'listas-deseos/nueva', component: CrearListaDeseos, canActivate: [roleGuard(['CLIENTE'])] },
+  {
+    path: 'listas-deseos/nueva',
+    component: CrearListaDeseos,
+    canActivate: [roleGuard(['CLIENTE'])],
+  },
   { path: 'listas-deseos/:id', component: ListasDeseos, canActivate: [roleGuard(['CLIENTE'])] },
-  { path: 'account/metodos-pago', component: MetodosPagoComponent, canActivate: [roleGuard(['CLIENTE'])] },
-  { path: 'account', component: Cuenta, canActivate: [roleGuard(['ADMINISTRADOR', 'VENDEDOR', 'CLIENTE'])] },
+  {
+    path: 'account/metodos-pago',
+    component: MetodosPagoComponent,
+    canActivate: [roleGuard(['CLIENTE'])],
+  },
+  {
+    path: 'account',
+    component: Cuenta,
+    canActivate: [roleGuard(['ADMINISTRADOR', 'VENDEDOR', 'CLIENTE'])],
+  },
   {
     path: 'manage',
     component: Gestionar,
@@ -80,4 +111,5 @@ export const routes: Routes = [
   { path: 'login', component: InicioSesion, canActivate: [guestGuard] },
   { path: 'recover-password', component: RecoverPasswordComponent, canActivate: [guestGuard] },
   { path: 'reset-password', component: ResetPasswordComponent, canActivate: [guestGuard] },
+  { path: '**', component: NotFound },
 ];

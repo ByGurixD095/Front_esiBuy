@@ -248,6 +248,13 @@
   line-height: 1.5;
 }
 
+.modal-confirmacion .mensaje-error {
+  margin: 0 0 12px;
+  color: #a12622;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .acciones-modal {
   display: flex;
   justify-content: stretch;

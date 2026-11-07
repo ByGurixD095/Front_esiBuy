@@ -74,7 +74,6 @@
                 <small class="esi-ayuda">Déjalo vacío para conservar el valor actual.</small>
               }
             </div>
-
           </div>
         </section>
 
@@ -148,11 +147,7 @@
             <div class="campos">
               <div class="esi-campo">
                 <label for="sede">Sede</label>
-                <input
-                  id="sede"
-                  type="text"
-                  formControlName="sede"
-                />
+                <input id="sede" type="text" formControlName="sede" />
               </div>
               <div class="esi-campo">
                 <label for="fechaIncorporacion">Fecha de incorporación</label>
@@ -215,12 +210,12 @@
           </section>
         }
 
-          <app-avatar-selector
-            [value]="form.controls.imagenPerfil.value"
-            [esVendedor]="rol() === 'VENDEDOR'"
-            (valueChange)="form.controls.imagenPerfil.setValue($event)"
-            (fileSeleccionado)="archivoAvatar.set($event)"
-          />
+        <app-avatar-selector
+          [value]="form.controls.imagenPerfil.value"
+          [esVendedor]="rol() === 'VENDEDOR'"
+          (valueChange)="form.controls.imagenPerfil.setValue($event)"
+          (fileSeleccionado)="archivoAvatar.set($event)"
+        />
 
         @if (mensajeExito()) {
           <p class="esi-alerta esi-alerta--ok" role="status">{{ mensajeExito() }}</p>
@@ -275,6 +270,9 @@
       aria-labelledby="confirmar-cierre-titulo"
     >
       <h2 id="confirmar-cierre-titulo">¿Seguro que quiere cerrar sesión?</h2>
+      @if (errorCierreSesion()) {
+        <p class="mensaje-error" role="alert">{{ errorCierreSesion() }}</p>
+      }
       <div class="acciones-modal">
         <button
           type="button"

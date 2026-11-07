@@ -40,7 +40,7 @@ jobs:
         env:
           API_URL: ${{ vars.API_URL }}
         run: |
-          node -e 'const fs = require("node:fs"); fs.writeFileSync("src/environments/environment.production.ts", `export const environment = { apiUrl: ${JSON.stringify(process.env.API_URL)}, csrfEnabled: true };\n`);'
+          node -e 'const fs = require("node:fs"); const file = "src/environments/environment.production.ts"; const source = fs.readFileSync(file, "utf8"); const updated = source.replace(/apiUrl:\s*[^,\n]+/, `apiUrl: ${JSON.stringify(process.env.API_URL)}`); if (updated === source) throw new Error("Could not update production API URL"); fs.writeFileSync(file, updated);'
 
       - name: Build Angular application
         run: npm run build

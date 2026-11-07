@@ -5,6 +5,18 @@
 /tmp
 /out-tsc
 /bazel-out
+/.angular/
+/coverage
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+serviceAccount*.json
+firebase-service-account*.json
 
 # Node
 /node_modules
@@ -30,11 +42,11 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
+.firebase/
+*.log
 Bocetos EsiBuy.html
 .sass-cache/
 /connect.lock
-/coverage
 /libpeerconnection.log
 testem.log
 /typings

@@ -151,7 +151,7 @@ export class AuthService {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.removeItem('esiBuy.rol');
       sessionStorage.removeItem('esiBuy.email');
-      sessionStorage.removeItem('esiBuy.expiresAt'); // NUEVO
+      sessionStorage.removeItem('esiBuy.expiresAt');
     }
     this.sessionCheckedSignal.set(true);
   }
@@ -194,7 +194,6 @@ private storeSessionIfComplete(respuesta: LoginResponse): void {
       if (respuesta.email) {
         sessionStorage.setItem('esiBuy.email', respuesta.email);
       }
-      // NUEVO: Guardar la fecha exacta de caducidad del token
       if (respuesta.accessToken) {
         const exp = this.getTokenExpiration(respuesta.accessToken);
         if (exp > 0) {

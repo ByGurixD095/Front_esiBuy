@@ -4,14 +4,12 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { authSessionInterceptor } from './interceptors/auth-session.interceptor';
-import { csrfInterceptor } from './interceptors/csrf.interceptor';
+import { csrfInterceptor, requestCsrfToken } from './interceptors/csrf.interceptor';
 import { AuthService } from './services/auth.service';
 import { provideAppInitializer, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, of, switchMap } from 'rxjs';
 import { environment } from '../environments/environment';
-import { requestCsrfToken } from './interceptors/csrf.interceptor';
-import { ApiDiagnosticsService } from './services/api-diagnostics.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       const auth = inject(AuthService);
       if (!environment.csrfEnabled) return auth.checkSessionOnLoad();
-      return requestCsrfToken(inject(HttpClient), inject(ApiDiagnosticsService)).pipe(
+      return requestCsrfToken(inject(HttpClient)).pipe(
         catchError(() => of(null)),
         switchMap(() => auth.checkSessionOnLoad()),
       );

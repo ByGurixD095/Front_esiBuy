@@ -43,6 +43,7 @@ export class Cuenta {
   readonly mensajeError = signal('');
   readonly confirmandoCierreSesion = signal(false);
   readonly cerrandoSesion = signal(false);
+  readonly errorCierreSesion = signal('');
   readonly confirmandoEliminacion = signal(false);
   readonly eliminandoCuenta = signal(false);
   readonly errorEliminacion = signal('');
@@ -151,7 +152,7 @@ export class Cuenta {
         error: () => {
           this.mensajeError.set('Error al subir la imagen de perfil.');
           this.guardando.set(false);
-        }
+        },
       });
     } else {
       let imagenFinal = this.form.controls.imagenPerfil.value.trim();
@@ -166,7 +167,7 @@ export class Cuenta {
     this.form.controls.imagenPerfil.setValue(imagenFinal);
     const valores = this.form.getRawValue();
     const datosEspecificos: Partial<ActualizarPerfilRequest> = {};
-    
+
     if (rol === 'CLIENTE') {
       datosEspecificos.tipoCliente = valores.tipoCliente;
     } else if (rol === 'ADMINISTRADOR') {
@@ -227,11 +228,13 @@ export class Cuenta {
   }
 
   cerrarSesion(): void {
+    this.errorCierreSesion.set('');
     this.confirmandoCierreSesion.set(true);
   }
 
   cancelarCierreSesion(): void {
     if (!this.cerrandoSesion()) {
+      this.errorCierreSesion.set('');
       this.confirmandoCierreSesion.set(false);
     }
   }
@@ -247,9 +250,11 @@ export class Cuenta {
         this.confirmandoCierreSesion.set(false);
         void this.router.navigate(['/']);
       },
-      error: () => {
-        this.confirmandoCierreSesion.set(false);
-        void this.router.navigate(['/']);
+      error: (error: HttpErrorResponse) => {
+        this.cerrandoSesion.set(false);
+        this.errorCierreSesion.set(
+          this.auth.errorMessage(error, 'No se ha podido cerrar la sesión. Inténtalo de nuevo.'),
+        );
       },
     });
   }
