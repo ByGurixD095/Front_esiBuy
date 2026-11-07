@@ -443,6 +443,7 @@ h1 {
   width: 100%;
   min-height: 48px;
   margin-top: 10px;
+  margin-bottom: 10px;
   border: 1px solid var(--esi-ink);
   border-radius: var(--esi-radius);
   color: #fff;

@@ -51,6 +51,15 @@
                     <span class="descuento">-{{ producto.descuento }}%</span>
                   }
                 </p>
+                <button
+                  type="button"
+                  class="boton-eliminar"
+                  [disabled]="eliminandoProductoId() !== null"
+                  [attr.aria-label]="'Eliminar ' + producto.nombre + ' de la lista'"
+                  (click)="solicitarEliminacion(producto)"
+                >
+                  <span aria-hidden="true">🗑️</span>
+                </button>
               </div>
             </li>
           }
@@ -153,4 +162,46 @@
       }
     }
   </section>
+
+  @if (productoPendienteEliminacion(); as producto) {
+    <div class="modal-fondo">
+      <section
+        class="modal-confirmacion esi-tarjeta"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirmar-eliminacion-lista-titulo"
+        aria-describedby="confirmar-eliminacion-lista-texto"
+        [attr.aria-busy]="eliminandoProductoId() === producto.id"
+      >
+        <p class="esi-eyebrow">Confirmar acción</p>
+        <h2 id="confirmar-eliminacion-lista-titulo">
+          ¿Seguro que quieres eliminar el producto de la lista de deseos?
+        </h2>
+        <p id="confirmar-eliminacion-lista-texto" class="texto-confirmacion">
+          Vas a eliminar <strong>«{{ producto.nombre }}»</strong> de la lista de deseos. Esta acción no se puede deshacer.
+        </p>
+        @if (errorEliminacion(); as mensaje) {
+          <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p>
+        }
+        <div class="acciones-modal">
+          <button
+            type="button"
+            class="esi-boton boton-secundario"
+            [disabled]="eliminandoProductoId() !== null"
+            (click)="cancelarEliminacion()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="esi-boton boton-peligro"
+            [disabled]="eliminandoProductoId() !== null"
+            (click)="confirmarEliminacion()"
+          >
+            {{ eliminandoProductoId() === producto.id ? 'Eliminando…' : 'Sí, eliminar' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </app-marco-pagina>

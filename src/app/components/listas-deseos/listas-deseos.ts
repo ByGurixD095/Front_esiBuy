@@ -32,6 +32,9 @@ export class ListasDeseos implements OnInit {
   readonly listaPendienteEliminar = signal<ListaDeseos | null>(null);
   readonly errorEliminacionLista = signal<string | null>(null);
   readonly eliminandoLista = signal(false);
+  readonly errorEliminacion = signal<string | null>(null);
+  readonly productoPendienteEliminacion = signal<Producto | null>(null);
+  readonly eliminandoProductoId = signal<string | null>(null);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => this.cargar(params.get('id')));
@@ -46,6 +49,9 @@ export class ListasDeseos implements OnInit {
     this.listaPendienteEliminar.set(null);
     this.errorEliminacionLista.set(null);
     this.eliminandoLista.set(false);
+    this.errorEliminacion.set(null);
+    this.productoPendienteEliminacion.set(null);
+    this.eliminandoProductoId.set(null);
     this.productos.set([]);
 
     this.listasService.listar().subscribe({
@@ -95,6 +101,47 @@ export class ListasDeseos implements OnInit {
       error: (error: ListaDeseosApiError) => {
         this.errorEliminacionLista.set(error.message);
         this.eliminandoLista.set(false);
+      },
+    });
+  }
+
+  solicitarEliminacion(producto: Producto): void {
+    if (this.eliminandoProductoId()) return;
+    this.errorEliminacion.set(null);
+    this.productoPendienteEliminacion.set(producto);
+  }
+
+  cancelarEliminacion(): void {
+    if (this.eliminandoProductoId()) return;
+    this.productoPendienteEliminacion.set(null);
+    this.errorEliminacion.set(null);
+  }
+
+  confirmarEliminacion(): void {
+    const producto = this.productoPendienteEliminacion();
+    const idLista = this.idLista();
+    if (!idLista || !producto || this.eliminandoProductoId()) {
+      return;
+    }
+
+    this.errorEliminacion.set(null);
+    this.eliminandoProductoId.set(producto.id);
+    this.listasService.eliminarProducto(idLista, producto.id).subscribe({
+      next: () => {
+        this.productos.update((productos) => productos.filter((actual) => actual.id !== producto.id));
+        this.listas.update((listas) =>
+          listas.map((lista) =>
+            lista.id === idLista
+              ? { ...lista, productosIds: lista.productosIds.filter((id) => id !== producto.id) }
+              : lista,
+          ),
+        );
+        this.productoPendienteEliminacion.set(null);
+        this.eliminandoProductoId.set(null);
+      },
+      error: (error: ListaDeseosApiError) => {
+        this.errorEliminacion.set(error.message);
+        this.eliminandoProductoId.set(null);
       },
     });
   }
