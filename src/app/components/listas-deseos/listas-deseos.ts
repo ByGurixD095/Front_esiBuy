@@ -30,15 +30,9 @@ export class ListasDeseos implements OnInit {
   readonly cargandoProductos = signal(false);
   readonly errorListas = signal<string | null>(null);
   readonly errorProductos = signal<string | null>(null);
-  readonly listaEnEdicion = signal<ListaDeseos | null>(null);
-  readonly guardandoModificacion = signal(false);
-  readonly errorModificacion = signal<string | null>(null);
-  readonly formularioNombre = new FormGroup({
-    nombre: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.pattern(/\S/)],
-    }),
-  });
+  readonly errorEliminacion = signal<string | null>(null);
+  readonly productoPendienteEliminacion = signal<Producto | null>(null);
+  readonly eliminandoProductoId = signal<string | null>(null);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => this.cargar(params.get('id')));
@@ -50,9 +44,9 @@ export class ListasDeseos implements OnInit {
     this.cargandoProductos.set(false);
     this.errorListas.set(null);
     this.errorProductos.set(null);
-    this.listaEnEdicion.set(null);
-    this.errorModificacion.set(null);
-    this.guardandoModificacion.set(false);
+    this.errorEliminacion.set(null);
+    this.productoPendienteEliminacion.set(null);
+    this.eliminandoProductoId.set(null);
     this.productos.set([]);
 
     this.listasService.listar().subscribe({
@@ -75,52 +69,43 @@ export class ListasDeseos implements OnInit {
     );
   }
 
-  editarLista(lista: ListaDeseos): void {
-    if (this.guardandoModificacion()) return;
-
-    this.formularioNombre.controls.nombre.setValue(lista.nombre);
-    this.formularioNombre.controls.nombre.markAsPristine();
-    this.formularioNombre.controls.nombre.markAsUntouched();
-    this.errorModificacion.set(null);
-    this.listaEnEdicion.set(lista);
+  solicitarEliminacion(producto: Producto): void {
+    if (this.eliminandoProductoId()) return;
+    this.errorEliminacion.set(null);
+    this.productoPendienteEliminacion.set(producto);
   }
 
-  cancelarModificacion(): void {
-    if (this.guardandoModificacion()) return;
-    this.listaEnEdicion.set(null);
-    this.errorModificacion.set(null);
+  cancelarEliminacion(): void {
+    if (this.eliminandoProductoId()) return;
+    this.productoPendienteEliminacion.set(null);
+    this.errorEliminacion.set(null);
   }
 
-  confirmarModificacion(nombreIntroducido: string): void {
-    const lista = this.listaEnEdicion();
-    const controlNombre = this.formularioNombre.controls.nombre;
-    controlNombre.setValue(nombreIntroducido);
-    const nombre = nombreIntroducido.trim();
-    if (!lista || this.guardandoModificacion()) return;
-    if (!nombre) {
-      controlNombre.markAsTouched();
+  confirmarEliminacion(): void {
+    const producto = this.productoPendienteEliminacion();
+    const idLista = this.idLista();
+    if (!idLista || !producto || this.eliminandoProductoId()) {
       return;
     }
 
-    this.errorModificacion.set(null);
-    this.guardandoModificacion.set(true);
-    this.listas.update((listas) =>
-      listas.map((actual) => (actual.id === lista.id ? { ...actual, nombre } : actual)),
-    );
-    this.listasService.modificarLista(lista.id, nombre).subscribe({
+    this.errorEliminacion.set(null);
+    this.eliminandoProductoId.set(producto.id);
+    this.listasService.eliminarProducto(idLista, producto.id).subscribe({
       next: () => {
+        this.productos.update((productos) => productos.filter((actual) => actual.id !== producto.id));
         this.listas.update((listas) =>
-          listas.map((actual) => (actual.id === lista.id ? { ...actual, nombre } : actual)),
+          listas.map((lista) =>
+            lista.id === idLista
+              ? { ...lista, productosIds: lista.productosIds.filter((id) => id !== producto.id) }
+              : lista,
+          ),
         );
-        this.listaEnEdicion.set(null);
-        this.guardandoModificacion.set(false);
+        this.productoPendienteEliminacion.set(null);
+        this.eliminandoProductoId.set(null);
       },
       error: (error: ListaDeseosApiError) => {
-        this.listas.update((listas) =>
-          listas.map((actual) => (actual.id === lista.id ? lista : actual)),
-        );
-        this.errorModificacion.set(error.message);
-        this.guardandoModificacion.set(false);
+        this.errorEliminacion.set(error.message);
+        this.eliminandoProductoId.set(null);
       },
     });
   }

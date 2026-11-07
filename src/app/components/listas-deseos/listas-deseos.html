@@ -51,6 +51,15 @@
                     <span class="descuento">-{{ producto.descuento }}%</span>
                   }
                 </p>
+                <button
+                  type="button"
+                  class="boton-eliminar"
+                  [disabled]="eliminandoProductoId() !== null"
+                  [attr.aria-label]="'Eliminar ' + producto.nombre + ' de la lista'"
+                  (click)="solicitarEliminacion(producto)"
+                >
+                  <span aria-hidden="true">🗑️</span>
+                </button>
               </div>
             </li>
           }
@@ -107,62 +116,45 @@
     }
   </section>
 
-  @if (listaEnEdicion(); as lista) {
+  @if (productoPendienteEliminacion(); as producto) {
     <div class="modal-fondo">
       <section
         class="modal-confirmacion esi-tarjeta"
-        role="dialog"
+        role="alertdialog"
         aria-modal="true"
-        aria-labelledby="modificar-lista-titulo"
-        aria-describedby="modificar-lista-descripcion"
-        [attr.aria-busy]="guardandoModificacion()"
+        aria-labelledby="confirmar-eliminacion-lista-titulo"
+        aria-describedby="confirmar-eliminacion-lista-texto"
+        [attr.aria-busy]="eliminandoProductoId() === producto.id"
       >
-        <p class="esi-eyebrow">Editar lista</p>
-        <h2 id="modificar-lista-titulo">Cambiar nombre de la lista</h2>
-        <p id="modificar-lista-descripcion" class="texto-confirmacion">
-          Modifica el nombre de «{{ lista.nombre }}».
+        <p class="esi-eyebrow">Confirmar acción</p>
+        <h2 id="confirmar-eliminacion-lista-titulo">
+          ¿Seguro que quieres eliminar el producto de la lista de deseos?
+        </h2>
+        <p id="confirmar-eliminacion-lista-texto" class="texto-confirmacion">
+          Vas a eliminar <strong>«{{ producto.nombre }}»</strong> de la lista de deseos. Esta acción no se puede deshacer.
         </p>
-        <form
-          class="formulario-modificar-lista"
-          (ngSubmit)="confirmarModificacion(nombreListaInput.value)"
-        >
-          <label for="nuevo-nombre-lista">Nombre de la lista</label>
-          <input
-            id="nuevo-nombre-lista"
-            #nombreListaInput
-            type="text"
-            [formControl]="formularioNombre.controls.nombre"
-            autocomplete="off"
-            [disabled]="guardandoModificacion()"
-            [attr.aria-invalid]="formularioNombre.controls.nombre.invalid && formularioNombre.controls.nombre.touched"
-          />
-          @if (formularioNombre.controls.nombre.invalid && formularioNombre.controls.nombre.touched) {
-            <p class="error-modal" role="alert">Escribe un nombre para la lista.</p>
-          }
-          @if (errorModificacion(); as mensaje) {
-            <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p>
-          }
-          <div class="acciones-modal">
-            <button
-              type="button"
-              class="esi-boton boton-secundario"
-              [disabled]="guardandoModificacion()"
-              (click)="cancelarModificacion()"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="esi-boton"
-              [disabled]="guardandoModificacion()"
-              (click)="confirmarModificacion(nombreListaInput.value)"
-            >
-              {{ guardandoModificacion() ? 'Guardando…' : 'Guardar cambios' }}
-            </button>
-          </div>
-        </form>
+        @if (errorEliminacion(); as mensaje) {
+          <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p>
+        }
+        <div class="acciones-modal">
+          <button
+            type="button"
+            class="esi-boton boton-secundario"
+            [disabled]="eliminandoProductoId() !== null"
+            (click)="cancelarEliminacion()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="esi-boton boton-peligro"
+            [disabled]="eliminandoProductoId() !== null"
+            (click)="confirmarEliminacion()"
+          >
+            {{ eliminandoProductoId() === producto.id ? 'Eliminando…' : 'Sí, eliminar' }}
+          </button>
+        </div>
       </section>
     </div>
   }
-
 </app-marco-pagina>
