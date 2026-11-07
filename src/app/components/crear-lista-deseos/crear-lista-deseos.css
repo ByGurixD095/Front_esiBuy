@@ -36,6 +36,12 @@
   box-shadow: 0 1px 3px rgba(20, 35, 60, 0.12);
 }
 
+.mensaje-exito {
+  box-sizing: border-box;
+  width: min(100%, 528px);
+  margin-bottom: 1rem;
+}
+
 .ayuda-error {
   color: #8f1f1f;
 }

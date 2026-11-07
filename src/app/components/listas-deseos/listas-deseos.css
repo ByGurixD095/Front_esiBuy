@@ -11,13 +11,26 @@
 .estado-error p { color: #8f1f1f; }
 
 .lista-listas, .lista-productos { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
-.lista-listas { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-.tarjeta-lista { display: flex; align-items: center; gap: 1rem; min-height: 100px; padding: 1.25rem; color: inherit; text-decoration: none; }
-.tarjeta-lista:hover { border-color: var(--esi-orange); transform: translateY(-2px); }
-.icono-lista { color: var(--esi-orange-text); font-size: 2rem; }
-.nombre-lista { flex: 1; font-size: 1.1rem; font-weight: 700; overflow-wrap: anywhere; }
-.abrir-lista { color: #5d6b7e; font-size: 1.5rem; }
-.tarjeta-lista:focus-visible, .volver-listas:focus-visible, .datos a:focus-visible, .imagen:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
+.lista-listas { grid-template-columns: minmax(0, 680px); }
+.tarjeta-lista { box-sizing: border-box; display: flex; align-items: center; gap: 1rem; width: 100%; min-width: 0; min-height: 96px; padding: 1.1rem 1.25rem; color: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.tarjeta-lista:hover { border-color: var(--esi-orange); box-shadow: 0 5px 16px rgb(23 33 38 / 8%); }
+.enlace-lista { display: flex; flex: 1; align-items: center; gap: 1rem; min-width: 0; color: inherit; text-decoration: none; }
+.enlace-lista:focus-visible { border-radius: 6px; outline: 3px solid var(--esi-orange); outline-offset: 4px; }
+.boton-modificar-lista { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border: 1px solid transparent; border-radius: 50%; color: #78838b; background: transparent; cursor: pointer; transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
+.boton-modificar-lista svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.boton-modificar-lista:hover:not(:disabled) { border-color: var(--esi-orange-soft); color: var(--esi-orange-text); background: var(--esi-orange-soft); }
+.boton-modificar-lista:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 2px; }
+.boton-modificar-lista:disabled { cursor: wait; opacity: 0.6; }
+.boton-eliminar-lista { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border: 1px solid transparent; border-radius: 50%; color: #78838b; background: transparent; cursor: pointer; transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
+.boton-eliminar-lista svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.boton-eliminar-lista:hover:not(:disabled) { border-color: #f1c8c4; color: var(--esi-error-text); background: var(--esi-error-bg); }
+.boton-eliminar-lista:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 2px; }
+.boton-eliminar-lista:disabled { cursor: wait; opacity: 0.6; }
+.icono-lista { display: grid; flex: 0 0 44px; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--esi-orange-text); background: var(--esi-orange-soft); font-size: 1.7rem; }
+.datos-lista { display: grid; flex: 1; min-width: 0; gap: 0.4rem; }
+.nombre-lista { overflow-wrap: anywhere; font-size: 1.1rem; font-weight: 700; }
+.cantidad-productos { color: var(--esi-soft-ink); font-size: 0.875rem; }
+.volver-listas:focus-visible, .datos a:focus-visible, .imagen:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
 .volver-listas { display: inline-block; margin-bottom: 1.5rem; color: #1a2b4a; font-weight: 600; text-decoration: none; }
 .volver-listas:hover { text-decoration: underline; }
 
@@ -54,10 +67,29 @@
 .precio strong { font-size: 18px; }
 .precio del { color: #5d6b7e; font-size: 14px; }
 .descuento { padding: 2px 8px; border-radius: 999px; color: #8f1f1f; background: #fbe4e4; font-size: 12px; font-weight: 500; }
+.modal-fondo { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; padding: 20px; background: rgb(23 33 38 / 58%); }
+.modal-confirmacion { box-sizing: border-box; width: min(100%, 460px); padding: 30px; box-shadow: 0 18px 50px rgb(15 22 26 / 24%); }
+.modal-confirmacion h2 { margin: 0 0 12px; font-family: var(--esi-font-title); font-size: 26px; font-weight: 400; line-height: 1.2; }
+.texto-confirmacion { margin: 0; color: var(--esi-soft-ink); font-size: 14px; line-height: 1.55; }
+.formulario-modificar-lista { display: grid; gap: 0.65rem; margin-top: 1rem; }
+.formulario-modificar-lista label { font-size: 14px; font-weight: 700; }
+.formulario-modificar-lista input { box-sizing: border-box; width: 100%; min-height: 46px; padding: 0 12px; border: 1px solid var(--esi-field-border); border-radius: var(--esi-radius); font: inherit; }
+.formulario-modificar-lista input:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 1px; }
+.error-modal { margin: 0; color: var(--esi-error-text); font-size: 14px; }
+.acciones-modal { display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+.acciones-modal .esi-boton { min-height: 44px; padding: 0 16px; }
+.boton-secundario { color: var(--esi-ink); background: transparent; border-color: var(--esi-line); }
+.boton-secundario:hover:not(:disabled) { color: var(--esi-ink); background: var(--esi-paper); border-color: var(--esi-line); }
+.boton-peligro { background: var(--esi-error-text); border-color: var(--esi-error-text); }
+.boton-peligro:hover:not(:disabled) { background: #741818; border-color: #741818; }
+.modal-confirmacion button:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 2px; }
 
 @media (max-width: 600px) {
   .encabezado-listas { align-items: flex-start; flex-direction: column; }
   .lista-listas, .lista-productos { grid-template-columns: 1fr; }
+  .tarjeta-lista { gap: 0.75rem; padding: 1rem; }
+  .enlace-lista { gap: 0.75rem; }
+  .icono-lista { flex-basis: 40px; width: 40px; height: 40px; }
   .acciones-modal { flex-direction: column-reverse; }
   .acciones-modal .esi-boton { width: 100%; }
   .modal-confirmacion { padding: 24px; }
