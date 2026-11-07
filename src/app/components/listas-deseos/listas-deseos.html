@@ -51,15 +51,6 @@
                     <span class="descuento">-{{ producto.descuento }}%</span>
                   }
                 </p>
-                <button
-                  type="button"
-                  class="boton-eliminar"
-                  [disabled]="eliminandoProductoId() !== null"
-                  [attr.aria-label]="'Eliminar ' + producto.nombre + ' de la lista'"
-                  (click)="solicitarEliminacion(producto)"
-                >
-                  <span aria-hidden="true">🗑️</span>
-                </button>
               </div>
             </li>
           }
@@ -92,116 +83,16 @@
         </div>
         <ul class="lista-listas">
           @for (lista of listas(); track lista.id) {
-            <li class="tarjeta-lista esi-tarjeta">
-              <a class="enlace-lista" [routerLink]="['/listas-deseos', lista.id]">
+            <li>
+              <a class="tarjeta-lista esi-tarjeta" [routerLink]="['/listas-deseos', lista.id]">
                 <span class="icono-lista" aria-hidden="true">♡</span>
-                <span class="datos-lista">
-                  <span class="nombre-lista">{{ lista.nombre }}</span>
-                  <span class="cantidad-productos">
-                    {{ lista.productosIds.length }}
-                    {{ lista.productosIds.length === 1 ? 'producto guardado' : 'productos guardados' }}
-                  </span>
-                </span>
+                <span class="nombre-lista">{{ lista.nombre }}</span>
+                <span class="abrir-lista" aria-hidden="true">→</span>
               </a>
-              <button
-                type="button"
-                class="boton-eliminar-lista"
-                [disabled]="eliminandoLista()"
-                [attr.aria-label]="'Eliminar la lista ' + lista.nombre"
-                [attr.title]="'Eliminar la lista ' + lista.nombre"
-                (click)="solicitarEliminacionLista(lista)"
-              >
-                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3" />
-                </svg>
-              </button>
             </li>
           }
         </ul>
       }
-
-      @if (listaPendienteEliminar(); as lista) {
-        <div class="modal-fondo">
-          <section
-            class="modal-confirmacion esi-tarjeta"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="confirmar-eliminacion-lista-titulo"
-            aria-describedby="confirmar-eliminacion-lista-texto"
-            [attr.aria-busy]="eliminandoLista()"
-          >
-            <p class="esi-eyebrow">Confirmar acción</p>
-            <h2 id="confirmar-eliminacion-lista-titulo">¿Seguro que quieres eliminar esta lista?</h2>
-            <p id="confirmar-eliminacion-lista-texto" class="texto-confirmacion">
-              Vas a eliminar <strong>«{{ lista.nombre }}»</strong> y todos los productos guardados en ella.
-              Esta acción no se puede deshacer.
-            </p>
-            @if (errorEliminacionLista(); as mensaje) {
-              <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p>
-            }
-            <div class="acciones-modal">
-              <button
-                type="button"
-                class="esi-boton boton-secundario"
-                [disabled]="eliminandoLista()"
-                (click)="cancelarEliminacionLista()"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                class="esi-boton boton-peligro"
-                [disabled]="eliminandoLista()"
-                (click)="confirmarEliminacionLista()"
-              >
-                {{ eliminandoLista() ? 'Eliminando…' : 'Sí, eliminar' }}
-              </button>
-            </div>
-          </section>
-        </div>
-      }
     }
   </section>
-
-  @if (productoPendienteEliminacion(); as producto) {
-    <div class="modal-fondo">
-      <section
-        class="modal-confirmacion esi-tarjeta"
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="confirmar-eliminacion-lista-titulo"
-        aria-describedby="confirmar-eliminacion-lista-texto"
-        [attr.aria-busy]="eliminandoProductoId() === producto.id"
-      >
-        <p class="esi-eyebrow">Confirmar acción</p>
-        <h2 id="confirmar-eliminacion-lista-titulo">
-          ¿Seguro que quieres eliminar el producto de la lista de deseos?
-        </h2>
-        <p id="confirmar-eliminacion-lista-texto" class="texto-confirmacion">
-          Vas a eliminar <strong>«{{ producto.nombre }}»</strong> de la lista de deseos. Esta acción no se puede deshacer.
-        </p>
-        @if (errorEliminacion(); as mensaje) {
-          <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p>
-        }
-        <div class="acciones-modal">
-          <button
-            type="button"
-            class="esi-boton boton-secundario"
-            [disabled]="eliminandoProductoId() !== null"
-            (click)="cancelarEliminacion()"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="esi-boton boton-peligro"
-            [disabled]="eliminandoProductoId() !== null"
-            (click)="confirmarEliminacion()"
-          >
-            {{ eliminandoProductoId() === producto.id ? 'Eliminando…' : 'Sí, eliminar' }}
-          </button>
-        </div>
-      </section>
-    </div>
-  }
 </app-marco-pagina>

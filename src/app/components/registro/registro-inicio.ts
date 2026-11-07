@@ -6,7 +6,7 @@ import { MarcoPagina } from '../marco-pagina/marco-pagina';
   selector: 'app-registro-inicio',
   imports: [RouterLink, MarcoPagina],
   template: `
-    <app-marco-pagina >
+    <app-marco-pagina [volver]="true">
       <div class="pagina">
         <p class="esi-eyebrow">Registro</p>
         <h1 class="esi-titulo">crear <em>cuenta.</em></h1>
