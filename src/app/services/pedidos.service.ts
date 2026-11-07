@@ -29,7 +29,7 @@ export interface LineaPedido {
   nombre: string;
   referencia: string;
   urlImagen: string | null;
-  enviado?: boolean;
+  enviado: boolean;
   precioUnitarioCent: number;
   cantidad: number;
   subtotalCent: number;
