@@ -11,7 +11,7 @@ import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ApiDiagnosticsService } from '../services/api-diagnostics.service';
-import { CSRF_RETRIED_CONTEXT, getCsrfTokenObtainedAt } from './csrf.interceptor';
+import { CSRF_ATTEMPT_CONTEXT, CSRF_REQUEST_ID_CONTEXT, CSRF_RETRIED_CONTEXT, getCsrfTokenObtainedAt } from './csrf.interceptor';
 
 const RETRIED_AFTER_REFRESH = new HttpContextToken<boolean>(() => false);
 const refreshInProgress = new BehaviorSubject<boolean>(false);
@@ -32,7 +32,7 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
   const isCsrfBootstrap = request.url === `${environment.apiUrl.replace(/\/+$/, '')}/csrf`;
   const finalRequest = isApiRequest ? request.clone({ withCredentials: true }) : request;
   const startedAt = Date.now();
-  const requestId = createRequestId();
+  const requestId = request.context.get(CSRF_REQUEST_ID_CONTEXT) || createRequestId();
 
   return next(finalRequest).pipe(
     tap((response) => {
@@ -46,6 +46,7 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
         durationMs: Date.now() - startedAt, credentialsIncluded: finalRequest.withCredentials,
         csrfHeaderPresent: csrfHeaderName(finalRequest) !== undefined, csrfHeaderName: csrfHeaderName(finalRequest),
         csrfTokenObtainedAt: getCsrfTokenObtainedAt(), csrfRenewedOrRetried: request.context.get(CSRF_RETRIED_CONTEXT),
+        csrfAttempt: request.context.get(CSRF_ATTEMPT_CONTEXT) || undefined,
         ...safeApiDetails(body),
       });
     }),
@@ -67,6 +68,7 @@ export const authSessionInterceptor: HttpInterceptorFn = (request, next) => {
           ),
           csrfHeaderName: csrfHeaderName(finalRequest),
           csrfTokenObtainedAt: getCsrfTokenObtainedAt(), csrfRenewedOrRetried: request.context.get(CSRF_RETRIED_CONTEXT),
+          csrfAttempt: request.context.get(CSRF_ATTEMPT_CONTEXT) || undefined,
           errorType: error.name,
           ...safeApiDetails(error.error),
         });

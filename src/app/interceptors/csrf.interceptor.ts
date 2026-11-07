@@ -14,6 +14,8 @@ let token: CsrfTokenResponse | null = null;
 let obtainedAt: string | null = null;
 let csrfRequest$: Observable<CsrfTokenResponse> | null = null;
 export const CSRF_RETRIED_CONTEXT = new HttpContextToken<boolean>(() => false);
+export const CSRF_REQUEST_ID_CONTEXT = new HttpContextToken<string>(() => '');
+export const CSRF_ATTEMPT_CONTEXT = new HttpContextToken<number>(() => 0);
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 export function requestCsrfToken(http: HttpClient, diagnostics: ApiDiagnosticsService): Observable<CsrfTokenResponse> {
@@ -21,7 +23,7 @@ export function requestCsrfToken(http: HttpClient, diagnostics: ApiDiagnosticsSe
     const url = `${environment.apiUrl.replace(/\/+$/, '')}/csrf`;
     const startedAt = Date.now();
     const requestId = createRequestId();
-    csrfRequest$ = defer(() => http.get<CsrfTokenResponse>(url, { withCredentials: true })).pipe(
+    csrfRequest$ = defer(() => http.get<CsrfTokenResponse>(url, { withCredentials: true, cache: 'no-store' })).pipe(
       map((response) => {
         if (!response.headerName || !response.token) throw new Error('El backend devolvió una respuesta CSRF incompleta.');
         token = response;
@@ -72,7 +74,9 @@ export const csrfInterceptor: HttpInterceptorFn = (request, next) => {
   let didRetry = false;
   const send = (csrf: CsrfTokenResponse, retried: boolean): Observable<HttpEvent<unknown>> => {
     const outgoing = request.clone({ withCredentials: true, setHeaders: { [csrf.headerName]: csrf.token },
-      context: retried ? request.context.set(CSRF_RETRIED_CONTEXT, true) : request.context });
+      context: request.context.set(CSRF_REQUEST_ID_CONTEXT, requestId)
+        .set(CSRF_ATTEMPT_CONTEXT, retried ? 2 : 1)
+        .set(CSRF_RETRIED_CONTEXT, retried || request.context.get(CSRF_RETRIED_CONTEXT)) });
     return next(outgoing).pipe(catchError((error: unknown) => {
       const reason = responseField(error, 'reason');
       if (!retried && error instanceof HttpErrorResponse && error.status === 403 &&
@@ -90,6 +94,7 @@ export const csrfInterceptor: HttpInterceptorFn = (request, next) => {
     diagnostics.record({ timestamp: new Date().toISOString(), requestId, sourceOrigin: globalThis.location?.origin ?? 'unknown',
       method: request.method, endpoint: safeEndpoint(request.url), status: error instanceof HttpErrorResponse ? error.status : 0,
       httpResponseReceived: error instanceof HttpErrorResponse && error.status !== 0,
+      csrfAttempt: didRetry ? 2 : 1,
       reason: responseField(error, 'reason'), category: error instanceof HttpErrorResponse && error.status ? 'api-response' : 'network-cors',
       durationMs: Date.now() - startedAt, credentialsIncluded: true, csrfHeaderPresent: !!token,
       csrfHeaderName: token?.headerName, csrfTokenObtainedAt: obtainedAt, csrfRenewedOrRetried: didRetry,

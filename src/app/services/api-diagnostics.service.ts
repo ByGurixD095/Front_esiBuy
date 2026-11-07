@@ -15,6 +15,7 @@ export interface ApiDiagnostic {
   csrfHeaderName?: string;
   csrfTokenObtainedAt?: string | null;
   csrfRenewedOrRetried?: boolean;
+  csrfAttempt?: number;
   httpResponseReceived?: boolean;
   csrfCookiePresent?: unknown;
   accessTokenCookiePresent?: unknown;
