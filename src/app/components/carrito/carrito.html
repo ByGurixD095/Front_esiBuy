@@ -246,7 +246,6 @@
                     <span>{{ direccion.direccion }}</span>
                     <span>{{ direccion.codigoPostal }} {{ direccion.ciudad }}, {{ direccion.provincia }}</span>
                     <span>{{ direccion.pais }} · {{ direccion.telefono }}</span>
-                    <a routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Administrar mis direcciones</a>
                   </div>
                 } @else {
                   <div class="checkout-address field-wide">

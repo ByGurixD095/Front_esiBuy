@@ -201,3 +201,28 @@ button:disabled {
     grid-column: auto;
   }
 }
+
+.volver-pedido {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 16px;
+  margin: 0 0 24px;
+  border: 1px solid var(--esi-ink);
+  border-radius: var(--esi-radius);
+  color: var(--esi-ink);
+  background: transparent;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.volver-pedido:hover {
+  color: #fff;
+  background: var(--esi-ink);
+}
+
+.volver-pedido:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 2px;
+}
