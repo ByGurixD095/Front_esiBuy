@@ -28,6 +28,13 @@
         <h2>¡Pago confirmado!</h2>
         <p>Tu pedido <strong>{{ pedido.id }}</strong> ya está confirmado.</p>
         <p class="success-total">Total: {{ formatearPrecio(pedido.totalCent) }}</p>
+        @if (pedido.lineas?.length) {
+          <ul class="pedido-lineas">
+            @for (linea of pedido.lineas; track linea.productoId) {
+              <li>{{ linea.nombre }} · {{ linea.cantidad }} × {{ formatearPrecio(linea.precioUnitarioCent) }} = {{ formatearPrecio(linea.subtotalCent) }}</li>
+            }
+          </ul>
+        }
         <a class="primary-link" routerLink="/pedidos">Consultar mis pedidos</a>
         <a class="primary-link" routerLink="/products">Volver al catálogo</a>
       </section>
@@ -39,6 +46,13 @@
           El pedido <strong>{{ pedido.id }}</strong> está reservado. Este paso simula el pago y no realiza ningún cobro.
         </p>
         <p class="success-total">Total: {{ formatearPrecio(pedido.totalCent) }}</p>
+        @if (pedido.lineas?.length) {
+          <ul class="pedido-lineas">
+            @for (linea of pedido.lineas; track linea.productoId) {
+              <li>{{ linea.nombre }} · {{ linea.cantidad }} × {{ formatearPrecio(linea.precioUnitarioCent) }} = {{ formatearPrecio(linea.subtotalCent) }}</li>
+            }
+          </ul>
+        }
         <button type="button" class="buy-button" [disabled]="procesandoPago()" (click)="confirmarPago()">
           {{ procesandoPago() ? 'Confirmando…' : 'Confirmar pago simulado' }}
         </button>
@@ -145,7 +159,7 @@
             <span>Subtotal</span>
             <strong>{{ formatearPrecio(totalCentimos()) }}</strong>
           </div>
-          <p class="summary-note">Los descuentos aplicables se calcularán al finalizar la compra.</p>
+          <p class="summary-note">Los precios incluyen los descuentos aplicables a tu cuenta; el total definitivo se confirma al tramitar el pedido.</p>
           <button
             type="button"
             class="buy-button"

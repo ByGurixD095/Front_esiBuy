@@ -102,7 +102,7 @@ export class ProductoDetalle implements OnInit {
   }
 
   formatearPrecioConDescuento(precioCent: number, descuento: number): string {
-    return this.formatearPrecio(Math.round(precioCent * (1 - descuento / 100)));
+    return this.formatearPrecio(Math.floor(precioCent * (1 - descuento / 100)));
   }
 
   esVendedor(): boolean {

@@ -13,6 +13,7 @@ export class PanelFiltrosProductos {
   readonly productos = input<Producto[]>([]);
   readonly categoriasDisponibles = input<Categoria[] | null>(null);
   readonly mostrarEstado = input(false);
+  readonly mostrarFavoritos = input(false);
   readonly filtrosChange = output<FiltrosProductos>();
 
   readonly busqueda = signal('');
@@ -22,6 +23,7 @@ export class PanelFiltrosProductos {
   readonly precioMinimo = signal<number | null>(null);
   readonly precioMaximo = signal<number | null>(null);
   readonly soloConDescuento = signal(false);
+  readonly soloFavoritos = signal(false);
 
   readonly categorias = linkedSignal<
     { disponibles: Categoria[] | null; productos: Producto[] },
@@ -65,7 +67,7 @@ export class PanelFiltrosProductos {
       this.estado() !== 'todos' ||
       this.precioMinimo() !== null ||
       this.precioMaximo() !== null ||
-      this.soloConDescuento(),
+      this.soloConDescuento() || this.soloFavoritos(),
   );
 
   actualizarBusqueda(event: Event): void {
@@ -101,6 +103,10 @@ export class PanelFiltrosProductos {
     this.soloConDescuento.set((event.target as HTMLInputElement).checked);
   }
 
+  alternarFavoritos(event: Event): void {
+    this.soloFavoritos.set((event.target as HTMLInputElement).checked);
+  }
+
   aplicarFiltros(): void {
     const minimo = this.precioMinimo();
     const maximo = this.precioMaximo();
@@ -115,6 +121,7 @@ export class PanelFiltrosProductos {
       precioMinCent: this.precioMinimo(),
       precioMaxCent: this.precioMaximo(),
       soloOfertas: this.soloConDescuento(),
+      soloFavoritos: this.soloFavoritos(),
       orden: this.orden(),
       estado: this.estado(),
     });
@@ -128,6 +135,7 @@ export class PanelFiltrosProductos {
     this.precioMinimo.set(null);
     this.precioMaximo.set(null);
     this.soloConDescuento.set(false);
+    this.soloFavoritos.set(false);
     this.aplicarFiltros();
   }
 

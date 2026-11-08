@@ -266,7 +266,7 @@ export class Carrito implements OnInit {
       error: (error: HttpErrorResponse) => {
         this.errorPedido.set(
           error.status === 409
-            ? 'Ha cambiado la disponibilidad de algún producto. Hemos actualizado la cesta; revísala antes de volver a intentarlo.'
+            ? 'Ha cambiado la disponibilidad de algún producto. Hemos ajustado la cesta al stock disponible; revísala antes de volver a intentarlo.'
             : this.auth.errorMessage(error, 'No se ha podido realizar el pedido. Revisa la cesta e inténtalo de nuevo.'),
         );
         this.creandoPedido.set(false);

@@ -62,7 +62,7 @@ export class MisFavoritos implements OnInit {
   }
 
   formatearPrecio(precioCent: number, descuento = 0): string {
-    const final = Math.round(precioCent * (1 - descuento / 100));
+    const final = Math.floor(precioCent * (1 - descuento / 100));
     return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(final / 100);
   }
 

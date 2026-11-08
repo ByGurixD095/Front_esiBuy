@@ -23,6 +23,7 @@ export interface FiltrosProductos {
   precioMinCent?: number | null;
   precioMaxCent?: number | null;
   soloOfertas?: boolean;
+  soloFavoritos?: boolean;
   orden?: string;
   estado?: EstadoProducto;
 }

@@ -47,6 +47,7 @@
       </div>
       <div class="detail-content">
         <p class="eyebrow">{{ item.categoria }}</p>
+        @if (item.soloPremium) { <p class="premium-badge">Solo clientes premium</p> }
         <h1>{{ item.nombre }}</h1>
         <p class="description">{{ item.descripcion || 'Este producto no tiene descripción.' }}</p>
         <p class="seller">
@@ -66,10 +67,8 @@
         </div>
 
         <p class="stock" [class.out-of-stock]="item.numStock === 0">
-          {{ item.numStock > 0 ? 'Disponible' : 'Agotado' }}
-          <span>{{
-            item.numStock > 0 ? item.numStock + ' unidades en stock' : 'No hay unidades disponibles'
-          }}</span>
+          {{ item.numStock > 0 ? (item.numStock < 5 ? '¡Quedan pocas unidades!' : 'Disponible') : 'Agotado' }}
+          <span>{{ item.numStock > 0 ? 'Disponibilidad limitada' : 'No hay unidades disponibles' }}</span>
         </p>
 
         <section class="purchase-panel" aria-label="Opciones de compra">
@@ -107,7 +106,7 @@
 
         @if (item.descuentoPremium > 0) {
           <p class="premium-note">
-            Descuento adicional para clientes premium: {{ item.descuentoPremium }}%
+            Descuento para clientes premium: {{ item.descuentoPremium }}%
           </p>
         }
 

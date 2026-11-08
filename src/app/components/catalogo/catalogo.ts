@@ -98,7 +98,10 @@ export class Catalogo implements OnInit {
 
   private cargarFavoritos(): void {
     this.favoritosService.listar().subscribe({
-      next: (productos) => this.favoritosIds.set(new Set(productos.map((p) => p.id))),
+      next: (productos) => {
+        this.favoritosIds.set(new Set(productos.map((p) => p.id)));
+        this.aplicarFiltroFavoritos();
+      },
       error: (error: FavoritosApiError) => this.errorFavorito.set(error.message),
     });
   }
@@ -122,6 +125,7 @@ export class Catalogo implements OnInit {
           else siguiente.add(producto.id);
           return siguiente;
         });
+        this.aplicarFiltroFavoritos();
         this.terminarProceso(producto.id);
       },
       error: (error: FavoritosApiError) => {
@@ -303,7 +307,8 @@ export class Catalogo implements OnInit {
   private mensajeParaErrorCarrito(status: number): string {
     if (status === 0) return 'No se puede conectar con el servidor para añadir el producto.';
     if (status === 401) return 'Inicia sesión como cliente para añadir productos a la cesta.';
-    if (status === 403) return 'El servidor ha rechazado la petición (403). Comprueba tus permisos y el token de seguridad.';
+    if (status === 403) return 'No tienes permiso para añadir este producto; puede estar reservado a clientes premium.';
+    if (status === 409) return 'El producto ya no tiene stock suficiente. Actualiza el catálogo e inténtalo de nuevo.';
     if (status === 404) return 'El producto ya no está disponible.';
     return `No se ha podido añadir el producto a la cesta (HTTP ${status}).`;
   }
@@ -313,7 +318,9 @@ export class Catalogo implements OnInit {
     this.error.set(null);
     this.productService.obtenerDisponibles(filtros, this.paginaActual(), this.tamanoPagina).subscribe({
       next: (paginaProductos: PaginaProducto) => {
-        this.productos.set(filtrarProductos(paginaProductos.content, filtros));
+        this.productos.set(filtrarProductos(paginaProductos.content, filtros).filter(
+          (producto) => !filtros.soloFavoritos || this.favoritosIds().has(producto.id),
+        ));
         this.totalPaginas.set(paginaProductos.totalPages);
         this.totalElementos.set(paginaProductos.totalElements);
         if (paginaProductos.number === 0 && !this.hayFiltrosRestrictivos(filtros)) {
@@ -336,8 +343,13 @@ export class Catalogo implements OnInit {
         filtros.precioMinCent != null ||
         filtros.precioMaxCent != null ||
         filtros.soloOfertas ||
+        filtros.soloFavoritos ||
         (filtros.estado && filtros.estado !== 'todos'),
     );
+  }
+
+  private aplicarFiltroFavoritos(): void {
+    if (this.filtros().soloFavoritos) this.cargarCatalogo();
   }
 
   aplicarFiltros(filtros: FiltrosProductos): void {
@@ -363,6 +375,6 @@ export class Catalogo implements OnInit {
   }
 
   formatearPrecioConDescuento(precioCent: number, descuento: number): string {
-    return this.formatearPrecio(Math.round(precioCent * (1 - descuento / 100)));
+    return this.formatearPrecio(Math.floor(precioCent * (1 - descuento / 100)));
   }
 }

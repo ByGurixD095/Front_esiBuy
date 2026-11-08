@@ -41,6 +41,9 @@
     </div>
   </fieldset>
   <label class="discount-filter"><input type="checkbox" [checked]="soloConDescuento()" (change)="alternarDescuento($event)" /> Solo ofertas</label>
+  @if (mostrarFavoritos()) {
+    <label class="discount-filter"><input type="checkbox" [checked]="soloFavoritos()" (change)="alternarFavoritos($event)" /> Solo favoritos</label>
+  }
   <div class="filter-actions">
     <button class="apply-filter" type="button" (click)="aplicarFiltros()">Aplicar filtros</button>
     @if (hayFiltros()) {

@@ -33,14 +33,15 @@
                 <div class="overlay-inactivo"><span>No disponible</span></div>
               }
               @if (producto.urlImagen) {
-                <img [src]="producto.urlImagen" [alt]="producto.nombre" loading="lazy" />
+                <a [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver ' + producto.nombre"><img [src]="producto.urlImagen" [alt]="producto.nombre" loading="lazy" /></a>
               } @else {
-                <span class="sin-imagen" aria-label="Producto sin imagen">Sin imagen</span>
+                <a class="sin-imagen" [routerLink]="['/products', producto.id]" aria-label="Ver producto sin imagen">Sin imagen</a>
               }
             </div>
             <div class="datos">
               <p class="categoria">{{ producto.categoria }}</p>
-              <h2>{{ producto.nombre }}</h2>
+              <h2><a [routerLink]="['/products', producto.id]">{{ producto.nombre }}</a></h2>
+              @if (producto.soloPremium) { <span class="descuento">Solo clientes premium</span> }
               <p class="precio">
                 @if (producto.descuento > 0) {
                   <del>{{ formatearPrecio(producto.precioCent) }}</del>
