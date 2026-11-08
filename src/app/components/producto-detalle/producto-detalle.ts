@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { ProductInfo } from '../../models/producto.model';
 import { AuthService } from '../../services/auth.service';
@@ -30,6 +30,7 @@ import { ProductApiError, ProductService } from '../../services/product.service'
 })
 export class ProductoDetalle implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly productoService = inject(ProductService);
   private readonly carritoService = inject(CarritoService);
@@ -166,6 +167,14 @@ export class ProductoDetalle implements OnInit {
   }
 
   anadirAlCarrito(): void {
+    this.anadirAlCarritoYContinuar(false);
+  }
+
+  comprarAhora(): void {
+    this.anadirAlCarritoYContinuar(true);
+  }
+
+  private anadirAlCarritoYContinuar(irACesta: boolean): void {
     const id = this.productoId();
     const item = this.producto();
     if (!id || !item || this.anadiendoAlCarrito() || item.numStock < 1) return;
@@ -184,6 +193,7 @@ export class ProductoDetalle implements OnInit {
         }
         this.mensajeCarrito.set(`${item.nombre} se ha añadido a tu cesta.`);
         this.anadiendoAlCarrito.set(false);
+        if (irACesta) void this.router.navigate(['/cart']);
       },
       error: (error: HttpErrorResponse) => {
         this.errorCarrito.set(this.mensajeParaErrorCarrito(error));

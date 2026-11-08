@@ -322,6 +322,7 @@
 
 .buy-button {
   width: 100%;
+  cursor: pointer;
 }
 
 .wishlist-button {
