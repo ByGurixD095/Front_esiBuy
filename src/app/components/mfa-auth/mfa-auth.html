@@ -7,7 +7,7 @@
     <br>2. Introduce el código de seis dígitos generado por la aplicación para confirmar la configuración.
     <br>3. Guarda los códigos de respaldo que se te proporcionan. Son de un solo uso y no podrás consultarlos de nuevo.
     <br>4. Después de guardar los códigos de respaldo, volverás al acceso para iniciar sesión.
-    <br>5. Tras iniciar sesión, se te pedirá un código de seis dígitos de la aplicación o un código de respaldo (2FA activo) + código de correo (3FA activo).
+    <br>5. En cada inicio de sesión, introduce el código de la aplicación (o uno de respaldo) y el código recibido por correo. Administradores y vendedores siempre deben completar ambos.
   </p>
 
   @if (qrCodeUri()) {
@@ -33,23 +33,31 @@
 <section class="mfa-panel">
   <h2>Verificación en dos pasos</h2>
   <p class="tutorial">
-    Introduce el código de seis dígitos de tu aplicación. También puedes usar un código de respaldo.
+    Introduce el código de seis dígitos de tu aplicación o uno de tus códigos de respaldo.
   </p>
   @if (requiereEmailOtp()) {
-  <p class="tutorial">También hemos enviado un código adicional a tu correo para completar el 3FA.</p>
+  <p class="tutorial">También hemos enviado un código de seis dígitos a tu correo. Necesitas ambos códigos para continuar.</p>
   }
   <form [formGroup]="verifyForm" (ngSubmit)="enviarVerificacion()" novalidate>
     <div class="esi-campo">
       <label for="totp-code">Código TOTP o código de respaldo</label>
-      <input id="totp-code" type="text" inputmode="numeric" formControlName="totpCode" autocomplete="one-time-code" />
+      <input id="totp-code" type="text" inputmode="numeric" maxlength="8" formControlName="totpCode" autocomplete="one-time-code" />
     </div>
+    @if (verifyForm.controls.totpCode.touched && verifyForm.controls.totpCode.hasError('pattern')) {
+    <small class="esi-ayuda esi-error">Introduce un código TOTP de 6 cifras o un código de respaldo de 8 cifras.</small>
+    }
     @if (requiereEmailOtp()) {
     <div class="esi-campo">
       <label for="email-otp-code">
         Código recibido por correo
       </label>
-      <input id="email-otp-code" type="text" inputmode="numeric" formControlName="emailOtpCode" autocomplete="one-time-code" />
+      <input id="email-otp-code" type="text" inputmode="numeric" maxlength="6" formControlName="emailOtpCode" autocomplete="one-time-code" required />
     </div>
+    @if (verifyForm.controls.emailOtpCode.touched && verifyForm.controls.emailOtpCode.hasError('required')) {
+    <small class="esi-ayuda esi-error">El código enviado por correo es obligatorio.</small>
+    } @else if (verifyForm.controls.emailOtpCode.touched && verifyForm.controls.emailOtpCode.hasError('pattern')) {
+    <small class="esi-ayuda esi-error">El código de correo debe tener 6 cifras.</small>
+    }
     }
     @if (errorMessage()) {
     <p class="esi-alerta esi-alerta--error" role="alert">{{ errorMessage() }}</p>

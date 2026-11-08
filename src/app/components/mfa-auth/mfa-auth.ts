@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 export type MfaAuthMode = 'login' | 'setup' | 'verify' | 'backup';
@@ -22,13 +22,31 @@ export class MfaAuth {
   readonly finalizarRespaldo = output<void>();
 
   readonly setupForm = new FormGroup({
-    code: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    code: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern(/^\d{6}$/)],
+    }),
   });
 
   readonly verifyForm = new FormGroup({
-    totpCode: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    totpCode: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern(/^(?:\d{6}|\d{8})$/)],
+    }),
     emailOtpCode: new FormControl('', { nonNullable: true }),
   });
+
+  constructor() {
+    effect(() => {
+      const emailOtpControl = this.verifyForm.controls.emailOtpCode;
+      emailOtpControl.setValidators(
+        this.requiereEmailOtp()
+          ? [Validators.required, Validators.pattern(/^\d{6}$/)]
+          : [],
+      );
+      emailOtpControl.updateValueAndValidity({ emitEvent: false });
+    });
+  }
 
   enviarConfiguracion(): void {
     if (this.setupForm.invalid) {

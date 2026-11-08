@@ -35,6 +35,13 @@ export class InicioSesion {
   readonly backupCodes = signal<string[]>([]);
   readonly emailOtpRequired = signal(false);
 
+  constructor() {
+    const emailRegistro = this.route.snapshot.queryParamMap.get('email');
+    if (emailRegistro) {
+      this.form.controls.usuario.setValue(emailRegistro);
+    }
+  }
+
   alternarContrasena(): void {
     this.mostrarContrasena.update((visible) => !visible);
   }
@@ -53,7 +60,11 @@ export class InicioSesion {
       next: (respuesta) => {
         this.cargando.set(false);
         this.emailMfa.set(respuesta.email ?? usuario);
-        this.emailOtpRequired.set(respuesta.emailOtpRequired ?? false);
+        this.emailOtpRequired.set(
+          respuesta.emailOtpRequired === true ||
+            respuesta.rol === 'ADMINISTRADOR' ||
+            respuesta.rol === 'VENDEDOR',
+        );
 
         if (respuesta.mfaStatus === 'SUCCESS') {
           this.navegarTrasLogin(respuesta.rol);
