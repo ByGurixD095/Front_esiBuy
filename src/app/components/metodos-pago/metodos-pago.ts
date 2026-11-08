@@ -8,6 +8,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import {
   MetodoPago,
@@ -62,7 +63,7 @@ const PREFIJOS_TELEFONICOS = [
 
 @Component({
   selector: 'app-metodos-pago',
-  imports: [MarcoPagina, ReactiveFormsModule],
+  imports: [MarcoPagina, ReactiveFormsModule, RouterLink],
   templateUrl: './metodos-pago.html',
   styleUrl: './metodos-pago.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

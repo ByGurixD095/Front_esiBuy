@@ -176,6 +176,10 @@
               <p class="eyebrow">Último paso</p>
               <h2 id="checkout-title">Datos del pedido</h2>
               <p>Indica dónde recibirlo y elige uno de tus métodos de pago guardados.</p>
+              <nav class="checkout-manage-links" aria-label="Gestionar datos del pedido">
+                <a routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Gestionar direcciones</a>
+                <a routerLink="/account/metodos-pago" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Gestionar métodos de pago</a>
+              </nav>
             </div>
             <button type="button" class="cancel-button" [disabled]="creandoPedido()" (click)="cerrarCheckout()">
               Cerrar
@@ -197,17 +201,17 @@
             <div class="checkout-status checkout-error">
               <p role="alert">{{ errorDirecciones() }}</p>
               <button type="button" class="retry-button" (click)="cargarDirecciones()">Reintentar</button>
-              <a class="primary-link" routerLink="/account/direcciones">Gestionar direcciones</a>
+              <a class="primary-link" routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Gestionar direcciones y volver al pedido</a>
             </div>
           } @else if (metodosPago().length === 0) {
             <div class="checkout-status">
               <p>Aún no tienes métodos de pago guardados.</p>
-              <a class="primary-link" routerLink="/account/metodos-pago">Añadir método de pago</a>
+              <a class="primary-link" routerLink="/account/metodos-pago" [queryParams]="{ continuarPedido: true }">Añadir método de pago y volver al pedido</a>
             </div>
           } @else if (direcciones().length === 0) {
             <div class="checkout-status">
               <p>Aún no tienes direcciones de envío guardadas.</p>
-              <a class="primary-link" routerLink="/account/direcciones">Añadir dirección de envío</a>
+              <a class="primary-link" routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true }">Añadir dirección y volver al pedido</a>
             </div>
           } @else {
             <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()" novalidate>
@@ -242,12 +246,12 @@
                     <span>{{ direccion.direccion }}</span>
                     <span>{{ direccion.codigoPostal }} {{ direccion.ciudad }}, {{ direccion.provincia }}</span>
                     <span>{{ direccion.pais }} · {{ direccion.telefono }}</span>
-                    <a routerLink="/account/direcciones">Administrar mis direcciones</a>
+                    <a routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Administrar mis direcciones</a>
                   </div>
                 } @else {
                   <div class="checkout-address field-wide">
                     <p>Selecciona una dirección guardada.</p>
-                    <a routerLink="/account/direcciones">Añadir dirección</a>
+                    <a routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Añadir dirección</a>
                   </div>
                 }
               </div>

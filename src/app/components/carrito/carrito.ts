@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CarritoService, ItemCarrito } from '../../services/carrito.service';
 import { DireccionGuardada, DireccionesService } from '../../services/direcciones.service';
@@ -17,11 +17,14 @@ import { MarcoPagina } from '../marco-pagina/marco-pagina';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Carrito implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly auth = inject(AuthService);
   private readonly carritoService = inject(CarritoService);
   private readonly direccionesService = inject(DireccionesService);
   private readonly metodosPagoService = inject(MetodosPagoService);
   private readonly pedidosService = inject(PedidosService);
+  private metodoPagoPreferido: string | null = null;
+  private direccionPreferida: string | null = null;
 
   readonly items = signal<ItemCarrito[]>([]);
   readonly cargando = signal(true);
@@ -55,6 +58,13 @@ export class Carrito implements OnInit {
 
   ngOnInit(): void {
     this.cargarCarrito();
+    this.route.queryParamMap.subscribe((params) => {
+      if (params.get('continuarPedido') === 'true') {
+        this.metodoPagoPreferido = params.get('metodoPagoId');
+        this.direccionPreferida = params.get('direccionId');
+        this.abrirCheckout();
+      }
+    });
   }
 
   cargarCarrito(): void {
@@ -190,12 +200,9 @@ export class Carrito implements OnInit {
     this.metodosPagoService.listar().subscribe({
       next: (metodos) => {
         this.metodosPago.set(metodos);
-        if (
-          metodos.length > 0 &&
-          !metodos.some((metodo) => metodo.id === this.checkoutForm.controls.metodoPagoId.value)
-        ) {
-          this.checkoutForm.controls.metodoPagoId.setValue(metodos[0].id);
-        }
+        const metodoPreferido = metodos.find((metodo) => metodo.id === this.metodoPagoPreferido);
+        const metodoActual = metodos.find((metodo) => metodo.id === this.checkoutForm.controls.metodoPagoId.value);
+        this.checkoutForm.controls.metodoPagoId.setValue(metodoPreferido?.id ?? metodoActual?.id ?? metodos[0]?.id ?? '');
         this.cargandoMetodosPago.set(false);
       },
       error: (error: HttpErrorResponse) => {
@@ -213,10 +220,13 @@ export class Carrito implements OnInit {
     this.direccionesService.listar().subscribe({
       next: (direcciones) => {
         this.direcciones.set(direcciones);
-        const direccionId = this.checkoutForm.controls.direccionId.value;
-        if (!direcciones.some((direccion) => direccion.id === direccionId)) {
-          this.checkoutForm.controls.direccionId.setValue(direcciones[0]?.id ?? '');
-        }
+        const direccionPreferida = direcciones.find((direccion) => direccion.id === this.direccionPreferida);
+        const direccionActual = direcciones.find(
+          (direccion) => direccion.id === this.checkoutForm.controls.direccionId.value,
+        );
+        this.checkoutForm.controls.direccionId.setValue(
+          direccionPreferida?.id ?? direccionActual?.id ?? direcciones[0]?.id ?? '',
+        );
         this.cargandoDirecciones.set(false);
       },
       error: (error: HttpErrorResponse) => {
