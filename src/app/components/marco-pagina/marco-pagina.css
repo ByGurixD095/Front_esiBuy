@@ -74,6 +74,21 @@
   text-decoration: underline;
 }
 
+.cart-link .cart-count {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  padding: 0 5px;
+  place-items: center;
+  border-radius: 999px;
+  color: #0d162d;
+  background: #ff9f43;
+  font: 700 11px Arial, sans-serif;
+  vertical-align: middle;
+}
+
+
 .volver-link {
   color: #ff9f43;
   border-left: 1px solid #263452;

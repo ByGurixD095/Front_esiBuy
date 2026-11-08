@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PaginaProducto, Producto } from '../../models/producto.model';
+import { MarcoPagina } from '../marco-pagina/marco-pagina';
 import { Favoritos, FavoritosApiError } from '../../services/favoritos-service/favoritos';
 import { CarritoService, ItemCarrito } from '../../services/carrito.service';
 import { Categoria, Categorias } from '../../services/categorias.service';
@@ -16,7 +17,7 @@ import { FiltrosProductos, ProductApiError, ProductService, filtrarProductos } f
 
 @Component({
   selector: 'app-catalogo',
-  imports: [RouterLink, PanelFiltrosProductos],
+  imports: [RouterLink, PanelFiltrosProductos, MarcoPagina],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

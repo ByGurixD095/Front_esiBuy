@@ -168,6 +168,13 @@ export class Carrito implements OnInit {
     this.errorPago.set('');
     this.cargarMetodosPago();
     this.cargarDirecciones();
+        
+    setTimeout(() => {
+      const seccionCheckout = document.getElementById('zona-confirmacion');
+      if (seccionCheckout) {
+        seccionCheckout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
   }
 
   cerrarCheckout(): void {
