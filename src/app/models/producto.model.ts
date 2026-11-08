@@ -26,6 +26,16 @@ export interface ProductInfo {
   descuento: number;
   descuentoPremium: number;
   vendedor: string;
+  mediaEstrellas?: number;
+  valoraciones?: Valoracion[];
+  puedeValorar?: boolean;
+}
+
+export interface Valoracion {
+  nombreUsuario: string;
+  estrellas: number;
+  texto: string;
+  fecha: string | null;
 }
 
 export interface PaginaProducto {

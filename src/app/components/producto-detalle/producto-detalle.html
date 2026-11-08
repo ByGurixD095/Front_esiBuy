@@ -95,14 +95,8 @@
               <p class="cart-feedback" role="status">{{ mensaje }}</p>
             }
           }
-          @if (esCliente()) {
-            <button
-              type="button"
-              class="buy-button checkout-button"
-              [disabled]="anadiendoAlCarrito() || item.numStock < 1"
-              (click)="comprarAhora()"
-            >{{ anadiendoAlCarrito() ? 'Procesando…' : 'Comprar ahora' }}</button>
-          }
+          <button type="button" class="buy-button checkout-button" disabled>Comprar ahora</button>
+          <p>La compra online todavía no está disponible en EsiBuy.</p>
         </section>
 
         @if (item.descuentoPremium > 0) {
@@ -111,9 +105,68 @@
           </p>
         }
 
-        <section class="coming-soon" aria-labelledby="product-community-title">
+        <section class="reviews-section" aria-labelledby="product-community-title">
           <h2 id="product-community-title">Opiniones y estadísticas</h2>
-          <p>Los comentarios y las estadísticas estarán disponibles próximamente.</p>
+          <p class="rating-summary">
+            <strong>{{ (item.mediaEstrellas ?? 0) | number: '1.1-1' }}</strong>
+            <span class="stars" aria-label="Media de estrellas">{{ estrellasDe(item.mediaEstrellas ?? 0) }}</span>
+            ({{ (item.valoraciones ?? []).length }} valoraciones)
+          </p>
+          @if ((item.valoraciones ?? []).length > 0) {
+            <div class="reviews-list">
+              @for (valoracion of (item.valoraciones ?? []); track valoracion.fecha + valoracion.nombreUsuario) {
+                <article class="review">
+                  <p class="review-heading">
+                    <strong>{{ valoracion.nombreUsuario }}</strong>
+                    <span class="stars">{{ estrellasDe(valoracion.estrellas) }}</span>
+                  </p>
+                  <p>{{ valoracion.texto }}</p>
+                </article>
+              }
+            </div>
+          } @else {
+            <p>Aún no hay valoraciones para este producto.</p>
+          }
+          @if (item.puedeValorar) {
+            <div class="review-form">
+              <h3>Valora este producto</h3>
+              <div
+                class="star-picker"
+                aria-label="Selecciona una puntuación"
+                (mouseleave)="limpiarEstrellasEnHover()"
+              >
+                @for (estrella of [1, 2, 3, 4, 5]; track estrella) {
+                  <button
+                    type="button"
+                    [class.selected]="estrella <= estrellasActivas()"
+                    [attr.aria-label]="estrella + ' estrellas'"
+                    (mouseenter)="mostrarEstrellasEnHover(estrella)"
+                    (focus)="mostrarEstrellasEnHover(estrella)"
+                    (blur)="limpiarEstrellasEnHover()"
+                    (click)="seleccionarEstrellas(estrella)"
+                  >★</button>
+                }
+              </div>
+              <textarea
+                maxlength="2000"
+                placeholder="Escribe tu reseña"
+                [value]="textoValoracion()"
+                (input)="actualizarTextoValoracion($event)"
+              ></textarea>
+              <button
+                type="button"
+                class="buy-button"
+                [disabled]="enviandoValoracion() || !estrellasSeleccionadas() || !textoValoracion().trim()"
+                (click)="enviarValoracion()"
+              >{{ enviandoValoracion() ? 'Publicando...' : 'Publicar valoración' }}</button>
+              @if (errorValoracion(); as mensaje) {
+                <p class="cart-feedback cart-feedback-error" role="alert">{{ mensaje }}</p>
+              }
+              @if (mensajeValoracion(); as mensaje) {
+                <p class="cart-feedback" role="status">{{ mensaje }}</p>
+              }
+            </div>
+          }
         </section>
 
         @if (esVendedor()) {

@@ -7,8 +7,9 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { ProductInfo } from '../../models/producto.model';
 import { AuthService } from '../../services/auth.service';
@@ -22,14 +23,13 @@ import { ProductApiError, ProductService } from '../../services/product.service'
 
 @Component({
   selector: 'app-producto-detalle',
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './producto-detalle.html',
   styleUrl: './producto-detalle.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductoDetalle implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly productoService = inject(ProductService);
   private readonly carritoService = inject(CarritoService);
@@ -53,6 +53,12 @@ export class ProductoDetalle implements OnInit {
   readonly nombreNuevaLista = signal('');
   readonly errorListaDeseos = signal<string | null>(null);
   readonly mensajeListaDeseos = signal<string | null>(null);
+  readonly estrellasSeleccionadas = signal(0);
+  readonly estrellasEnHover = signal(0);
+  readonly textoValoracion = signal('');
+  readonly enviandoValoracion = signal(false);
+  readonly errorValoracion = signal<string | null>(null);
+  readonly mensajeValoracion = signal<string | null>(null);
   private carritoVersion = 0;
 
   ngOnInit(): void {
@@ -106,15 +112,60 @@ export class ProductoDetalle implements OnInit {
     return this.auth.hasRole(['CLIENTE']);
   }
 
+  seleccionarEstrellas(estrellas: number): void {
+    this.estrellasSeleccionadas.set(estrellas);
+  }
+
+  mostrarEstrellasEnHover(estrellas: number): void {
+    this.estrellasEnHover.set(estrellas);
+  }
+
+  limpiarEstrellasEnHover(): void {
+    this.estrellasEnHover.set(0);
+  }
+
+  estrellasActivas(): number {
+    return this.estrellasEnHover() || this.estrellasSeleccionadas();
+  }
+
+  actualizarTextoValoracion(event: Event): void {
+    this.textoValoracion.set((event.target as HTMLTextAreaElement).value);
+  }
+
+  enviarValoracion(): void {
+    const id = this.productoId();
+    const estrellas = this.estrellasSeleccionadas();
+    const texto = this.textoValoracion().trim();
+    if (!id || !estrellas || !texto || this.enviandoValoracion()) return;
+
+    this.enviandoValoracion.set(true);
+    this.errorValoracion.set(null);
+    this.mensajeValoracion.set(null);
+    this.productoService.crearValoracion(id, estrellas, texto).subscribe({
+      next: () => {
+        this.mensajeValoracion.set('Tu valoración se ha publicado correctamente.');
+        this.estrellasSeleccionadas.set(0);
+        this.textoValoracion.set('');
+        this.enviandoValoracion.set(false);
+        this.productoService.obtenerInfo(id).subscribe({
+          next: (producto) => this.producto.set(producto),
+          error: () => this.mensajeValoracion.set('La valoración se publicó, pero no se pudo actualizar el resumen.'),
+        });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.errorValoracion.set(error.status === 409
+          ? 'Ya has valorado este producto.'
+          : error.error?.message ?? 'No se ha podido publicar la valoración.');
+        this.enviandoValoracion.set(false);
+      },
+    });
+  }
+
+  estrellasDe(media: number): string {
+    return '★'.repeat(Math.round(media)) + '☆'.repeat(5 - Math.round(media));
+  }
+
   anadirAlCarrito(): void {
-    this.anadirAlCarritoYContinuar(false);
-  }
-
-  comprarAhora(): void {
-    this.anadirAlCarritoYContinuar(true);
-  }
-
-  private anadirAlCarritoYContinuar(irACesta: boolean): void {
     const id = this.productoId();
     const item = this.producto();
     if (!id || !item || this.anadiendoAlCarrito() || item.numStock < 1) return;
@@ -133,7 +184,6 @@ export class ProductoDetalle implements OnInit {
         }
         this.mensajeCarrito.set(`${item.nombre} se ha añadido a tu cesta.`);
         this.anadiendoAlCarrito.set(false);
-        if (irACesta) void this.router.navigate(['/cart']);
       },
       error: (error: HttpErrorResponse) => {
         this.errorCarrito.set(this.mensajeParaErrorCarrito(error));
@@ -276,7 +326,7 @@ export class ProductoDetalle implements OnInit {
   private mensajeParaErrorCarrito(error: HttpErrorResponse): string {
     if (error.status === 0) return 'No se puede conectar con el servidor para añadir el producto.';
     if (error.status === 401) return 'Inicia sesión como cliente para añadir productos a la cesta.';
-    if (error.status === 403) return 'El servidor ha rechazado la petición (403). Comprueba tus permisos y el token de seguridad.';
+    if (error.status === 403) return 'Solo los clientes pueden añadir productos a la cesta.';
     if (error.status === 404) return 'El producto ya no está disponible.';
     return `No se ha podido añadir el producto a la cesta (HTTP ${error.status}).`;
   }
