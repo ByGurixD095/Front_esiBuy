@@ -47,6 +47,10 @@
         font-size: 14px;
         text-decoration: none;
       }
+      a:focus-visible {
+        outline: 3px solid var(--orange);
+        outline-offset: 4px;
+      }
       header a:hover {
         color: #ff9f43;
         text-decoration: underline;
@@ -180,10 +184,6 @@
         color: var(--muted);
         font-size: 12px;
         text-align: center;
-      }
-      a:focus-visible {
-        outline: 3px solid var(--orange);
-        outline-offset: 4px;
       }
       @media (max-width: 560px) {
         header img {

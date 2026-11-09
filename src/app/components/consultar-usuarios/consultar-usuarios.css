@@ -139,6 +139,7 @@ td:last-child {
 .fila-eliminada td {
   background: #fbf0ee;
   color: #7d443b;
+  opacity: 0.68;
 }
 
 tbody tr:last-child td {
@@ -194,9 +195,6 @@ tbody tr:last-child td {
   background: var(--esi-error-bg);
 }
 
-.fila-eliminada td {
-  opacity: 0.68;
-}
 
 .acciones {
   display: flex;

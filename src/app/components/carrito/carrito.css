@@ -302,6 +302,12 @@ h1 {
   cursor: pointer;
 }
 
+.remove-button:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
 .remove-button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
@@ -432,6 +438,12 @@ h1 {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.buy-button:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 2px;
+  z-index: 1;
 }
 
 .buy-button:disabled {
@@ -591,8 +603,6 @@ h1 {
 .continue-link:focus-visible,
 .primary-link:focus-visible,
 .retry-button:focus-visible,
-.buy-button:focus-visible,
-.remove-button:focus-visible,
 .cancel-button:focus-visible,
 .confirm-remove-button:focus-visible {
   outline: 3px solid var(--esi-orange);

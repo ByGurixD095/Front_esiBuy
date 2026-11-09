@@ -87,16 +87,27 @@ h1 {
   border-bottom: 1px solid var(--esi-line);
 }
 
+.order-tabs button,
+.order-actions button {
+  padding: 0 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.order-actions button {
+  min-height: 42px;
+  border: 1px solid var(--esi-ink);
+  border-radius: 8px;
+}
+
+
 .order-tabs button {
   min-height: 44px;
   border: 0;
   border-bottom: 3px solid transparent;
-  padding: 0 14px;
   color: var(--esi-soft-ink);
   background: transparent;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .order-tabs button.selected {
@@ -326,15 +337,6 @@ h1 {
   padding: 0 24px 18px;
 }
 
-.order-actions button {
-  min-height: 42px;
-  border: 1px solid var(--esi-ink);
-  border-radius: 8px;
-  padding: 0 14px;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
 
 .order-actions .primary-action {
   color: white;

@@ -161,15 +161,15 @@
   border-color: var(--esi-line);
 }
 
+.acciones-formulario .boton-secundario {
+  flex: 0 0 auto;
+  width: auto;
+}
+
 .boton-secundario:hover:not(:disabled) {
   color: var(--esi-ink);
   background: var(--esi-paper);
   border-color: var(--esi-line);
-}
-
-.acciones-formulario .boton-secundario {
-  flex: 0 0 auto;
-  width: auto;
 }
 
 @media (max-width: 600px) {
