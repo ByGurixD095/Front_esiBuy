@@ -201,7 +201,7 @@
           } @else {
             <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()" novalidate>
               <div class="checkout-fields">
-                
+               
                 <!-- NUEVA SECCIÓN DE LOTES -->
                 <div class="checkout-field field-wide lotes-section">
                   <label>División del pedido</label>
@@ -221,6 +221,19 @@
                   } @else {
                     <p class="summary-note">Todos los productos son de <strong>{{ lotesPorVendedor()[0]?.vendedor }}</strong> y se enviarán en un único pedido.</p>
                   }
+                </div>
+                 <div class="checkout-field field-wide">
+                  <label for="metodo-pago-pedido">Método de pago</label>
+                  <select id="metodo-pago-pedido" formControlName="metodoPagoId">
+                    @for (metodo of metodosPago(); track metodo.id) {
+                      <option [value]="metodo.id">
+                        {{ metodo.alias }} · {{ metodo.tipo }}
+                        @if (metodo.referencia) {
+                          ({{ metodo.referencia }})
+                        }
+                      </option>
+                    }
+                  </select>
                 </div>
 
                 <div class="checkout-field field-wide">
