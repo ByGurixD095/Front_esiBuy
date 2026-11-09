@@ -1,12 +1,516 @@
 <app-marco-pagina>
-  <section class="inicio" aria-labelledby="inicio-titulo">
-    <p class="esi-eyebrow">EsiBuy</p>
-    <h1 id="inicio-titulo" class="esi-titulo">Compra y vende <em>a tu manera.</em></h1>
-    <p class="descripcion">
-      Explora el catálogo, accede a tu cuenta y gestiona las opciones disponibles para tu perfil.
-    </p>
-    <div class="acciones" aria-label="Acciones principales">
-      <a class="esi-boton accion-principal" routerLink="/products">Ver catálogo</a>
-    </div>
-  </section>
+  <div class="landing-pro">
+    <!-- HERO SECTION -->
+    <header class="hero-section" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <div class="campus-badge" role="status">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span>Comunidad ESI · Escuela Superior de Informática</span>
+        </div>
+
+        <h1 id="hero-title" class="hero-title">
+          La tecnología que necesitas,<br />
+          <em>directo de tu campus a tus manos.</em>
+        </h1>
+
+        <p class="hero-subtitle">
+          El marketplace exclusivo para estudiantes y docentes. Compra y vende portátiles,
+          componentes, robótica, libros y periféricos con entrega en mano en la facultad o envío protegido.
+        </p>
+
+        <!-- BUSCADOR SPOTLIGHT -->
+        <div class="hero-search-box" role="search">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              #searchInput
+              type="search"
+              class="search-input"
+              placeholder="¿Qué buscas hoy? Ej: ThinkPad, Arduino, Monitor, BBDD..."
+              aria-label="Buscar productos en el catálogo"
+              (keyup.enter)="buscar(searchInput.value)"
+            />
+            <button
+              type="button"
+              class="search-button"
+              (click)="buscar(searchInput.value)"
+              aria-label="Ejecutar búsqueda"
+            >
+              Buscar
+            </button>
+          </div>
+
+          <div class="search-tags" aria-label="Búsquedas sugeridas">
+            <span class="tags-label">Tendencias:</span>
+            <button type="button" class="tag-pill" (click)="filtrarPorTag('ThinkPad')">#Portátiles</button>
+            <button type="button" class="tag-pill" (click)="filtrarPorTag('Arduino')">#Arduino</button>
+            <button type="button" class="tag-pill" (click)="filtrarPorTag('Monitor')">#Monitores</button>
+            <button type="button" class="tag-pill" (click)="filtrarPorTag('Libros')">#Libros ESI</button>
+            <button type="button" class="tag-pill tag-pill--oferta" (click)="seleccionarFiltro('ofertas')">🔥 Ofertas</button>
+          </div>
+        </div>
+
+        <!-- ACCIONES HERO -->
+        <div class="hero-cta-group">
+          <a routerLink="/products" class="btn-primary">
+            <span>Explorar catálogo</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+
+          @if (auth.hasRole(['VENDEDOR'])) {
+            <a routerLink="/products/new" class="btn-secondary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Publicar nuevo producto</span>
+            </a>
+          } @else if (auth.isAuthenticated()) {
+            <a routerLink="/products" class="btn-secondary">
+              <span>Novedades del campus</span>
+            </a>
+          } @else {
+            <a routerLink="/register" class="btn-secondary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+              </svg>
+              <span>Vender mis artículos</span>
+            </a>
+          }
+        </div>
+      </div>
+
+      <!-- VISUAL SHOWCASE HERO -->
+      <aside class="hero-visual" aria-label="Vista previa destacada de la plataforma">
+        <div class="showcase-card">
+          <div class="showcase-topbar">
+            <span class="showcase-tag">🔥 Producto estrella de la semana</span>
+            <span class="showcase-status">En campus hoy</span>
+          </div>
+
+          <div class="showcase-image-wrap">
+            <img
+              src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80"
+              alt="MacBook Pro M2 verificado para desarrollo de software"
+              class="showcase-image"
+              loading="eager"
+            />
+            <div class="showcase-verified-badge" title="Usuario con autenticación multifactor verificada">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+              </svg>
+              <span>Vendedor ESI Verificado</span>
+            </div>
+          </div>
+
+          <div class="showcase-details">
+            <div class="showcase-cat">Portátiles · Optimizado Desarrollo</div>
+            <h3 class="showcase-product-title">MacBook Pro 14" M2 Pro (16GB / 512GB)</h3>
+            <p class="showcase-desc">Ideal para compilación intensiva, contenedores Docker y TFG. Batería al 97% y ciclo de cargas mínimo.</p>
+            <div class="showcase-price-row">
+              <div class="showcase-pricing">
+                <span class="price-old">1.490,00 €</span>
+                <span class="price-current">1.150,00 €</span>
+              </div>
+              <a routerLink="/products" class="showcase-link" aria-label="Ver producto">Ver en catálogo →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- BADGES FLOTANTES SATÉLITE -->
+        <div class="floating-badge floating-badge--top">
+          <span class="badge-icon">🛡️</span>
+          <div class="badge-text">
+            <strong>Seguridad 2FA & 3FA</strong>
+            <small>Transacciones de confianza</small>
+          </div>
+        </div>
+
+        <div class="floating-badge floating-badge--bottom">
+          <span class="badge-icon">📍</span>
+          <div class="badge-text">
+            <strong>Sin gastos de envío</strong>
+            <small>Recogida directa en la ESI</small>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <!-- TRUST & METRICS BANNER -->
+    <section class="metrics-banner" aria-label="Estadísticas de la plataforma">
+      <div class="metric-card">
+        <span class="metric-value">+1.200</span>
+        <span class="metric-label">Compañeros y docentes</span>
+        <span class="metric-sub">Ecosistema ESI activo</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">0 €</span>
+        <span class="metric-label">Costes por entrega en mano</span>
+        <span class="metric-sub">En cafetería o hall ESI</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">100%</span>
+        <span class="metric-label">Cuentas con 2FA / 3FA</span>
+        <span class="metric-sub">Máxima privacidad y control</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-value">4.9 / 5</span>
+        <span class="metric-label">Valoración promedio</span>
+        <span class="metric-sub">Satisfacción garantizada</span>
+      </div>
+    </section>
+
+    <!-- EXPLORAR POR CATEGORÍAS -->
+    <section class="categories-section" aria-labelledby="cat-title">
+      <div class="section-header">
+        <p class="esi-eyebrow">Exploración rápida</p>
+        <h2 id="cat-title" class="section-title">Encuentra por categorías populares</h2>
+        <p class="section-description">
+          Todo lo necesario para tus asignaturas, laboratorios y proyectos ordenado para ti.
+        </p>
+      </div>
+
+      <div class="categories-grid">
+        @for (cat of categorias; track cat.id) {
+          <div class="category-card" (click)="buscar(cat.nombre)" role="button" tabindex="0" (keyup.enter)="buscar(cat.nombre)">
+            <div class="category-icon-wrap" aria-hidden="true">
+              @switch (cat.icono) {
+                @case ('laptop') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="2" y1="20" x2="22" y2="20"></line>
+                  </svg>
+                }
+                @case ('robot') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <path d="M12 7v4"></path>
+                    <line x1="8" y1="16" x2="8" y2="16.01"></line>
+                    <line x1="16" y1="16" x2="16" y2="16.01"></line>
+                  </svg>
+                }
+                @case ('monitor') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                }
+                @case ('book') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                }
+                @case ('headphones') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                  </svg>
+                }
+                @default {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                }
+              }
+            </div>
+            <div class="category-meta">
+              <span class="category-badge">{{ cat.badge }}</span>
+              <h3 class="category-name">{{ cat.nombre }}</h3>
+              <p class="category-desc">{{ cat.descripcion }}</p>
+            </div>
+            <span class="category-link-arrow" aria-hidden="true">→</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- SHOWCASE DE PRODUCTOS DESTACADOS -->
+    <section class="showcase-section" aria-labelledby="showcase-title">
+      <div class="showcase-head-row">
+        <div>
+          <p class="esi-eyebrow">Selección recomendada</p>
+          <h2 id="showcase-title" class="section-title">Artículos destacados en la ESI</h2>
+        </div>
+
+        <!-- FILTROS INTERACTIVOS -->
+        <div class="showcase-filters" role="tablist" aria-label="Filtro de productos destacados">
+          <button
+            type="button"
+            class="filter-tab"
+            [class.active]="filtroDestacados() === 'todos'"
+            (click)="seleccionarFiltro('todos')"
+            role="tab"
+            [attr.aria-selected]="filtroDestacados() === 'todos'"
+          >
+            Todos
+          </button>
+          <button
+            type="button"
+            class="filter-tab"
+            [class.active]="filtroDestacados() === 'ofertas'"
+            (click)="seleccionarFiltro('ofertas')"
+            role="tab"
+            [attr.aria-selected]="filtroDestacados() === 'ofertas'"
+          >
+            🔥 Con descuento
+          </button>
+          <button
+            type="button"
+            class="filter-tab"
+            [class.active]="filtroDestacados() === 'baratos'"
+            (click)="seleccionarFiltro('baratos')"
+            role="tab"
+            [attr.aria-selected]="filtroDestacados() === 'baratos'"
+          >
+            Menos de 50 €
+          </button>
+        </div>
+      </div>
+
+      <!-- PRODUCT GRID -->
+      <div class="products-grid">
+        @for (prod of productosVisibles(); track prod.id) {
+          <article class="product-card">
+            <div class="product-media">
+              @if (prod.descuento > 0) {
+                <span class="badge-discount">-{{ prod.descuento }}%</span>
+              }
+              <span class="badge-stock">{{ prod.numStock > 1 ? prod.numStock + ' disponibles' : 'Última unidad' }}</span>
+
+              <a [routerLink]="['/products', prod.id]" class="product-img-link" [attr.aria-label]="'Ver ' + prod.nombre">
+                @if (prod.urlImagen) {
+                  <img [src]="prod.urlImagen" [alt]="prod.nombre" loading="lazy" class="product-thumb" />
+                } @else {
+                  <div class="product-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span>Sin imagen</span>
+                  </div>
+                }
+              </a>
+            </div>
+
+            <div class="product-body">
+              <span class="product-cat-label">{{ prod.categoria || 'Tecnología' }}</span>
+              <h3 class="product-name">
+                <a [routerLink]="['/products', prod.id]">{{ prod.nombre }}</a>
+              </h3>
+              @if (prod.descripcion) {
+                <p class="product-desc">{{ prod.descripcion }}</p>
+              }
+
+              <div class="product-pricing-wrap">
+                <div class="product-prices">
+                  @if (prod.descuento > 0) {
+                    <del class="old-price">{{ formatearPrecio(prod.precioCent) }}</del>
+                    <strong class="curr-price">{{ formatearPrecioConDescuento(prod.precioCent, prod.descuento) }}</strong>
+                  } @else {
+                    <strong class="curr-price">{{ formatearPrecio(prod.precioCent) }}</strong>
+                  }
+                </div>
+                <a [routerLink]="['/products', prod.id]" class="btn-product-detail" aria-label="Ver detalles">
+                  Ver detalles
+                </a>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="showcase-footer-action">
+        <a routerLink="/products" class="btn-catalog-more">
+          <span>Ver catálogo completo con todos los productos</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- DIFERENCIALES: ¿POR QUÉ ESIBUY? -->
+    <section class="value-prop-section" aria-labelledby="why-title">
+      <div class="section-header text-center">
+        <p class="esi-eyebrow">Ventajas exclusivas</p>
+        <h2 id="why-title" class="section-title">Diseñado a medida para nuestra universidad</h2>
+        <p class="section-description">
+          Olvídate de comisiones abusivas de portales externos y de envíos inciertos.
+        </p>
+      </div>
+
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">📍</div>
+          <h3>Entrega directa en la ESI</h3>
+          <p>
+            Queda entre clases en la cafetería, en la entrada o en los laboratorios. Sin gastos de envío ni esperas de paquetería.
+          </p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">🔐</div>
+          <h3>Seguridad con 2FA / 3FA</h3>
+          <p>
+            Tus datos y compras están protegidos con doble factor TOTP y verificación por email para evitar suplantaciones.
+          </p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">💡</div>
+          <h3>Precios justos entre iguales</h3>
+          <p>
+            Material que necesitas para el cuatrimestre a precios solidarios. Ahorra hasta un 60% en libros, sensores y gadgets.
+          </p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">♻️</div>
+          <h3>Economía circular y sostenible</h3>
+          <p>
+            Dale una segunda vida a tu tecnología. Reduce la huella electrónica reutilizando placas, manuales y componentes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CÓMO FUNCIONA -->
+    <section class="how-it-works-section" aria-labelledby="how-title">
+      <div class="section-header text-center">
+        <p class="esi-eyebrow">Paso a paso</p>
+        <h2 id="how-title" class="section-title">Cómo funciona EsiBuy</h2>
+        <p class="section-description">
+          Comprar y vender tecnología universitaria nunca había sido tan fácil e intuitivo.
+        </p>
+      </div>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 class="step-heading">Busca o publica en minutos</h3>
+          <p class="step-text">
+            Explora el catálogo filtrando por asignatura, hardware o precio. Si quieres vender, sube fotos y descripción al instante.
+          </p>
+        </div>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 class="step-heading">Acuerda o tramita online</h3>
+          <p class="step-text">
+            Gestiona la cesta, listas de deseos y métodos de pago seguros con total transparencia y confirmación inmediata.
+          </p>
+        </div>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 class="step-heading">Entrega y disfruta</h3>
+          <p class="step-text">
+            Recógelo en mano en la facultad o recíbelo por envío. Valora la experiencia y suma confianza a la comunidad.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIOS -->
+    <section class="testimonials-section" aria-labelledby="reviews-title">
+      <div class="section-header text-center">
+        <p class="esi-eyebrow">Comunidad real</p>
+        <h2 id="reviews-title" class="section-title">Lo que opinan en los pasillos de la ESI</h2>
+      </div>
+
+      <div class="testimonials-grid">
+        @for (t of testimonios; track t.autor) {
+          <div class="testi-card">
+            <div class="testi-stars" aria-label="5 estrellas de 5">
+              ★★★★★
+            </div>
+            <p class="testi-quote">“{{ t.comentario }}”</p>
+            <div class="testi-author">
+              <div class="author-avatar" aria-hidden="true">{{ t.iniciales }}</div>
+              <div>
+                <strong class="author-name">{{ t.autor }}</strong>
+                <span class="author-role">{{ t.rol }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- PREGUNTAS FRECUENTES (FAQ) -->
+    <section class="faq-section" aria-labelledby="faq-title">
+      <div class="section-header text-center">
+        <p class="esi-eyebrow">Dudas habituales</p>
+        <h2 id="faq-title" class="section-title">Preguntas Frecuentes</h2>
+      </div>
+
+      <div class="faq-accordion">
+        @for (item of faqs; track item.pregunta; let i = $index) {
+          <div class="faq-item" [class.expanded]="faqAbierta() === i">
+            <button
+              type="button"
+              class="faq-question"
+              (click)="toggleFaq(i)"
+              [attr.aria-expanded]="faqAbierta() === i"
+              [attr.aria-controls]="'faq-answer-' + i"
+            >
+              <span>{{ item.pregunta }}</span>
+              <span class="faq-toggle-icon" aria-hidden="true">{{ faqAbierta() === i ? '−' : '+' }}</span>
+            </button>
+            @if (faqAbierta() === i) {
+              <div [id]="'faq-answer-' + i" class="faq-answer" role="region">
+                <p>{{ item.respuesta }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- CTA BANNER FINAL -->
+    <section class="cta-final-section" aria-labelledby="cta-title">
+      <div class="cta-card">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <div class="cta-content">
+          <p class="cta-eyebrow">¿Tienes material que ya no necesitas?</p>
+          <h2 id="cta-title" class="cta-title">
+            Ponlo a la venta en 2 minutos y gana dinero extra.
+          </h2>
+          <p class="cta-description">
+            Ayuda a tus compañeros de cursos inferiores a equiparse para sus prácticas mientras liberas espacio en casa.
+          </p>
+
+          <div class="cta-buttons">
+            @if (auth.hasRole(['VENDEDOR'])) {
+              <a routerLink="/products/new" class="btn-cta-white">Publicar un producto ahora</a>
+            } @else if (auth.isAuthenticated()) {
+              <a routerLink="/products" class="btn-cta-white">Explorar catálogo completo</a>
+            } @else {
+              <a routerLink="/register/vendedor" class="btn-cta-white">Registrarme como vendedor</a>
+              <a routerLink="/register" class="btn-cta-outline">Crear cuenta de estudiante</a>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </app-marco-pagina>
