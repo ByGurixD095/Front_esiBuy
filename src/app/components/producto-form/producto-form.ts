@@ -21,6 +21,7 @@ interface BorradorProducto {
   categoriaId: string;
   urlImagen: string;
   activo: boolean;
+  soloPremium?: boolean;
 }
 
 const CLAVE_BORRADOR_PRODUCTO = 'esiBuy.producto.borrador';
@@ -69,6 +70,7 @@ export class ProductoForm implements OnInit {
     categoriaId: ['', [Validators.required]],
     urlImagen: ['', [Validators.pattern(/^\s*$|^https?:\/\/.+/i)]],
     activo: [true],
+    soloPremium: [false],
   });
 
   ngOnInit(): void {
@@ -112,6 +114,7 @@ export class ProductoForm implements OnInit {
           categoriaId: producto.categoriaId,
           urlImagen: producto.urlImagen ?? '',
           activo: producto.activo,
+          soloPremium: producto.soloPremium ?? false,
         });
         this.loadingProduct.set(false);
       },
@@ -246,6 +249,7 @@ subirImagenProducto(event: Event): void {
       categoriaId: formValue.categoriaId.trim(),
       urlImagen: urlImagenFinal.trim() || null, // Usamos la URL final
       activo: formValue.activo,
+      soloPremium: formValue.soloPremium,
     };
 
     const request = this.editingId()

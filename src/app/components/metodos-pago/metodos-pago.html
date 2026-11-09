@@ -1,8 +1,9 @@
-<app-marco-pagina panel="Métodos de pago" [volver]="true">
+<app-marco-pagina panel="Métodos de pago" >
   <section class="pagina-metodos" aria-labelledby="metodos-titulo" [attr.aria-busy]="cargando()">
     <p class="esi-eyebrow">Área de cliente</p>
     <h1 id="metodos-titulo" class="esi-titulo">Métodos de pago.</h1>
     <p class="descripcion">Consulta tus métodos guardados o registra uno nuevo.</p>
+    <a class="volver-pedido" routerLink="/cart" queryParamsHandling="merge" [queryParams]="{ continuarPedido: true }">← Volver al pedido y continuar la compra</a>
 
     @if (mensajeEliminacion()) {
       <p class="esi-alerta esi-alerta--ok aviso-eliminacion" role="status">

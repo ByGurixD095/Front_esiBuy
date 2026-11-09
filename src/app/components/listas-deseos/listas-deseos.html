@@ -51,6 +51,7 @@
                     <span class="descuento">-{{ producto.descuento }}%</span>
                   }
                 </p>
+                <button type="button" class="boton-eliminar-lista" [disabled]="eliminandoProductoId() !== null" [attr.aria-label]="'Quitar ' + producto.nombre + ' de la lista'" (click)="solicitarEliminacion(producto)">Quitar de la lista</button>
               </div>
             </li>
           }
@@ -155,6 +156,21 @@
           >
             {{ guardandoModificacion() ? 'Guardando…' : 'Guardar cambios' }}
           </button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (listaPendienteEliminar(); as lista) {
+    <div class="modal-fondo">
+      <section class="modal-confirmacion esi-tarjeta" role="alertdialog" aria-modal="true" aria-labelledby="confirmar-eliminacion-lista-titulo" [attr.aria-busy]="eliminandoLista()">
+        <p class="esi-eyebrow">Confirmar acción</p>
+        <h2 id="confirmar-eliminacion-lista-titulo">¿Eliminar la lista «{{ lista.nombre }}»?</h2>
+        <p class="texto-confirmacion">Se eliminará la lista y dejará de estar disponible.</p>
+        @if (errorEliminacionLista(); as mensaje) { <p class="esi-alerta esi-alerta--error error-modal" role="alert">{{ mensaje }}</p> }
+        <div class="acciones-modal">
+          <button type="button" class="esi-boton boton-secundario" [disabled]="eliminandoLista()" (click)="cancelarEliminacionLista()">Cancelar</button>
+          <button type="button" class="esi-boton boton-peligro" [disabled]="eliminandoLista()" (click)="confirmarEliminacionLista()">{{ eliminandoLista() ? 'Eliminando…' : 'Sí, eliminar lista' }}</button>
         </div>
       </section>
     </div>

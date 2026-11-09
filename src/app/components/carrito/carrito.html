@@ -22,23 +22,22 @@
         <h2>Cargando tu cesta</h2>
         <p>Estamos recuperando los productos que has añadido.</p>
       </section>
-    } @else if (pedidoConfirmado(); as pedido) {
+    } @else if (pedidoConfirmado()) {
       <section class="cart-state order-success" role="status" aria-live="polite">
         <span class="state-symbol" aria-hidden="true">✓</span>
         <h2>¡Pago confirmado!</h2>
-        <p>Tu pedido <strong>{{ pedido.id }}</strong> ya está confirmado.</p>
-        <p class="success-total">Total: {{ formatearPrecio(pedido.totalCent) }}</p>
+        <p>Tus pedidos ya están confirmados y en proceso de envío.</p>
         <a class="primary-link" routerLink="/pedidos">Consultar mis pedidos</a>
         <a class="primary-link" routerLink="/products">Volver al catálogo</a>
       </section>
-    } @else if (pedidoPendientePago(); as pedido) {
+    } @else if (pedidosPendientesPago().length > 0) {
       <section class="cart-state order-success" aria-labelledby="payment-title">
         <span class="state-symbol" aria-hidden="true">€</span>
         <h2 id="payment-title">Confirmación de pago</h2>
         <p>
-          El pedido <strong>{{ pedido.id }}</strong> está reservado. Este paso simula el pago y no realiza ningún cobro.
+          Se han generado <strong>{{ pedidosPendientesPago().length }}</strong> pedido(s). Este paso simula el pago y no realiza ningún cobro real.
         </p>
-        <p class="success-total">Total: {{ formatearPrecio(pedido.totalCent) }}</p>
+        <p class="success-total">Total a pagar: {{ formatearPrecio(totalPendientePago()) }}</p>
         <button type="button" class="buy-button" [disabled]="procesandoPago()" (click)="confirmarPago()">
           {{ procesandoPago() ? 'Confirmando…' : 'Confirmar pago simulado' }}
         </button>
@@ -145,7 +144,7 @@
             <span>Subtotal</span>
             <strong>{{ formatearPrecio(totalCentimos()) }}</strong>
           </div>
-          <p class="summary-note">Los descuentos aplicables se calcularán al finalizar la compra.</p>
+          <p class="summary-note">Los precios incluyen los descuentos aplicables a tu cuenta; el total definitivo se confirma al tramitar el pedido.</p>
           <button
             type="button"
             class="buy-button"
@@ -156,12 +155,16 @@
       </div>
 
       @if (checkoutAbierto()) {
-        <section class="checkout-panel" aria-labelledby="checkout-title">
+        <section id="zona-confirmacion" class="checkout-panel" aria-labelledby="checkout-title">
           <div class="checkout-heading">
             <div>
               <p class="eyebrow">Último paso</p>
               <h2 id="checkout-title">Datos del pedido</h2>
               <p>Indica dónde recibirlo y elige uno de tus métodos de pago guardados.</p>
+              <nav class="checkout-manage-links" aria-label="Gestionar datos del pedido">
+                <a routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Gestionar direcciones</a>
+                <a routerLink="/account/metodos-pago" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Gestionar métodos de pago</a>
+              </nav>
             </div>
             <button type="button" class="cancel-button" [disabled]="creandoPedido()" (click)="cerrarCheckout()">
               Cerrar
@@ -183,22 +186,43 @@
             <div class="checkout-status checkout-error">
               <p role="alert">{{ errorDirecciones() }}</p>
               <button type="button" class="retry-button" (click)="cargarDirecciones()">Reintentar</button>
-              <a class="primary-link" routerLink="/account/direcciones">Gestionar direcciones</a>
+              <a class="primary-link" routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Gestionar direcciones y volver al pedido</a>
             </div>
           } @else if (metodosPago().length === 0) {
             <div class="checkout-status">
               <p>Aún no tienes métodos de pago guardados.</p>
-              <a class="primary-link" routerLink="/account/metodos-pago">Añadir método de pago</a>
+              <a class="primary-link" routerLink="/account/metodos-pago" [queryParams]="{ continuarPedido: true }">Añadir método de pago y volver al pedido</a>
             </div>
           } @else if (direcciones().length === 0) {
             <div class="checkout-status">
               <p>Aún no tienes direcciones de envío guardadas.</p>
-              <a class="primary-link" routerLink="/account/direcciones">Añadir dirección de envío</a>
+              <a class="primary-link" routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true }">Añadir dirección y volver al pedido</a>
             </div>
           } @else {
             <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()" novalidate>
               <div class="checkout-fields">
-                <div class="checkout-field field-wide">
+               
+                <!-- NUEVA SECCIÓN DE LOTES -->
+                <div class="checkout-field field-wide lotes-section">
+                  <label>División del pedido</label>
+                  @if (lotesPorVendedor().length > 1) {
+                    <p class="summary-note">Tienes productos de distintos vendedores. Selecciona qué lotes quieres comprar ahora; se crearán pedidos separados.</p>
+                    <div class="lotes-selector">
+                      @for (lote of lotesPorVendedor(); track lote.vendedor) {
+                        <label class="lote-checkbox">
+                          <input type="checkbox" [checked]="vendedoresSeleccionados().has(lote.vendedor)" (change)="alternarVendedor(lote.vendedor)" />
+                          <div class="lote-info">
+                            <strong>{{ lote.vendedor }}</strong>
+                            <span>({{ lote.items.length }} {{ lote.items.length === 1 ? 'artículo' : 'artículos' }} - {{ formatearPrecio(lote.subtotal) }})</span>
+                          </div>
+                        </label>
+                      }
+                    </div>
+                  } @else {
+                    <p class="summary-note">Todos los productos son de <strong>{{ lotesPorVendedor()[0]?.vendedor }}</strong> y se enviarán en un único pedido.</p>
+                  }
+                </div>
+                 <div class="checkout-field field-wide">
                   <label for="metodo-pago-pedido">Método de pago</label>
                   <select id="metodo-pago-pedido" formControlName="metodoPagoId">
                     @for (metodo of metodosPago(); track metodo.id) {
@@ -228,16 +252,15 @@
                     <span>{{ direccion.direccion }}</span>
                     <span>{{ direccion.codigoPostal }} {{ direccion.ciudad }}, {{ direccion.provincia }}</span>
                     <span>{{ direccion.pais }} · {{ direccion.telefono }}</span>
-                    <a routerLink="/account/direcciones">Administrar mis direcciones</a>
                   </div>
                 } @else {
                   <div class="checkout-address field-wide">
                     <p>Selecciona una dirección guardada.</p>
-                    <a routerLink="/account/direcciones">Añadir dirección</a>
+                    <a routerLink="/account/direcciones" [queryParams]="{ continuarPedido: true, metodoPagoId: checkoutForm.controls.metodoPagoId.value, direccionId: checkoutForm.controls.direccionId.value }">Añadir dirección</a>
                   </div>
                 }
               </div>
-              <p class="checkout-total">Total del pedido <strong>{{ formatearPrecio(totalCentimos()) }}</strong></p>
+              <p class="checkout-total">Total a tramitar <strong>{{ formatearPrecio(totalCheckout()) }}</strong></p>
               <button type="submit" class="buy-button checkout-submit" [disabled]="creandoPedido()">
                 {{ creandoPedido() ? 'Realizando pedido...' : 'Confirmar pedido' }}
               </button>

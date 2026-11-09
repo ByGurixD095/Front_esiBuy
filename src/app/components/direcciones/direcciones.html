@@ -1,8 +1,9 @@
-<app-marco-pagina panel="Direcciones de envío" [volver]="true">
+<app-marco-pagina panel="Direcciones de envío" >
   <section class="addresses-page" aria-labelledby="addresses-title" [attr.aria-busy]="cargando()">
     <p class="eyebrow">Área de cliente</p>
     <h1 id="addresses-title">Direcciones de envío.</h1>
     <p class="intro">Guarda y administra las direcciones que puedes seleccionar al tramitar un pedido.</p>
+    <a routerLink="/cart" queryParamsHandling="merge" class="volver-pedido" [queryParams]="{ continuarPedido: true }">← Volver al pedido y continuar la compra</a>
 
     @if (mensaje()) {
       <p class="notice success" role="status">{{ mensaje() }}</p>

@@ -1,8 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { firstValueFrom, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { ProductService } from '../../services/product.service';
 import { CarritoService, ItemCarrito } from '../../services/carrito.service';
 import { DireccionGuardada, DireccionesService } from '../../services/direcciones.service';
 import { MetodoPago, MetodosPagoService } from '../../services/metodos-pago-service/metodos-pago';
@@ -17,13 +20,19 @@ import { MarcoPagina } from '../marco-pagina/marco-pagina';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Carrito implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly auth = inject(AuthService);
   private readonly carritoService = inject(CarritoService);
   private readonly direccionesService = inject(DireccionesService);
   private readonly metodosPagoService = inject(MetodosPagoService);
   private readonly pedidosService = inject(PedidosService);
+  private metodoPagoPreferido: string | null = null;
+  private direccionPreferida: string | null = null;
 
-  readonly items = signal<ItemCarrito[]>([]);
+  // Inyectamos ProductService para poder consultar el vendedor de cada item
+  private readonly productoService = inject(ProductService);
+
+  readonly items = signal<(ItemCarrito & { vendedor: string })[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly actualizandoIds = signal<ReadonlySet<string>>(new Set());
@@ -41,11 +50,41 @@ export class Carrito implements OnInit {
   readonly procesandoPago = signal(false);
   readonly errorPedido = signal('');
   readonly errorPago = signal('');
-  readonly pedidoPendientePago = signal<PedidoCreado | null>(null);
-  readonly pedidoConfirmado = signal<PedidoCreado | null>(null);
+  
+  // Cambiamos a un array para soportar múltiples pedidos a la vez
+  readonly pedidosPendientesPago = signal<PedidoCreado[]>([]);
+  readonly pedidoConfirmado = signal<boolean>(false);
+
   readonly cantidadUnidades = computed(() => this.items().reduce((total, item) => total + item.cantidad, 0));
   readonly totalCentimos = computed(() =>
     this.items().reduce((total, item) => total + item.precioCent * item.cantidad, 0),
+  );
+
+  // AGRUPACIÓN POR LOTE
+  readonly lotesPorVendedor = computed(() => {
+    const map = new Map<string, { vendedor: string; items: (ItemCarrito & { vendedor: string })[]; subtotal: number }>();
+    for (const item of this.items()) {
+      if (!map.has(item.vendedor)) {
+        map.set(item.vendedor, { vendedor: item.vendedor, items: [], subtotal: 0 });
+      }
+      const lote = map.get(item.vendedor)!;
+      lote.items.push(item);
+      lote.subtotal += item.precioCent * item.cantidad;
+    }
+    return Array.from(map.values());
+  });
+
+  readonly vendedoresSeleccionados = signal<Set<string>>(new Set());
+
+  readonly totalCheckout = computed(() => {
+    const seleccionados = this.vendedoresSeleccionados();
+    return this.lotesPorVendedor()
+      .filter(l => seleccionados.has(l.vendedor))
+      .reduce((total, l) => total + l.subtotal, 0);
+  });
+
+  readonly totalPendientePago = computed(() => 
+    this.pedidosPendientesPago().reduce((sum, p) => sum + p.totalCent, 0)
   );
 
   readonly checkoutForm = new FormGroup({
@@ -60,9 +99,21 @@ export class Carrito implements OnInit {
   cargarCarrito(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.carritoService.obtenerCarrito().subscribe({
-      next: (items) => {
-        this.items.set(items);
+    this.carritoService.obtenerCarrito().pipe(
+      switchMap(items => {
+        if (items.length === 0) return of([]);
+        // Consultamos la información de cada producto para averiguar su vendedor
+        const peticiones = items.map(item =>
+          this.productoService.obtenerInfo(item.productoId).pipe(
+            map(info => ({ ...item, vendedor: info.vendedor })),
+            catchError(() => of({ ...item, vendedor: 'Vendedor Desconocido' }))
+          )
+        );
+        return forkJoin(peticiones);
+      })
+    ).subscribe({
+      next: (itemsConVendedor) => {
+        this.items.set(itemsConVendedor);
         this.cargando.set(false);
       },
       error: (error: HttpErrorResponse) => {
@@ -168,6 +219,16 @@ export class Carrito implements OnInit {
     this.errorPago.set('');
     this.cargarMetodosPago();
     this.cargarDirecciones();
+    
+    // Marcar todos los lotes por defecto
+    this.vendedoresSeleccionados.set(new Set(this.lotesPorVendedor().map(l => l.vendedor)));
+
+    setTimeout(() => {
+      const seccionCheckout = document.getElementById('zona-confirmacion');
+      if (seccionCheckout) {
+        seccionCheckout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
   }
 
   cerrarCheckout(): void {
@@ -175,6 +236,16 @@ export class Carrito implements OnInit {
       this.checkoutAbierto.set(false);
       this.errorPedido.set('');
     }
+  }
+
+  alternarVendedor(vendedorId: string): void {
+    const seleccionados = new Set(this.vendedoresSeleccionados());
+    if (seleccionados.has(vendedorId)) {
+      seleccionados.delete(vendedorId);
+    } else {
+      seleccionados.add(vendedorId);
+    }
+    this.vendedoresSeleccionados.set(seleccionados);
   }
 
   cargarMetodosPago(): void {
@@ -221,11 +292,17 @@ export class Carrito implements OnInit {
     });
   }
 
-  confirmarPedido(): void {
+  async confirmarPedido(): Promise<void> {
     if (this.creandoPedido()) return;
     if (this.checkoutForm.invalid || this.metodosPago().length === 0 || this.direcciones().length === 0) {
       this.checkoutForm.markAllAsTouched();
       this.errorPedido.set('Selecciona una dirección guardada y un método de pago.');
+      return;
+    }
+    
+    const seleccionados = Array.from(this.vendedoresSeleccionados());
+    if (seleccionados.length === 0) {
+      this.errorPedido.set('Selecciona al menos un lote de productos para tramitar.');
       return;
     }
 
@@ -235,7 +312,8 @@ export class Carrito implements OnInit {
       this.errorPedido.set('La dirección seleccionada ya no está disponible. Actualiza la lista.');
       return;
     }
-    const datos: CrearPedidoRequest = {
+
+    const datosFormato = {
       metodoPagoId: valores.metodoPagoId,
       direccionEnvio: {
         nombreCompleto: direccion.nombreCompleto,
@@ -250,48 +328,74 @@ export class Carrito implements OnInit {
 
     this.creandoPedido.set(true);
     this.errorPedido.set('');
-    this.pedidosService.crear(datos).subscribe({
-      next: (pedido) => {
-        this.pedidoPendientePago.set(pedido);
-        this.items.set([]);
-        this.creandoPedido.set(false);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.errorPedido.set(
-          error.status === 409
-            ? 'Ha cambiado la disponibilidad de algún producto. Hemos actualizado la cesta; revísala antes de volver a intentarlo.'
-            : this.auth.errorMessage(error, 'No se ha podido realizar el pedido. Revisa la cesta e inténtalo de nuevo.'),
-        );
-        this.creandoPedido.set(false);
-        if (error.status === 409) this.cargarCarrito();
-      },
-    });
+    
+    const lotesAComprar = this.lotesPorVendedor().filter(l => seleccionados.includes(l.vendedor));
+    const lotesNoComprados = this.lotesPorVendedor().filter(l => !seleccionados.includes(l.vendedor));
+    const pedidosGenerados: PedidoCreado[] = [];
+
+    try {
+      // Orquestación Frontend: Creamos pedidos por separado vaciando y llenando la cesta dinámicamente
+      for (const lote of lotesAComprar) {
+        await firstValueFrom(this.carritoService.vaciar());
+        for (const item of lote.items) {
+          await firstValueFrom(this.carritoService.anadirProducto(item.productoId));
+          if (item.cantidad > 1) {
+            await firstValueFrom(this.carritoService.actualizarCantidad(item.productoId, item.cantidad));
+          }
+        }
+        const pedido = await firstValueFrom(this.pedidosService.crear(datosFormato));
+        pedidosGenerados.push(pedido);
+      }
+
+      // Restaurar lo que no se ha comprado
+      await firstValueFrom(this.carritoService.vaciar());
+      for (const lote of lotesNoComprados) {
+        for (const item of lote.items) {
+          await firstValueFrom(this.carritoService.anadirProducto(item.productoId));
+          if (item.cantidad > 1) {
+            await firstValueFrom(this.carritoService.actualizarCantidad(item.productoId, item.cantidad));
+          }
+        }
+      }
+
+      this.pedidosPendientesPago.set(pedidosGenerados);
+      this.creandoPedido.set(false);
+      this.cargarCarrito();
+
+    } catch (error: any) {
+      this.errorPedido.set('Error procesando los lotes. Es posible que algún producto se haya agotado en este instante.');
+      this.creandoPedido.set(false);
+      this.cargarCarrito();
+    }
   }
 
   confirmarPago(): void {
-    const pedido = this.pedidoPendientePago();
-    if (!pedido || this.procesandoPago()) return;
+    const pedidos = this.pedidosPendientesPago();
+    if (pedidos.length === 0 || this.procesandoPago()) return;
 
     this.procesandoPago.set(true);
     this.errorPago.set('');
-    this.pedidosService.pagar(pedido.id).subscribe({
-      next: (pedidoPagado) => {
-        this.pedidoConfirmado.set(pedidoPagado);
-        this.pedidoPendientePago.set(null);
+
+    const peticiones = pedidos.map(p => this.pedidosService.pagar(p.id));
+    
+    forkJoin(peticiones).subscribe({
+      next: () => {
+        this.pedidoConfirmado.set(true);
+        this.pedidosPendientesPago.set([]);
         this.procesandoPago.set(false);
         this.checkoutAbierto.set(false);
       },
       error: (error: HttpErrorResponse) => {
         this.procesandoPago.set(false);
         if (error.status === 409) {
-          this.pedidoPendientePago.set(null);
+          this.pedidosPendientesPago.set([]);
           this.errorPago.set(
             'No se pudo completar el pago dentro del plazo. Hemos actualizado el carrito; revísalo antes de realizar otro pedido.',
           );
           this.cargarCarrito();
         } else {
           this.errorPago.set(
-            this.auth.errorMessage(error, 'No se ha podido confirmar el pago simulado. Puedes volver a intentarlo.'),
+            this.auth.errorMessage(error, 'No se ha podido confirmar el pago de todos los lotes. Revisa la página de pedidos.'),
           );
         }
       },
@@ -323,7 +427,7 @@ export class Carrito implements OnInit {
   private mensajeParaError(error: HttpErrorResponse): string {
     if (error.status === 0) return 'No se puede conectar con el servidor. Inténtalo de nuevo.';
     if (error.status === 401) return 'Tu sesión ha caducado. Inicia sesión de nuevo para consultar la cesta.';
-    if (error.status === 403) return 'El servidor ha rechazado la petición (403). Comprueba tus permisos y el token de seguridad.';
+    if (error.status === 403) return 'Solo los clientes pueden consultar y modificar su cesta.';
     if (error.status === 404) return 'No se ha encontrado el carrito o el producto que intentas modificar.';
     if (error.status === 400) return 'La cantidad indicada no es válida.';
     return `No se ha podido actualizar el carrito (HTTP ${error.status}).`;

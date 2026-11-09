@@ -92,6 +92,8 @@ function mensajeParaStatus(error: HttpErrorResponse): string {
       return 'No tienes permisos para realizar esta acción';
     case 404:
       return 'No se ha encontrado el producto o ya no pertenece a tu catálogo';
+    case 409:
+      return 'No puedes eliminar un producto que forma parte de pedidos anteriores.';
     case 500:
       return 'Error interno del servidor';
     case 0:

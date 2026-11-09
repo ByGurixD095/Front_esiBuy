@@ -1,41 +1,4 @@
-﻿<main class="catalog-shell">
-  <header class="catalog-header">
-    <a class="brand" routerLink="/" aria-label="EsiBuy, ir al inicio"><img src="/assets/images/svg/logo.svg" alt="EsiBuy" /></a>
-    <nav class="header-actions" aria-label="Acciones de usuario">
-      <a class="account-link" routerLink="/products">Catálogo</a>
-      @if (auth.isAuthenticated()) {
-        <a class="account-link" routerLink="/account">Mi cuenta</a>
-        @if (esCliente()) {
-          <a
-            class="account-link cart-link"
-            routerLink="/cart"
-            [attr.aria-label]="
-              cantidadCarrito() === null
-                ? 'Mi cesta'
-                : 'Mi cesta, ' +
-                  cantidadCarrito() +
-                  (cantidadCarrito() === 1 ? ' producto' : ' productos')
-            "
-          >
-            Mi cesta
-            @if (cantidadCarrito() !== null) {
-              <span class="cart-count">{{ cantidadCarrito() }}</span>
-            }
-          </a>
-          <a class="account-link" routerLink="/favoritos">Mis favoritos</a>
-          <a class="account-link" routerLink="/listas-deseos">Mis listas</a>
-          <a class="account-link" routerLink="/pedidos">Mis pedidos</a>
-          <a class="account-link" routerLink="/account/direcciones">Direcciones</a>
-        }
-        @if (auth.hasRole(['ADMINISTRADOR', 'VENDEDOR'])) {
-          <a class="account-link" routerLink="/manage">Gestionar</a>
-        }
-      } @else {
-        <a class="account-link" routerLink="/login">Iniciar sesión / Registro</a>
-      }
-    </nav>
-  </header>
-
+﻿﻿<app-marco-pagina panel="Catálogo de productos" [cantidadCarrito]="esCliente() ? cantidadCarrito() : undefined">
   <section class="catalog-content" aria-labelledby="catalog-title">
     <div class="catalog-intro">
       <div>
@@ -63,7 +26,7 @@
       </aside>
     </div>
 
-    <app-panel-filtros-productos [productos]="productos()" [categoriasDisponibles]="categoriasDisponibles()" (filtrosChange)="aplicarFiltros($event)" />
+    <app-panel-filtros-productos [productos]="productos()" [categoriasDisponibles]="categoriasDisponibles()" [mostrarFavoritos]="esCliente()" (filtrosChange)="aplicarFiltros($event)" />
     @if (errorCategorias(); as mensaje) {
       <p class="cart-feedback cart-feedback-error" role="alert">
         {{ mensaje }}
@@ -145,7 +108,8 @@
               <h2><a class="product-info-link" [routerLink]="['/products', producto.id]">{{ producto.nombre }}</a></h2>
               @if (producto.descripcion) { <p class="description">{{ producto.descripcion }}</p> }
               <div class="product-meta">
-                <span>Stock: <strong>{{ producto.numStock }}</strong></span>
+                <span>{{ producto.numStock < 5 ? '¡Quedan pocas unidades!' : 'Disponible' }}</span>
+                @if (producto.soloPremium) { <span class="premium-discount">Solo clientes premium</span> }
                 @if (producto.descuentoPremium > 0) { <span class="premium-discount">Premium -{{ producto.descuentoPremium }}%</span> }
               </div>
               <div class="product-footer">
@@ -284,4 +248,4 @@
   }
 
   <footer class="catalog-footer"><span>© 2026 EsiBuy</span><span>Productos disponibles en tiempo real</span></footer>
-</main>
+</app-marco-pagina>

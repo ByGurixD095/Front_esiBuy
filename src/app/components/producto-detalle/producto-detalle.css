@@ -148,6 +148,101 @@
   color: #64748b;
 }
 
+.reviews-section {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.reviews-section h2,
+.review-form h3 {
+  margin: 0;
+}
+
+.rating-summary,
+.review-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stars,
+.star-picker button {
+  color: #f59e0b;
+  letter-spacing: 0.08em;
+}
+
+.reviews-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.review {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.review p {
+  margin: 6px 0 0;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.review-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  background: #fff8e8;
+}
+
+.star-picker {
+  display: flex;
+  gap: 4px;
+}
+
+.star-picker button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 30px;
+  cursor: pointer;
+  color: #cbd5e1;
+}
+
+.star-picker button.selected,
+.star-picker button:hover {
+  color: #f59e0b;
+  animation: star-fill 160ms ease-out both;
+}
+
+.star-picker button:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+@keyframes star-fill {
+  from {
+    transform: scale(0.82);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.review-form textarea {
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  font: inherit;
+  resize: none;
+}
+
 .description {
   line-height: 1.6;
 }
@@ -227,6 +322,7 @@
 
 .buy-button {
   width: 100%;
+  cursor: pointer;
 }
 
 .wishlist-button {

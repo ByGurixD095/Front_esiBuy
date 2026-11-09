@@ -20,6 +20,7 @@ export interface CrearPedidoRequest {
 
 export interface PedidoCreado {
   id: string;
+  lineas?: LineaPedido[];
   totalCent: number;
   estado: string;
 }

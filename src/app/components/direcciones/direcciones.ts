@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { DireccionEnvio } from '../../services/pedidos.service';
 import { DireccionGuardada, DireccionesService } from '../../services/direcciones.service';
@@ -8,7 +9,7 @@ import { MarcoPagina } from '../marco-pagina/marco-pagina';
 
 @Component({
   selector: 'app-direcciones',
-  imports: [MarcoPagina, ReactiveFormsModule],
+  imports: [MarcoPagina, ReactiveFormsModule, RouterLink],
   templateUrl: './direcciones.html',
   styleUrl: './direcciones.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -69,7 +69,7 @@ export class ListasDeseos implements OnInit {
   }
 
   formatearPrecio(precioCent: number, descuento = 0): string {
-    const precioFinal = Math.round(precioCent * (1 - descuento / 100));
+    const precioFinal = Math.floor(precioCent * (1 - descuento / 100));
     return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(
       precioFinal / 100,
     );
