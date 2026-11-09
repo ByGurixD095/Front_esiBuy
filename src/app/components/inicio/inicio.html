@@ -1,12 +1,43 @@
 <app-marco-pagina>
   <section class="inicio" aria-labelledby="inicio-titulo">
-    <p class="esi-eyebrow">EsiBuy</p>
-    <h1 id="inicio-titulo" class="esi-titulo">Compra y vende <em>a tu manera.</em></h1>
-    <p class="descripcion">
-      Explora el catálogo, accede a tu cuenta y gestiona las opciones disponibles para tu perfil.
-    </p>
-    <div class="acciones" aria-label="Acciones principales">
-      <a class="esi-boton accion-principal" routerLink="/products">Ver catálogo</a>
+    <div class="inicio-contenido">
+      <div class="inicio-copy">
+        <p class="esi-eyebrow"><span class="punto-vivo" aria-hidden="true"></span> EsiBuy · tu mercado, tus reglas</p>
+        <h1 id="inicio-titulo" class="esi-titulo">Compra y vende <em>a tu manera.</em></h1>
+        <p class="descripcion">
+          Explora el catálogo, accede a tu cuenta y gestiona las opciones disponibles para tu perfil.
+        </p>
+        <div class="acciones" aria-label="Acciones principales">
+          <a class="esi-boton accion-principal" routerLink="/products">
+            Explorar catálogo <span aria-hidden="true">↗</span>
+          </a>
+          <p class="accion-nota">Encuentra algo que te encante.</p>
+        </div>
+        <div class="beneficios" aria-label="Ventajas de EsiBuy">
+          <span><i aria-hidden="true">✓</i> Descubre productos únicos</span>
+          <span><i aria-hidden="true">✓</i> Vende a tu ritmo</span>
+        </div>
+      </div>
+
+      <div class="escaparate" aria-label="Una selección de productos para descubrir">
+        <div class="brillo brillo-uno" aria-hidden="true"></div>
+        <div class="brillo brillo-dos" aria-hidden="true"></div>
+        <div class="tarjeta-producto tarjeta-a" aria-hidden="true">
+          <div class="producto-imagen imagen-auriculares"><span class="auriculares"></span></div>
+          <div class="producto-info"><span class="producto-tipo">TECNOLOGÍA</span><span class="producto-precio">39,90 €</span></div>
+        </div>
+        <div class="tarjeta-producto tarjeta-b" aria-hidden="true">
+          <div class="producto-imagen imagen-bolso"><span class="bolso"></span></div>
+          <div class="producto-info"><span class="producto-tipo">ESTILO</span><span class="producto-precio">24,50 €</span></div>
+        </div>
+        <div class="tarjeta-producto tarjeta-c" aria-hidden="true">
+          <div class="producto-imagen imagen-libro"><span class="libro"></span></div>
+          <div class="producto-info"><span class="producto-tipo">LECTURA</span><span class="producto-precio">12,00 €</span></div>
+        </div>
+        <div class="sello" aria-hidden="true"><span>ESI</span><strong>BUY</strong><i>✳</i></div>
+        <p class="escaparate-pie" aria-hidden="true">Pequeños hallazgos. Grandes favoritos.</p>
+      </div>
     </div>
+    <div class="franja" aria-hidden="true"><span>COMPRA</span><b>✳</b><span>VENDE</span><b>✳</b><span>DESCUBRE</span><b>✳</b><span>REPITE</span></div>
   </section>
 </app-marco-pagina>
