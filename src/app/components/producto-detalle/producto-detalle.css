@@ -240,7 +240,7 @@
   padding: 10px;
   border: 1px solid #cbd5e1;
   font: inherit;
-  resize: vertical;
+  resize: none;
 }
 
 .description {

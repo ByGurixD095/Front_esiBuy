@@ -697,6 +697,42 @@ h1 {
   outline-offset: 2px;
 }
 
+/* --- ESTILOS DE LOTES DE VENDEDOR --- */
+.lotes-section {
+  background: #fff;
+  border: 1px solid var(--esi-line);
+  border-radius: 8px;
+  padding: 16px;
+}
+.lotes-selector {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+.lote-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.lote-checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--esi-ink);
+}
+.lote-info {
+  display: flex;
+  flex-direction: column;
+}
+.lote-info strong {
+  font-size: 14px;
+  color: var(--esi-ink);
+}
+.lote-info span {
+  font-size: 13px;
+  color: var(--esi-soft-ink);
+}
+
 @media (max-width: 560px) {
   .checkout-manage-links {
     width: 100%;

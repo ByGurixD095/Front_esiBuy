@@ -22,37 +22,22 @@
         <h2>Cargando tu cesta</h2>
         <p>Estamos recuperando los productos que has añadido.</p>
       </section>
-    } @else if (pedidoConfirmado(); as pedido) {
+    } @else if (pedidoConfirmado()) {
       <section class="cart-state order-success" role="status" aria-live="polite">
         <span class="state-symbol" aria-hidden="true">✓</span>
         <h2>¡Pago confirmado!</h2>
-        <p>Tu pedido <strong>{{ pedido.id }}</strong> ya está confirmado.</p>
-        <p class="success-total">Total: {{ formatearPrecio(pedido.totalCent) }}</p>
-        @if (pedido.lineas?.length) {
-          <ul class="pedido-lineas">
-            @for (linea of pedido.lineas; track linea.productoId) {
-              <li>{{ linea.nombre }} · {{ linea.cantidad }} × {{ formatearPrecio(linea.precioUnitarioCent) }} = {{ formatearPrecio(linea.subtotalCent) }}</li>
-            }
-          </ul>
-        }
+        <p>Tus pedidos ya están confirmados y en proceso de envío.</p>
         <a class="primary-link" routerLink="/pedidos">Consultar mis pedidos</a>
         <a class="primary-link" routerLink="/products">Volver al catálogo</a>
       </section>
-    } @else if (pedidoPendientePago(); as pedido) {
+    } @else if (pedidosPendientesPago().length > 0) {
       <section class="cart-state order-success" aria-labelledby="payment-title">
         <span class="state-symbol" aria-hidden="true">€</span>
         <h2 id="payment-title">Confirmación de pago</h2>
         <p>
-          El pedido <strong>{{ pedido.id }}</strong> está reservado. Este paso simula el pago y no realiza ningún cobro.
+          Se han generado <strong>{{ pedidosPendientesPago().length }}</strong> pedido(s). Este paso simula el pago y no realiza ningún cobro real.
         </p>
-        <p class="success-total">Total: {{ formatearPrecio(pedido.totalCent) }}</p>
-        @if (pedido.lineas?.length) {
-          <ul class="pedido-lineas">
-            @for (linea of pedido.lineas; track linea.productoId) {
-              <li>{{ linea.nombre }} · {{ linea.cantidad }} × {{ formatearPrecio(linea.precioUnitarioCent) }} = {{ formatearPrecio(linea.subtotalCent) }}</li>
-            }
-          </ul>
-        }
+        <p class="success-total">Total a pagar: {{ formatearPrecio(totalPendientePago()) }}</p>
         <button type="button" class="buy-button" [disabled]="procesandoPago()" (click)="confirmarPago()">
           {{ procesandoPago() ? 'Confirmando…' : 'Confirmar pago simulado' }}
         </button>
@@ -217,7 +202,28 @@
           } @else {
             <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPedido()" novalidate>
               <div class="checkout-fields">
-                <div class="checkout-field field-wide">
+               
+                <!-- NUEVA SECCIÓN DE LOTES -->
+                <div class="checkout-field field-wide lotes-section">
+                  <label>División del pedido</label>
+                  @if (lotesPorVendedor().length > 1) {
+                    <p class="summary-note">Tienes productos de distintos vendedores. Selecciona qué lotes quieres comprar ahora; se crearán pedidos separados.</p>
+                    <div class="lotes-selector">
+                      @for (lote of lotesPorVendedor(); track lote.vendedor) {
+                        <label class="lote-checkbox">
+                          <input type="checkbox" [checked]="vendedoresSeleccionados().has(lote.vendedor)" (change)="alternarVendedor(lote.vendedor)" />
+                          <div class="lote-info">
+                            <strong>{{ lote.vendedor }}</strong>
+                            <span>({{ lote.items.length }} {{ lote.items.length === 1 ? 'artículo' : 'artículos' }} - {{ formatearPrecio(lote.subtotal) }})</span>
+                          </div>
+                        </label>
+                      }
+                    </div>
+                  } @else {
+                    <p class="summary-note">Todos los productos son de <strong>{{ lotesPorVendedor()[0]?.vendedor }}</strong> y se enviarán en un único pedido.</p>
+                  }
+                </div>
+                 <div class="checkout-field field-wide">
                   <label for="metodo-pago-pedido">Método de pago</label>
                   <select id="metodo-pago-pedido" formControlName="metodoPagoId">
                     @for (metodo of metodosPago(); track metodo.id) {
@@ -255,7 +261,7 @@
                   </div>
                 }
               </div>
-              <p class="checkout-total">Total del pedido <strong>{{ formatearPrecio(totalCentimos()) }}</strong></p>
+              <p class="checkout-total">Total a tramitar <strong>{{ formatearPrecio(totalCheckout()) }}</strong></p>
               <button type="submit" class="buy-button checkout-submit" [disabled]="creandoPedido()">
                 {{ creandoPedido() ? 'Realizando pedido...' : 'Confirmar pedido' }}
               </button>
