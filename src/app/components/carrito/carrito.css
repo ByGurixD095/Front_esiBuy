@@ -131,7 +131,7 @@ h1 {
   color: var(--esi-error-text);
 }
 
-.retry-button {
+.error-state .retry-button {
   margin-top: 20px;
 }
 
@@ -269,19 +269,6 @@ h1 {
   font: inherit;
 }
 
-.quantity-control input:focus-visible,
-.quantity-control button:focus-visible,
-.continue-link:focus-visible,
-.primary-link:focus-visible,
-.retry-button:focus-visible,
-.buy-button:focus-visible,
-.remove-button:focus-visible,
-.cancel-button:focus-visible,
-.confirm-remove-button:focus-visible {
-  outline: 3px solid var(--esi-orange);
-  outline-offset: 2px;
-  z-index: 1;
-}
 
 .updating-note {
   color: var(--esi-soft-ink);
@@ -315,14 +302,14 @@ h1 {
   cursor: pointer;
 }
 
-.remove-button:hover:not(:disabled) {
-  background: var(--esi-error-bg);
-  border-color: var(--esi-error-text);
-}
-
 .remove-button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.remove-button:hover:not(:disabled) {
+  background: var(--esi-error-bg);
+  border-color: var(--esi-error-text);
 }
 
 .confirmation-backdrop {
@@ -388,11 +375,6 @@ h1 {
   border-color: var(--esi-error-text);
 }
 
-.cancel-button:focus-visible,
-.confirm-remove-button:focus-visible {
-  outline: 3px solid var(--esi-orange);
-  outline-offset: 2px;
-}
 
 .order-summary {
   position: sticky;
@@ -452,14 +434,14 @@ h1 {
   cursor: pointer;
 }
 
-.buy-button:hover:not(:disabled) {
-  background: var(--esi-orange-hover);
-  border-color: var(--esi-orange-hover);
-}
-
 .buy-button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.buy-button:hover:not(:disabled) {
+  background: var(--esi-orange-hover);
+  border-color: var(--esi-orange-hover);
 }
 
 .checkout-panel {
@@ -483,6 +465,12 @@ h1 {
   font-family: var(--esi-font-title);
   font-size: 30px;
   font-weight: 400;
+}
+
+.checkout-field small,
+.checkout-error p {
+  color: var(--esi-error-text);
+  line-height: 1.4;
 }
 
 .checkout-heading p:last-child,
@@ -552,11 +540,6 @@ h1 {
   outline-offset: 2px;
 }
 
-.checkout-field small,
-.checkout-error p {
-  color: var(--esi-error-text);
-  line-height: 1.4;
-}
 
 .field-wide {
   grid-column: 1 / -1;
@@ -601,6 +584,20 @@ h1 {
   margin-top: 10px !important;
   color: var(--esi-ink) !important;
   font-weight: 700;
+}
+
+.quantity-control input:focus-visible,
+.quantity-control button:focus-visible,
+.continue-link:focus-visible,
+.primary-link:focus-visible,
+.retry-button:focus-visible,
+.buy-button:focus-visible,
+.remove-button:focus-visible,
+.cancel-button:focus-visible,
+.confirm-remove-button:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 2px;
+  z-index: 1;
 }
 
 @media (max-width: 800px) {

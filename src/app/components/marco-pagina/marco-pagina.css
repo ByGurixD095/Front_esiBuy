@@ -39,10 +39,6 @@
   height: auto;
 }
 
-.brand:focus-visible, .account-link:focus-visible, .pie a:focus-visible {
-  outline: 3px solid var(--esi-orange);
-  outline-offset: 3px;
-}
 
 .header-context {
   color: #cbd5e1;
@@ -126,6 +122,11 @@
 .pie a:hover {
   color: var(--esi-orange-text);
   text-decoration: underline;
+}
+
+.brand:focus-visible, .account-link:focus-visible, .pie a:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 3px;
 }
 
 /* --- RESPONSIVIDAD PARA MÓVILES --- */

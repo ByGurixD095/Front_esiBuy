@@ -61,8 +61,7 @@
   border-color: var(--esi-orange-text);
 }
 
-.entrada-archivo:focus-visible + .boton-subir,
-.opcion-avatar:focus-visible {
+.entrada-archivo:focus-visible + .boton-subir {
   outline: 2px solid var(--esi-orange-text);
   outline-offset: 3px;
 }
@@ -110,6 +109,11 @@
 .opcion-avatar:hover,
 .opcion-avatar.seleccionado {
   border-color: var(--esi-orange-text);
+}
+
+.opcion-avatar:focus-visible {
+  outline: 2px solid var(--esi-orange-text);
+  outline-offset: 3px;
 }
 
 .error-avatar {

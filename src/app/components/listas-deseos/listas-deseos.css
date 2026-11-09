@@ -18,26 +18,19 @@
 .enlace-lista:focus-visible { border-radius: 6px; outline: 3px solid var(--esi-orange); outline-offset: 4px; }
 .boton-modificar-lista { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border: 1px solid transparent; border-radius: 50%; color: #78838b; background: transparent; cursor: pointer; transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
 .boton-modificar-lista svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.boton-modificar-lista:hover:not(:disabled) { border-color: var(--esi-orange-soft); color: var(--esi-orange-text); background: var(--esi-orange-soft); }
 .boton-modificar-lista:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 2px; }
 .boton-modificar-lista:disabled { cursor: wait; opacity: 0.6; }
+.boton-modificar-lista:hover:not(:disabled) { border-color: var(--esi-orange-soft); color: var(--esi-orange-text); background: var(--esi-orange-soft); }
 .boton-eliminar-lista { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border: 1px solid transparent; border-radius: 50%; color: #78838b; background: transparent; cursor: pointer; transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
 .boton-eliminar-lista svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.boton-eliminar-lista:hover:not(:disabled) { border-color: #f1c8c4; color: var(--esi-error-text); background: var(--esi-error-bg); }
 .boton-eliminar-lista:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 2px; }
 .boton-eliminar-lista:disabled { cursor: wait; opacity: 0.6; }
+.boton-eliminar-lista:hover:not(:disabled) { border-color: #f1c8c4; color: var(--esi-error-text); background: var(--esi-error-bg); }
 .icono-lista { display: grid; flex: 0 0 44px; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--esi-orange-text); background: var(--esi-orange-soft); font-size: 1.7rem; }
 .datos-lista { display: grid; flex: 1; min-width: 0; gap: 0.4rem; }
 .nombre-lista { overflow-wrap: anywhere; font-size: 1.1rem; font-weight: 700; }
 .cantidad-productos { color: var(--esi-soft-ink); font-size: 0.875rem; }
-.volver-listas:focus-visible, .datos a:focus-visible, .imagen:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
-.lista-listas { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-.tarjeta-lista { display: flex; align-items: center; gap: 1rem; min-height: 100px; padding: 1.25rem; color: inherit; text-decoration: none; }
-.tarjeta-lista:hover { border-color: var(--esi-orange); transform: translateY(-2px); }
-.icono-lista { color: var(--esi-orange-text); font-size: 2rem; }
-.nombre-lista { flex: 1; font-size: 1.1rem; font-weight: 700; overflow-wrap: anywhere; }
-.abrir-lista { color: #5d6b7e; font-size: 1.5rem; }
-.tarjeta-lista:focus-visible, .volver-listas:focus-visible, .datos a:focus-visible, .imagen:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
+
 .volver-listas { display: inline-block; margin-bottom: 1.5rem; color: #1a2b4a; font-weight: 600; text-decoration: none; }
 .volver-listas:hover { text-decoration: underline; }
 
@@ -53,6 +46,7 @@
 .datos h2 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; }
 .datos h2 a { color: inherit; text-decoration: none; }
 .datos h2 a:hover { color: var(--esi-orange-text); text-decoration: underline; }
+.tarjeta-lista:focus-visible, .volver-listas:focus-visible, .datos a:focus-visible, .imagen:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
 .precio { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; margin: 0; }
 .precio strong { font-size: 18px; }
 .precio del { color: #5d6b7e; font-size: 14px; }

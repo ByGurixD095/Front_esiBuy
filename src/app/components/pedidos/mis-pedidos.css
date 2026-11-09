@@ -104,8 +104,7 @@ h1 {
   color: var(--esi-ink);
 }
 
-.order-tabs button:focus-visible,
-.order-actions button:focus-visible {
+.order-tabs button:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 2px;
 }
@@ -174,9 +173,6 @@ h1 {
   color: var(--esi-error-text);
 }
 
-.retry-button {
-  margin-top: 20px;
-}
 
 .orders-list {
   display: grid;
@@ -353,6 +349,11 @@ h1 {
 .order-actions button:disabled {
   cursor: wait;
   opacity: 0.6;
+}
+
+.order-actions button:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 2px;
 }
 
 @media (max-width: 600px) {

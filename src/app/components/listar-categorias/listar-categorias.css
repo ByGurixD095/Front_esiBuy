@@ -58,6 +58,18 @@
   outline-offset: 1px;
 }
 
+.campo-edicion span {
+  color: var(--esi-soft-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.paginacion span {
+  color: var(--esi-soft-ink);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
 .busqueda-categorias > span:first-child {
   font-size: 22px;
   line-height: 1;
@@ -170,11 +182,6 @@
   gap: 6px;
 }
 
-.campo-edicion span {
-  color: var(--esi-soft-ink);
-  font-size: 12px;
-  font-weight: 600;
-}
 
 .edicion input {
   box-sizing: border-box;
@@ -210,13 +217,14 @@
   border: 1px solid var(--esi-field-border);
 }
 
-.boton-modificar:hover:not(:disabled),
-.boton-cancelar:hover:not(:disabled) {
-  background: var(--esi-paper);
-}
-
 .boton-guardar {
   min-width: 88px;
+}
+
+.accion-eliminar {
+  color: var(--esi-error-text);
+  background: var(--esi-card);
+  border: 1px solid var(--esi-error-text);
 }
 
 .boton-guardar:disabled,
@@ -227,10 +235,9 @@
   opacity: 0.55;
 }
 
-.accion-eliminar {
-  color: var(--esi-error-text);
-  background: var(--esi-card);
-  border: 1px solid var(--esi-error-text);
+.boton-modificar:hover:not(:disabled),
+.boton-cancelar:hover:not(:disabled) {
+  background: var(--esi-paper);
 }
 
 .accion-eliminar:hover:not(:disabled) {
@@ -264,11 +271,6 @@
   opacity: 0.5;
 }
 
-.paginacion span {
-  color: var(--esi-soft-ink);
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
 
 .confirmacion-fondo {
   position: fixed;

@@ -7,6 +7,8 @@
 }
 
 * { box-sizing: border-box; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .45; }
 
 .seller-shell { min-height: 100vh; }
 .seller-header {
@@ -44,8 +46,8 @@ h1 em { color: var(--esi-orange-text); font-style: italic; }
 .demo-tools strong { font-size: 14px; }
 .demo-tools p, .demo-result { margin: 5px 0 0; color: var(--esi-soft-ink); font-size: 13px; }
 .demo-button { min-height: 42px; padding: 0 16px; border: 1px solid var(--esi-ink); border-radius: var(--esi-radius); color: #fff; background: var(--esi-ink); cursor: pointer; font: inherit; font-weight: 700; white-space: nowrap; }
-.demo-button:hover:not(:disabled) { border-color: var(--esi-orange-hover); background: var(--esi-orange-hover); }
 .demo-button:disabled { cursor: wait; opacity: .55; }
+.demo-button:hover:not(:disabled) { border-color: var(--esi-orange-hover); background: var(--esi-orange-hover); }
 .demo-result { margin: -12px 0 20px; color: var(--esi-ok-text); }
 
 .results-toolbar { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 14px; color: var(--esi-soft-ink); font-size: 13px; }
@@ -53,6 +55,11 @@ h1 em { color: var(--esi-orange-text); font-style: italic; }
 .table-container { overflow-x: auto; border: 1px solid var(--esi-line); background: var(--esi-card); }
 table { width: 100%; border-collapse: collapse; table-layout: auto; }
 th, td { padding: 13px 10px; border-bottom: 1px solid var(--esi-line); text-align: left; vertical-align: middle; }
+th:last-child, td:last-child { text-align: center; }
+.table-container td:nth-child(4), .table-container td:nth-child(5), .table-container td:nth-child(6), .table-container td:nth-child(7) { text-align: center; }
+.product-cell { display: flex; align-items: center; gap: 12px; min-width: 230px; }
+.product-cell img, .image-placeholder { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border: 1px solid var(--esi-line); border-radius: 4px; object-fit: cover; color: var(--esi-soft-ink); background: #f1efe8; }
+
 th { color: var(--esi-soft-ink); background: #f1efe8; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
 td { color: var(--esi-ink); font-size: 13px; }
 tbody tr:last-child td { border-bottom: 0; }
@@ -61,8 +68,6 @@ tbody tr.row-inactive { background: #e4e4e7; }
 tbody tr.row-inactive:hover { background: #d9d9de; }
 tbody tr.row-inactive .product-cell img { opacity: 0.55; filter: grayscale(1); }
 tbody tr.row-inactive td:not(:last-child):not([data-label="Estado"]) { color: #6b6b73; }
-.product-cell { display: flex; align-items: center; gap: 12px; min-width: 230px; }
-.product-cell img, .image-placeholder { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border: 1px solid var(--esi-line); border-radius: 4px; object-fit: cover; color: var(--esi-soft-ink); background: #f1efe8; }
 .product-cell strong, .product-cell small { display: block; }
 .product-cell strong { margin-bottom: 4px; }
 .product-cell small { max-width: 230px; overflow: hidden; color: var(--esi-soft-ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
@@ -82,7 +87,6 @@ tbody tr.row-inactive td:not(:last-child):not([data-label="Estado"]) { color: #6
 .product-actions .activate-action { color: var(--esi-ok-text); }
 .product-actions .activate-action:hover:not(:disabled) { border-color: var(--esi-ok-text); color: var(--esi-ok-text); background: var(--esi-ok-bg); }
 .icon-spinner { width: 15px; height: 15px; border: 2px solid var(--esi-line); border-top-color: currentColor; border-radius: 50%; animation: spin .8s linear infinite; }
-th:last-child, td:last-child { text-align: center; }
 .table-container th:nth-child(1) { width: 27%; }
 .table-container th:nth-child(2) { width: 14%; }
 .table-container th:nth-child(3) { width: 11%; }
@@ -90,19 +94,15 @@ th:last-child, td:last-child { text-align: center; }
 .table-container th:nth-child(5), .table-container th:nth-child(6) { width: 9%; text-align: center; }
 .table-container th:nth-child(7) { width: 10%; text-align: center; }
 .table-container th:nth-child(8) { width: 13%; }
-.table-container td:nth-child(4), .table-container td:nth-child(5), .table-container td:nth-child(6), .table-container td:nth-child(7) { text-align: center; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 24px; color: var(--esi-soft-ink); font-size: 13px; }
 .pagination button, .state-action { min-height: 42px; padding: 0 16px; border: 1px solid var(--esi-ink); border-radius: var(--esi-radius); color: #fff; background: var(--esi-ink); cursor: pointer; font: inherit; font-weight: 700; text-decoration: none; }
 .pagination button:hover:not(:disabled), .state-action:hover { background: var(--esi-orange-hover); border-color: var(--esi-orange-hover); }
-button:focus-visible, a:focus-visible { outline: 3px solid var(--esi-orange); outline-offset: 3px; }
-button:disabled { cursor: not-allowed; opacity: .45; }
 .state-panel { display: grid; justify-items: center; gap: 10px; padding: 70px 24px; border: 1px solid var(--esi-line); background: var(--esi-card); text-align: center; }
 .state-panel h2, .state-panel p { margin: 0; }
 .state-panel h2 { font-family: var(--esi-font-title); font-size: 28px; font-weight: 400; }
 .state-panel p { color: var(--esi-soft-ink); }
 .state-symbol { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: var(--esi-orange-text); background: var(--esi-orange-soft); font-size: 22px; }
 .error-state .state-symbol { color: var(--esi-error-text); background: var(--esi-error-bg); }
-.state-action { margin-top: 8px; }
 .state-link { display: inline-flex; align-items: center; }
 .loader { width: 28px; height: 28px; border: 3px solid var(--esi-line); border-top-color: var(--esi-orange); border-radius: 50%; animation: spin .8s linear infinite; }
 .seller-footer { display: flex; justify-content: space-between; width: min(1232px, calc(100% - 48px)); margin: 0 auto; padding: 22px 0; border-top: 1px solid var(--esi-line); color: var(--esi-soft-ink); font-size: 12px; }

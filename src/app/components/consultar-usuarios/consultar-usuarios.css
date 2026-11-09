@@ -85,14 +85,14 @@
   font-weight: 700;
 }
 
-.paginacion button:hover:not(:disabled) {
-  background: var(--esi-orange-hover);
-  border-color: var(--esi-orange-hover);
-}
-
 .paginacion button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+.paginacion button:hover:not(:disabled) {
+  background: var(--esi-orange-hover);
+  border-color: var(--esi-orange-hover);
 }
 
 table {
@@ -117,11 +117,6 @@ td {
   vertical-align: middle;
 }
 
-th:last-child,
-td:last-child {
-  width: 144px;
-}
-
 th {
   color: var(--esi-ink);
   font-size: 12px;
@@ -132,19 +127,33 @@ td {
   font-size: 12px;
 }
 
+th:last-child,
+td:last-child {
+  width: 144px;
+}
+
+.fila-seleccionada td {
+  background: var(--esi-orange-soft);
+}
+
+.fila-eliminada td {
+  background: #fbf0ee;
+  color: #7d443b;
+}
+
 tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.fila-seleccionable:focus-visible td,
+.fila-seleccionable:hover td {
+  background: var(--esi-orange-soft);
 }
 
 .fila-seleccionable {
   cursor: pointer;
 }
 
-.fila-seleccionable:hover td,
-.fila-seleccionable:focus-visible td,
-.fila-seleccionada td {
-  background: var(--esi-orange-soft);
-}
 
 .fila-seleccionable:focus-visible {
   outline: 2px solid var(--esi-orange-text);
@@ -230,6 +239,11 @@ tbody tr:last-child td {
   opacity: 1;
 }
 
+.accion-bloqueo:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .accion-bloqueo:not(:disabled):hover {
   background: var(--esi-orange-soft);
   border-color: var(--esi-orange-text);
@@ -245,19 +259,14 @@ tbody tr:last-child td {
   opacity: 1;
 }
 
-.accion-eliminar:not(:disabled):hover {
-  background: var(--esi-error-bg);
-  border-color: var(--esi-error-text);
-}
-
 .accion-eliminar:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
 
-.accion-bloqueo:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+.accion-eliminar:not(:disabled):hover {
+  background: var(--esi-error-bg);
+  border-color: var(--esi-error-text);
 }
 
 .confirmacion-fondo {
@@ -468,14 +477,6 @@ tbody tr:last-child td {
 
   td,
   th:last-child,
-  td:last-child {
-    width: auto;
-  }
-
-  tbody tr:last-child td {
-    border-bottom: 1px solid var(--esi-line);
-  }
-
   td {
     display: grid;
     grid-template-columns: minmax(112px, 0.38fr) minmax(0, 1fr);
@@ -485,15 +486,20 @@ tbody tr:last-child td {
     padding: 8px 0;
   }
 
+  td:last-child {
+    width: auto;
+    border-bottom: 0;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 1px solid var(--esi-line);
+  }
+
   td::before {
     content: attr(data-label);
     color: var(--esi-ink);
     font-size: 11px;
     font-weight: 700;
-  }
-
-  td:last-child {
-    border-bottom: 0;
   }
 
   .acciones {

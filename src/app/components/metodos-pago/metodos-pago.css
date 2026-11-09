@@ -155,6 +155,18 @@
   font-size: 15px;
 }
 
+.boton-secundario {
+  color: var(--esi-ink);
+  background: transparent;
+  border-color: var(--esi-line);
+}
+
+.boton-secundario:hover:not(:disabled) {
+  color: var(--esi-ink);
+  background: var(--esi-paper);
+  border-color: var(--esi-line);
+}
+
 .acciones-formulario .boton-secundario {
   flex: 0 0 auto;
   width: auto;
@@ -284,9 +296,10 @@
   font-weight: 700;
 }
 
-.boton-editar:not(:disabled):hover {
-  color: var(--esi-orange-text);
-  background: var(--esi-orange-soft);
+.boton-editar:focus-visible,
+.boton-quitar:focus-visible {
+  outline: 3px solid var(--esi-orange);
+  outline-offset: 2px;
 }
 
 .boton-editar:disabled,
@@ -295,15 +308,14 @@
   opacity: 0.55;
 }
 
+.boton-editar:not(:disabled):hover {
+  color: var(--esi-orange-text);
+  background: var(--esi-orange-soft);
+}
+
 .boton-quitar:not(:disabled):hover {
   color: var(--esi-error-text);
   background: var(--esi-error-bg);
-}
-
-.boton-editar:focus-visible,
-.boton-quitar:focus-visible {
-  outline: 3px solid var(--esi-orange);
-  outline-offset: 2px;
 }
 
 .estado-vacio {
@@ -391,17 +403,7 @@
   padding: 0 16px;
 }
 
-.boton-secundario {
-  color: var(--esi-ink);
-  background: transparent;
-  border-color: var(--esi-line);
-}
 
-.boton-secundario:hover:not(:disabled) {
-  color: var(--esi-ink);
-  background: var(--esi-paper);
-  border-color: var(--esi-line);
-}
 
 .boton-peligro {
   background: var(--esi-error-text);
