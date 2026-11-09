@@ -124,10 +124,12 @@ describe('Catalogo (favoritos HU 15)', () => {
     expect(html().querySelector('a[href="/listas-deseos"]')).toBeNull();
   });
 
-  it('muestra el enlace Mis listas a un cliente', async () => {
+  it('muestra el filtro de favoritos a un cliente', async () => {
     await crear('CLIENTE');
 
-    expect(html().querySelector('a[href="/listas-deseos"]')?.textContent).toContain('Mis listas');
+    expect(html().querySelector('app-panel-filtros-productos')?.textContent).toContain(
+      'Solo favoritos',
+    );
   });
 
   it('a un cliente le muestra Gestionar y marca los productos que ya son favoritos', async () => {

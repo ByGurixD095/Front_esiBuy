@@ -56,6 +56,10 @@ h1 {
   cursor: pointer;
 }
 
+.retry-button {
+  margin-top: 20px;
+}
+
 .continue-link:hover,
 .retry-button:hover {
   color: #fff;
@@ -85,6 +89,17 @@ h1 {
   gap: 8px;
   margin: 0 0 22px;
   border-bottom: 1px solid var(--esi-line);
+}
+
+.order-actions button {
+  min-height: 44px;
+  border: 1px solid var(--esi-ink);
+  border-radius: 8px;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .order-tabs button {
@@ -172,10 +187,6 @@ h1 {
 .error-state h2,
 .error-state p {
   color: var(--esi-error-text);
-}
-
-.retry-button {
-  margin-top: 20px;
 }
 
 .orders-list {
@@ -328,17 +339,6 @@ h1 {
   justify-content: flex-end;
   gap: 10px;
   padding: 0 24px 18px;
-}
-
-.order-actions button {
-  min-height: 44px;
-  border: 1px solid var(--esi-ink);
-  border-radius: 8px;
-  padding: 0 24px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .order-actions .primary-action {

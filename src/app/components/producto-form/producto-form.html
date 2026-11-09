@@ -30,7 +30,7 @@
           <p class="mobile-subtitle">Sube fotos de tu producto</p>
           <div class="image-preview-box">
             @if (imagenPreview() || productoForm.controls.urlImagen.value; as imageUrl) {
-              <img class="image-preview" [src]="imageUrl" alt="Vista previa del producto" />
+              <img class="image-preview" [src]="imageUrl" alt="Vista previa del producto" width="640" height="315" />
             } @else {
               <span class="camera-icon" aria-hidden="true">📷</span>
               <strong>Sube una imagen</strong>

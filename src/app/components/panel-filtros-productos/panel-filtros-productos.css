@@ -15,9 +15,11 @@
 .filter-search > span { position: absolute; top: 50%; left: 0.75rem; color: var(--soft-ink); font: 1.1rem Arial, sans-serif; transform: translateY(-50%); }
 .filter-search input, .filter-select select { width: 100%; height: 38px; border: 1px solid var(--line); border-radius: 3px; color: var(--ink); background: var(--paper); font: 0.7rem Arial, sans-serif; }
 .filter-search input { padding: 0 0.75rem 0 2.2rem; outline: 0; }
+.filter-select select { padding: 0 0.55rem; }
+.price-inputs input { width: 100%; height: 32px; padding: 0 0.5rem; border: 1px solid var(--line); border-radius: 3px; color: var(--ink); background: var(--paper); font: 0.68rem Arial, sans-serif; }
+.discount-filter input { accent-color: var(--orange); }
 .filter-search input:focus, .filter-select select:focus { border-color: var(--orange); outline: 2px solid rgba(228, 104, 61, 0.12); }
 .filter-select { display: grid; gap: 0.28rem; color: var(--soft-ink); font: 0.6rem Arial, sans-serif; }
-.filter-select select { padding: 0 0.55rem; }
 .price-filter { grid-column: span 2; min-width: 0; margin: 0; padding: 0; border: 0; }
 .price-filter legend { margin-bottom: 0.28rem; color: var(--soft-ink); font: 0.6rem Arial, sans-serif; }
 .price-range { position: relative; height: 24px; margin: 0 0.35rem; background: linear-gradient(to right, transparent calc(var(--price-min) / var(--price-scale) * 100%), var(--orange) calc(var(--price-min) / var(--price-scale) * 100%), var(--orange) calc(var(--price-max) / var(--price-scale) * 100%), transparent calc(var(--price-max) / var(--price-scale) * 100%)); }
@@ -31,10 +33,8 @@
 .range-max { z-index: 2; }
 .price-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .price-inputs label { display: grid; gap: 0.28rem; color: var(--soft-ink); font: 0.58rem Arial, sans-serif; }
-.price-inputs input { width: 100%; height: 32px; padding: 0 0.5rem; border: 1px solid var(--line); border-radius: 3px; color: var(--ink); background: var(--paper); font: 0.68rem Arial, sans-serif; }
 .price-inputs input:focus { border-color: var(--orange); outline: 2px solid rgba(228, 104, 61, 0.12); }
 .discount-filter { display: flex; align-items: center; gap: 0.4rem; height: 38px; padding: 0 0.35rem; color: var(--soft-ink); font: 0.68rem Arial, sans-serif; white-space: nowrap; }
-.discount-filter input { accent-color: var(--orange); }
 .filter-actions { display: flex; grid-column: 1 / -1; align-items: center; justify-content: flex-end; gap: 0.6rem; min-width: 0; padding-top: 0.85rem; border-top: 1px solid var(--line); }
 .apply-filter, .clear-filter { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 1rem; border-radius: 3px; font: 0.68rem Arial, sans-serif; cursor: pointer; white-space: nowrap; }
 .apply-filter { border: 1px solid var(--ink); color: #fff; background: var(--ink); font-weight: 700; }

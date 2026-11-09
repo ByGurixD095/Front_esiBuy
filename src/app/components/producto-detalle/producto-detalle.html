@@ -40,7 +40,7 @@
     <section class="detail-card">
       <div class="detail-image">
         @if (item.urlImagen) {
-          <img [src]="item.urlImagen" [alt]="item.nombre" />
+          <img [src]="item.urlImagen" [alt]="item.nombre" width="640" height="640" />
         } @else {
           <span>Sin imagen</span>
         }
@@ -152,7 +152,9 @@
                   >★</button>
                 }
               </div>
+              <label for="texto-valoracion">Tu valoración</label>
               <textarea
+                id="texto-valoracion"
                 maxlength="2000"
                 placeholder="Escribe tu reseña"
                 [value]="textoValoracion()"

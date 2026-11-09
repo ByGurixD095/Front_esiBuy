@@ -83,7 +83,7 @@
             <div class="product-image-wrap">
               <a class="product-image-link" [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver detalles de ' + producto.nombre">
                 @if (producto.urlImagen) {
-                  <img [src]="producto.urlImagen" [alt]="producto.nombre" loading="lazy" />
+                  <img [src]="producto.urlImagen" [alt]="producto.nombre" width="400" height="432" loading="lazy" />
                 } @else {
                   <div class="image-placeholder" aria-label="Producto sin imagen">Sin imagen</div>
                 }

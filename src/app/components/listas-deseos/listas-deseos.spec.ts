@@ -24,7 +24,6 @@ describe('ListasDeseos', () => {
     modificarLista: vi.fn(),
     eliminarLista: vi.fn(),
   };
-  const servicioFalso = { listar: vi.fn(), obtenerProductos: vi.fn() };
   const authFalso = {
     isAuthenticated: () => true,
     hasRole: () => true,

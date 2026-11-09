@@ -26,9 +26,9 @@
 .descuento { padding: 2px 8px; border-radius: 999px; color: #8f1f1f; background: #fbe4e4; font-size: 12px; font-weight: 500; }
 
 .quitar { margin-top: auto; min-height: 44px; padding: 0 1rem; border: 1px solid #d9a3a3; border-radius: 8px; color: #a32424; background: #f6f8fb; font: inherit; font-weight: 500; cursor: pointer; }
-.quitar:hover:not(:disabled) { background: #fbe4e4; }
 .quitar:focus-visible { outline: 3px solid #1a2b4a; outline-offset: 2px; }
 .quitar:disabled { opacity: 0.6; cursor: progress; }
+.quitar:hover:not(:disabled) { background: #fbe4e4; }
 
 .imagen {position: relative; aspect-ratio: 1 / 0.9; background: #e8ecf1; }
 .overlay-inactivo { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(247, 245, 239, 0.6); z-index: 10; }

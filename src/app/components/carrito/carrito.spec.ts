@@ -245,6 +245,7 @@ describe('Carrito', () => {
       throwError(() => new HttpErrorResponse({ status: 409 })),
     );
     await crear([{ productoId: 'p1', nombre: 'Mochila', precioCent: 100, urlImagen: null, cantidad: 1 }]);
+    carritoFalso.obtenerCarrito.mockClear();
 
     fixture.componentInstance.abrirCheckout();
     fixture.componentInstance.confirmarPedido();
@@ -253,6 +254,6 @@ describe('Carrito', () => {
 
     expect(fixture.componentInstance.pedidoPendientePago()).toBeNull();
     expect(fixture.componentInstance.errorPago()).toContain('dentro del plazo');
-    expect(carritoFalso.obtenerCarrito).toHaveBeenCalledTimes(2);
+    expect(carritoFalso.obtenerCarrito).toHaveBeenCalledOnce();
   });
 });

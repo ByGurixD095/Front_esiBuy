@@ -26,7 +26,7 @@ describe('Gestionar', () => {
   it('al cliente le ofrece Favoritos y nada de administración', async () => {
     const el = await crear('CLIENTE');
 
-    expect(el.querySelector('a[href="/favoritos"]')?.textContent).toContain('Mis favoritos');
+    expect(el.querySelector('a[href="/favoritos"]')?.textContent).toContain('Favoritos');
     expect(el.querySelector('a.opcion[href="/listas-deseos"]')?.textContent).toContain(
       'Mis listas de deseos',
     );

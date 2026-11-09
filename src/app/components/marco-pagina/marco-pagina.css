@@ -39,6 +39,23 @@
   height: auto;
 }
 
+.account-link {
+  color: #e2e8f0;
+  font: 14px Arial, sans-serif;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.pie a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--esi-soft-ink);
+  text-decoration: none;
+}
+
 .brand:focus-visible, .account-link:focus-visible, .pie a:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 3px;
@@ -58,15 +75,6 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-
-.account-link {
-  color: #e2e8f0;
-  font: 14px Arial, sans-serif;
-  text-decoration: none;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
 }
 
 .account-link:hover {
@@ -128,14 +136,6 @@
 .pie nav {
   display: flex;
   gap: 20px;
-}
-
-.pie a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--esi-soft-ink);
-  text-decoration: none;
 }
 
 .pie a:hover {

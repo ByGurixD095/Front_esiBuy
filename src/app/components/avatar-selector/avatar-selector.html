@@ -5,7 +5,7 @@
       <p>Sube una foto o elige un avatar. Si no eliges ninguno, te asignaremos uno al azar.</p>
     </div>
     @if (value()) {
-      <img class="vista-previa" [src]="value()" alt="Vista previa de tu imagen de perfil" />
+      <img class="vista-previa" [src]="value()" alt="Vista previa de tu imagen de perfil" width="64" height="64" />
     }
   </div>
 
@@ -30,7 +30,7 @@
         [attr.aria-label]="'Elegir avatar ' + avatar.nombre"
         (click)="seleccionarAvatar(avatar.ruta)"
       >
-        <img [src]="avatar.ruta" alt="" />
+        <img [src]="avatar.ruta" alt="" width="48" height="48" />
       </button>
     }
   </div>

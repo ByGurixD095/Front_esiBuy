@@ -11,7 +11,7 @@
   </p>
 
   @if (qrCodeUri()) {
-  <img class="qr" [src]="qrCodeUri()" alt="Código QR para configurar la autenticación TOTP" />
+  <img class="qr" [src]="qrCodeUri()" alt="Código QR para configurar la autenticación TOTP" width="240" height="240" />
   }
   <div class="secret">
     <strong>Clave manual</strong>

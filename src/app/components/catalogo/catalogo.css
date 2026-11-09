@@ -51,6 +51,7 @@
 .sell-link:hover { border-color: #ff6b00; color: #fff; background: #ff6b00; }
 .search-field { position: relative; display: flex; align-items: center; width: min(29vw, 340px); margin-left: auto; }
 .search-field input { width: 100%; height: 38px; padding: 0 3.3rem 0 2.3rem; border: 1px solid var(--line); border-radius: 5px; outline: 0; color: var(--ink); background: #fbfaf6; font-family: Arial, sans-serif; font-size: 0.75rem; }
+.wishlist-dialog select, .wishlist-dialog input { width: 100%; min-height: 42px; padding: 0.55rem; border: 1px solid var(--line); color: var(--ink); background: #fff; font: 0.82rem Arial, sans-serif; }
 .search-field input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(228, 104, 61, 0.13); }
 .search-icon { position: absolute; left: 0.75rem; z-index: 1; color: var(--soft-ink); font-family: Arial, sans-serif; font-size: 1.2rem; line-height: 1; }
 kbd { position: absolute; right: 0.6rem; padding: 0.12rem 0.28rem; border: 1px solid var(--line); border-radius: 3px; color: #89908e; background: #f4f1e9; font-family: Arial, sans-serif; font-size: 0.58rem; }
@@ -95,8 +96,9 @@ h1 em { color: var(--orange); font-style: italic; }
 .page-size-control select:focus { border-color: var(--orange); outline: 2px solid rgba(228, 104, 61, 0.12); }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 3rem; color: var(--soft-ink); font: 0.7rem Arial, sans-serif; }
 .pagination button { min-width: 86px; min-height: 34px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 3px; color: var(--ink); background: #fff; font: 0.68rem Arial, sans-serif; cursor: pointer; }
-.pagination button:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
+.empty-state button { padding: 0.7rem 1rem; border: 0; color: #fff; background: var(--ink); font: 0.72rem Arial, sans-serif; cursor: pointer; }
 .pagination button:disabled { cursor: not-allowed; opacity: 0.4; }
+.pagination button:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
 
 .product-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1.2rem, 2.3vw, 2.4rem) clamp(1rem, 1.8vw, 1.8rem); }
 .product-card { min-width: 0; animation: card-in 450ms both; }
@@ -104,6 +106,7 @@ h1 em { color: var(--orange); font-style: italic; }
 .product-image-link { display: block; width: 100%; height: 100%; color: inherit; }
 .product-image-wrap img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 500ms ease; }
 .product-card:hover .product-image-wrap img { transform: scale(1.045); }
+.product-info-link { display: block; color: inherit; text-decoration: none; }
 .product-image-link:focus-visible, .product-info-link:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 .featured-label, .discount-label { position: absolute; top: 0.8rem; padding: 0.38rem 0.55rem; font: 0.57rem Arial, sans-serif; letter-spacing: 0.03em; }
 .featured-label { left: 0.8rem; color: var(--ink); background: rgba(255, 254, 250, 0.88); }
@@ -111,7 +114,6 @@ h1 em { color: var(--orange); font-style: italic; }
 .favorite-button { position: absolute; right: 0.65rem; bottom: 0.65rem; display: grid; place-items: center; width: 33px; height: 33px; border: 0; border-radius: 50%; color: var(--ink); background: rgba(255, 254, 250, 0.9); font: 1.3rem Arial, sans-serif; cursor: pointer; }
 .favorite-button { z-index: 1; }
 .favorite-button.is-favorite { color: var(--orange); }
-.product-info-link { display: block; color: inherit; text-decoration: none; }
 .product-info { padding-top: 1rem; }
 .product-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
 .product-category { margin: 0 0 0.3rem; color: var(--orange); font: 0.58rem Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -133,7 +135,6 @@ h1 em { color: var(--orange); font-style: italic; }
 .wishlist-dialog { width: min(100%, 440px); padding: 1.5rem; background: var(--card); box-shadow: 0 20px 60px #0004; }
 .wishlist-dialog > p { margin: 0.8rem 0 1.2rem; color: var(--soft-ink); font: 0.82rem/1.5 Arial, sans-serif; }
 .wishlist-select-label { display: block; margin-bottom: 0.4rem; color: var(--soft-ink); font: 700 0.7rem Arial, sans-serif; }
-.wishlist-dialog select, .wishlist-dialog input { width: 100%; min-height: 42px; padding: 0.55rem; border: 1px solid var(--line); color: var(--ink); background: #fff; font: 0.82rem Arial, sans-serif; }
 .wishlist-dialog-actions { display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1.5rem; }
 .wishlist-action, .wishlist-cancel { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; padding: 0.6rem 0.9rem; border: 1px solid var(--ink); color: #fff; background: var(--ink); font: 700 0.7rem Arial, sans-serif; text-decoration: none; cursor: pointer; }
 .wishlist-cancel { color: var(--ink); background: transparent; }
@@ -171,7 +172,6 @@ h1 em { color: var(--orange); font-style: italic; }
 .empty-state > span { color: var(--orange); font: 2rem Arial, sans-serif; }
 .empty-state h2 { margin: 1rem 0 0.4rem; font-size: 1.5rem; font-weight: 400; }
 .empty-state p { margin: 0 0 1.5rem; color: var(--soft-ink); font: 0.8rem Arial, sans-serif; }
-.empty-state button { padding: 0.7rem 1rem; border: 0; color: #fff; background: var(--ink); font: 0.72rem Arial, sans-serif; cursor: pointer; }
 .catalog-footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.5rem clamp(1rem, 5vw, 5rem); border-top: 1px solid var(--line); color: #7b8583; font: 0.62rem Arial, sans-serif; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 

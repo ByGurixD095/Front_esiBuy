@@ -31,7 +31,7 @@
             <li class="tarjeta-producto" [class.inactivo]="!producto.activo">
               <a class="imagen" [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver ' + producto.nombre">
                 @if (producto.urlImagen) {
-                  <img [src]="producto.urlImagen" [alt]="producto.nombre" loading="lazy" />
+                  <img [src]="producto.urlImagen" [alt]="producto.nombre" width="320" height="320" loading="lazy" />
                 } @else {
                   <span class="sin-imagen">Sin imagen</span>
                 }

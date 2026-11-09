@@ -176,13 +176,7 @@ export class ListasDeseos implements OnInit {
     this.listasService.eliminarProducto(idLista, producto.id).subscribe({
       next: () => {
         this.productos.update((productos) => productos.filter((actual) => actual.id !== producto.id));
-        this.listas.update((listas) =>
-          listas.map((lista) =>
-            lista.id === idLista
-              ? { ...lista, productosIds: lista.productosIds.filter((id) => id !== producto.id) }
-              : lista,
-          ),
-        );
+        this.actualizarListasTrasEliminarProducto(idLista, producto.id);
         this.productoPendienteEliminacion.set(null);
         this.eliminandoProductoId.set(null);
       },
@@ -205,5 +199,14 @@ export class ListasDeseos implements OnInit {
         this.cargandoProductos.set(false);
       },
     });
+  }
+
+  private actualizarListasTrasEliminarProducto(idLista: string, idProducto: string): void {
+    this.listas.update((listas) =>
+      listas.map((lista) => {
+        if (lista.id !== idLista) return lista;
+        return { ...lista, productosIds: lista.productosIds.filter((id) => id !== idProducto) };
+      }),
+    );
   }
 }

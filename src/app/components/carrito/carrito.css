@@ -57,6 +57,10 @@ h1 {
   cursor: pointer;
 }
 
+.retry-button {
+  margin-top: 20px;
+}
+
 .continue-link:hover,
 .retry-button:hover {
   color: #fff;
@@ -129,10 +133,6 @@ h1 {
 .error-state h2,
 .error-state p {
   color: var(--esi-error-text);
-}
-
-.retry-button {
-  margin-top: 20px;
 }
 
 .cart-layout {
@@ -269,6 +269,70 @@ h1 {
   font: inherit;
 }
 
+.remove-button {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  color: var(--esi-error-text);
+  background: var(--esi-error-bg);
+  border: 1px solid var(--esi-error-text);
+  border-radius: var(--esi-radius);
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cancel-button,
+.confirm-remove-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--esi-ink);
+  border-radius: var(--esi-radius);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-button {
+  color: var(--esi-ink);
+  background: transparent;
+}
+
+.confirm-remove-button {
+  color: #fff;
+  background: var(--esi-error-text);
+  border-color: var(--esi-error-text);
+}
+
+.buy-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--esi-ink);
+  border-radius: var(--esi-radius);
+  color: #fff;
+  background: var(--esi-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.checkout-field input,
+.checkout-field select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--esi-field-border);
+  border-radius: var(--esi-radius);
+  background: #fff;
+  color: var(--esi-ink);
+  font: inherit;
+}
+
 .quantity-control input:focus-visible,
 .quantity-control button:focus-visible,
 .continue-link:focus-visible,
@@ -300,29 +364,14 @@ h1 {
   white-space: nowrap;
 }
 
-.remove-button {
-  display: inline-grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  padding: 0;
-  color: var(--esi-error-text);
-  background: var(--esi-error-bg);
-  border: 1px solid var(--esi-error-text);
-  border-radius: var(--esi-radius);
-  font-family: inherit;
-  font-size: 16px;
-  cursor: pointer;
+.remove-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .remove-button:hover:not(:disabled) {
   background: var(--esi-error-bg);
   border-color: var(--esi-error-text);
-}
-
-.remove-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
 }
 
 .confirmation-backdrop {
@@ -364,28 +413,6 @@ h1 {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 24px;
-}
-
-.cancel-button,
-.confirm-remove-button {
-  min-height: 42px;
-  padding: 0 16px;
-  border: 1px solid var(--esi-ink);
-  border-radius: var(--esi-radius);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.cancel-button {
-  color: var(--esi-ink);
-  background: transparent;
-}
-
-.confirm-remove-button {
-  color: #fff;
-  background: var(--esi-error-text);
-  border-color: var(--esi-error-text);
 }
 
 .cancel-button:focus-visible,
@@ -439,28 +466,14 @@ h1 {
   line-height: 1.5;
 }
 
-.buy-button {
-  width: 100%;
-  min-height: 48px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border: 1px solid var(--esi-ink);
-  border-radius: var(--esi-radius);
-  color: #fff;
-  background: var(--esi-ink);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
+.buy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .buy-button:hover:not(:disabled) {
   background: var(--esi-orange-hover);
   border-color: var(--esi-orange-hover);
-}
-
-.buy-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
 }
 
 .checkout-panel {
@@ -484,6 +497,12 @@ h1 {
   font-family: var(--esi-font-title);
   font-size: 30px;
   font-weight: 400;
+}
+
+.checkout-field small,
+.checkout-error p {
+  color: var(--esi-error-text);
+  line-height: 1.4;
 }
 
 .checkout-heading p:last-child,
@@ -511,19 +530,6 @@ h1 {
   font-weight: 700;
 }
 
-.checkout-field input,
-.checkout-field select {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 44px;
-  padding: 9px 12px;
-  border: 1px solid var(--esi-field-border);
-  border-radius: var(--esi-radius);
-  background: #fff;
-  color: var(--esi-ink);
-  font: inherit;
-}
-
 .checkout-address {
   display: grid;
   gap: 4px;
@@ -545,18 +551,29 @@ h1 {
   font-weight: 700;
 }
 
+.checkout-manage-links a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid var(--esi-line);
+  border-radius: var(--esi-radius);
+  color: var(--esi-ink);
+  background: var(--esi-card);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
 .checkout-field input:focus-visible,
 .checkout-field select:focus-visible,
 .checkout-panel button:focus-visible,
 .checkout-panel a:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 2px;
-}
-
-.checkout-field small,
-.checkout-error p {
-  color: var(--esi-error-text);
-  line-height: 1.4;
 }
 
 .field-wide {
@@ -666,23 +683,6 @@ h1 {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 16px;
-}
-
-.checkout-manage-links a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 15px;
-  border: 1px solid var(--esi-line);
-  border-radius: var(--esi-radius);
-  color: var(--esi-ink);
-  background: var(--esi-card);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
 }
 
 .checkout-manage-links a:hover {

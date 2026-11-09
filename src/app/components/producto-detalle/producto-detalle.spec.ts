@@ -41,7 +41,8 @@ describe('ProductoDetalle', () => {
     authFalso.hasRole.mockReset().mockReturnValue(false);
   });
 
-  it('muestra la información disponible y una opción de compra claramente deshabilitada', async () => {
+  it('muestra la información y permite comprar a un cliente si hay stock', async () => {
+    authFalso.hasRole.mockReturnValue(true);
     await TestBed.configureTestingModule({
       imports: [ProductoDetalle],
       providers: [
@@ -62,12 +63,9 @@ describe('ProductoDetalle', () => {
     expect(html.querySelector('h1')?.textContent).toContain('Camiseta ESI');
     expect(html.textContent).toContain('Tienda ESI');
     expect(html.textContent).toContain('18,00');
-    expect(html.textContent).toContain('3 unidades en stock');
-    expect(html.textContent).toContain(
-      'Los comentarios y las estadísticas estarán disponibles próximamente.',
-    );
-    expect(html.querySelector<HTMLButtonElement>('.checkout-button')?.disabled).toBe(true);
-    expect(html.textContent).toContain('La compra online todavía no está disponible en EsiBuy.');
+    expect(html.textContent).toContain('¡Quedan pocas unidades!');
+    expect(html.textContent).toContain('Aún no hay valoraciones para este producto.');
+    expect(html.querySelector<HTMLButtonElement>('.checkout-button')?.disabled).toBe(false);
   });
 
   it('vuelve a consultar la información cuando cambia el producto de la ruta', async () => {

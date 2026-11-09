@@ -154,6 +154,22 @@
   grid-column: 1 / -1;
 }
 
+.zona-peligro > .esi-boton {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.acciones-modal .esi-boton {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
 .cuenta form > .esi-boton {
   width: 100%;
   min-height: 52px;
@@ -194,14 +210,6 @@
   color: var(--esi-soft-ink);
   font-size: 14px;
   line-height: 1.5;
-}
-
-.zona-peligro > .esi-boton {
-  display: block;
-  width: 100%;
-  min-height: 52px;
-  border-radius: 8px;
-  font-size: 15px;
 }
 
 .boton-eliminar {
@@ -260,14 +268,6 @@
   justify-content: stretch;
   gap: 12px;
   margin-top: 28px;
-}
-
-.acciones-modal .esi-boton {
-  flex: 1;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 7px;
-  font-size: 15px;
 }
 
 .boton-secundario {

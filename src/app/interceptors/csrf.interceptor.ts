@@ -38,9 +38,12 @@ let token: CsrfTokenResponse | null = null;
 let csrfRequest$: Observable<CsrfTokenResponse> | null = null;
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-export function requestCsrfToken(http: HttpClient): Observable<CsrfTokenResponse> {
+export function requestCsrfToken(
+  http: HttpClient,
+  apiUrl: string = environment.apiUrl,
+): Observable<CsrfTokenResponse> {
   if (!csrfRequest$) {
-    const url = `${environment.apiUrl.replace(/\/+$/, '')}/csrf`;
+    const url = `${apiUrl.replace(/\/+$/, '')}/csrf`;
     csrfRequest$ = defer(() =>
       http.get<CsrfTokenResponse>(url, { withCredentials: true, cache: 'no-store' }),
     ).pipe(
@@ -107,13 +110,13 @@ export const csrfInterceptor: HttpInterceptorFn = (request, next) => {
         ) {
           retried = true;
           token = null;
-          return requestCsrfToken(http).pipe(switchMap((fresh) => send(fresh, true)));
+          return requestCsrfToken(http, apiUrl).pipe(switchMap((fresh) => send(fresh, true)));
         }
         return throwError(() => error);
       }),
     );
 
-  const current = token ? of(token) : requestCsrfToken(http);
+  const current = token ? of(token) : requestCsrfToken(http, apiUrl);
   return current.pipe(
     switchMap((csrf) => send(csrf)),
     catchError((error: unknown) => {

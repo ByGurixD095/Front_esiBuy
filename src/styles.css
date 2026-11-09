@@ -122,11 +122,6 @@ body {
   justify-content: center;  
 }
 
-.esi-boton:hover:not(:disabled) {
-  background: var(--esi-orange-hover);
-  border-color: var(--esi-orange-hover);
-}
-
 .esi-boton:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 2px;
@@ -135,6 +130,11 @@ body {
 .esi-boton:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.esi-boton:hover:not(:disabled) {
+  background: var(--esi-orange-hover);
+  border-color: var(--esi-orange-hover);
 }
 
 .esi-alerta {

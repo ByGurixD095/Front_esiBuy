@@ -101,16 +101,16 @@ form {
   color: #747b7d;
 }
 
-.esi-campo input:hover:not(:focus),
-.esi-campo select:hover:not(:focus) {
-  border-color: #85847b;
-}
-
 .esi-campo input:focus-visible,
 .esi-campo select:focus-visible {
   border-color: var(--esi-orange-text);
   outline-color: var(--esi-orange-text);
   box-shadow: 0 0 0 3px rgb(184 74 36 / 12%);
+}
+
+.esi-campo input:hover:not(:focus),
+.esi-campo select:hover:not(:focus) {
+  border-color: #85847b;
 }
 
 .esi-campo input.ng-invalid.ng-touched,

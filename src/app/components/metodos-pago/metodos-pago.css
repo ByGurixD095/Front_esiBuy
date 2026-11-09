@@ -155,6 +155,12 @@
   font-size: 15px;
 }
 
+.boton-secundario {
+  color: var(--esi-ink);
+  background: transparent;
+  border-color: var(--esi-line);
+}
+
 .acciones-formulario .boton-secundario {
   flex: 0 0 auto;
   width: auto;
@@ -284,26 +290,26 @@
   font-weight: 700;
 }
 
-.boton-editar:not(:disabled):hover {
-  color: var(--esi-orange-text);
-  background: var(--esi-orange-soft);
-}
-
 .boton-editar:disabled,
 .boton-quitar:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
 
-.boton-quitar:not(:disabled):hover {
-  color: var(--esi-error-text);
-  background: var(--esi-error-bg);
-}
-
 .boton-editar:focus-visible,
 .boton-quitar:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 2px;
+}
+
+.boton-editar:not(:disabled):hover {
+  color: var(--esi-orange-text);
+  background: var(--esi-orange-soft);
+}
+
+.boton-quitar:not(:disabled):hover {
+  color: var(--esi-error-text);
+  background: var(--esi-error-bg);
 }
 
 .estado-vacio {
@@ -389,12 +395,6 @@
 .acciones-modal .esi-boton {
   min-height: 44px;
   padding: 0 16px;
-}
-
-.boton-secundario {
-  color: var(--esi-ink);
-  background: transparent;
-  border-color: var(--esi-line);
 }
 
 .boton-secundario:hover:not(:disabled) {
@@ -491,4 +491,15 @@
 .volver-pedido:focus-visible {
   outline: 3px solid var(--esi-orange);
   outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
 }

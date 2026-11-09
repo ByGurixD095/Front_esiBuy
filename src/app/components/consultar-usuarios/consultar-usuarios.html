@@ -230,7 +230,7 @@
         </div>
         } @else if (usuarioDetalle(); as detalle) {
         @if (detalle.imagenPerfil) {
-        <img class="detalle-imagen" [src]="detalle.imagenPerfil" alt="Imagen de perfil del usuario" />
+        <img class="detalle-imagen" [src]="detalle.imagenPerfil" alt="Imagen de perfil del usuario" width="88" height="88" />
         }
         <dl class="detalle-lista">
           <div><dt>ID</dt><dd>{{ detalle.id }}</dd></div>

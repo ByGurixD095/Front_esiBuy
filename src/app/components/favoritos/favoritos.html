@@ -33,7 +33,7 @@
                 <div class="overlay-inactivo"><span>No disponible</span></div>
               }
               @if (producto.urlImagen) {
-                <a [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver ' + producto.nombre"><img [src]="producto.urlImagen" [alt]="producto.nombre" loading="lazy" /></a>
+                <a [routerLink]="['/products', producto.id]" [attr.aria-label]="'Ver ' + producto.nombre"><img [src]="producto.urlImagen" [alt]="producto.nombre" width="320" height="320" loading="lazy" /></a>
               } @else {
                 <a class="sin-imagen" [routerLink]="['/products', producto.id]" aria-label="Ver producto sin imagen">Sin imagen</a>
               }

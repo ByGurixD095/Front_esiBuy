@@ -93,7 +93,7 @@
             <article class="cart-item">
               <div class="item-image">
                 @if (item.urlImagen) {
-                  <img [src]="item.urlImagen" [alt]="item.nombre" />
+                  <img [src]="item.urlImagen" [alt]="item.nombre" width="96" height="96" />
                 } @else {
                   <span>Sin imagen</span>
                 }
@@ -113,6 +113,7 @@
                     >−</button>
                     <input
                       [id]="'cantidad-' + item.productoId"
+                      [attr.aria-label]="'Cantidad de ' + item.nombre"
                       type="number"
                       min="1"
                       step="1"
