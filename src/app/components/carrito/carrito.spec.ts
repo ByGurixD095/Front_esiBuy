@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { CarritoService, ItemCarrito } from '../../services/carrito.service';
 import { DireccionGuardada, DireccionesService } from '../../services/direcciones.service';
 import { MetodoPago, MetodosPagoService } from '../../services/metodos-pago-service/metodos-pago';
+import { ProductService } from '../../services/product.service';
 import { PedidosService } from '../../services/pedidos.service';
 import { Carrito } from './carrito';
 
@@ -14,12 +15,14 @@ describe('Carrito', () => {
   let fixture: ComponentFixture<Carrito>;
   const carritoFalso = {
     obtenerCarrito: vi.fn(),
+    anadirProducto: vi.fn(),
     actualizarCantidad: vi.fn(),
     eliminarProducto: vi.fn(),
     vaciar: vi.fn(),
   };
   const direccionesFalso = { listar: vi.fn() };
   const metodosPagoFalso = { listar: vi.fn() };
+  const productoFalso = { obtenerInfo: vi.fn() };
   const pedidosFalso = { crear: vi.fn(), pagar: vi.fn(), listarActivos: vi.fn() };
   const authFalso = {
     isAuthenticated: () => true,
@@ -36,6 +39,7 @@ describe('Carrito', () => {
         { provide: CarritoService, useValue: carritoFalso },
         { provide: DireccionesService, useValue: direccionesFalso },
         { provide: MetodosPagoService, useValue: metodosPagoFalso },
+        { provide: ProductService, useValue: productoFalso },
         { provide: PedidosService, useValue: pedidosFalso },
         { provide: AuthService, useValue: authFalso },
       ],
@@ -51,9 +55,12 @@ describe('Carrito', () => {
 
   beforeEach(() => {
     carritoFalso.obtenerCarrito.mockReset();
-    carritoFalso.actualizarCantidad.mockReset();
+    carritoFalso.actualizarCantidad.mockReset().mockReturnValue(of(undefined));
+    carritoFalso.anadirProducto.mockReset().mockReturnValue(of(undefined));
     carritoFalso.eliminarProducto.mockReset();
     carritoFalso.vaciar.mockReset();
+    carritoFalso.vaciar.mockReturnValue(of(undefined));
+    productoFalso.obtenerInfo.mockReset().mockReturnValue(of({ vendedor: 'Tienda ESI' }));
     direccionesFalso.listar.mockReset();
     direccionesFalso.listar.mockReturnValue(of([]));
     metodosPagoFalso.listar.mockReset();
@@ -177,7 +184,7 @@ describe('Carrito', () => {
       metodoPagoId: 'pago-1',
       direccionId: 'direccion-1',
     });
-    fixture.componentInstance.confirmarPedido();
+    await fixture.componentInstance.confirmarPedido();
     fixture.detectChanges();
 
     expect(pedidosFalso.crear).toHaveBeenCalledWith({
@@ -200,8 +207,8 @@ describe('Carrito', () => {
 
     expect(pedidosFalso.pagar).toHaveBeenCalledWith('pedido-1');
     expect(html().textContent).toContain('¡Pago confirmado!');
-    expect(html().textContent).toContain('pedido-1');
-    expect(html().textContent).toContain('56,98');
+    expect(fixture.componentInstance.pedidoConfirmado()).toBe(true);
+    expect(fixture.componentInstance.pedidosPendientesPago()).toHaveLength(0);
     expect(html().textContent).not.toContain('Mochila');
   });
 
@@ -221,7 +228,7 @@ describe('Carrito', () => {
     expect(html().textContent).toContain('Mochila');
   });
 
-  it('si el pago vence, borra el pedido pendiente y actualiza la cesta', async () => {
+  it('si el pago vence, borra los pedidos pendientes y actualiza la cesta', async () => {
     const metodo: MetodoPago = {
       id: 'pago-1',
       tipo: 'TARJETA',
@@ -248,11 +255,18 @@ describe('Carrito', () => {
     carritoFalso.obtenerCarrito.mockClear();
 
     fixture.componentInstance.abrirCheckout();
-    fixture.componentInstance.confirmarPedido();
+    fixture.componentInstance.checkoutForm.setValue({
+      metodoPagoId: 'pago-1',
+      direccionId: 'direccion-1',
+    });
+    await fixture.componentInstance.confirmarPedido();
+    expect(fixture.componentInstance.pedidosPendientesPago()).toHaveLength(1);
+
+    carritoFalso.obtenerCarrito.mockClear();
     fixture.componentInstance.confirmarPago();
     fixture.detectChanges();
 
-    expect(fixture.componentInstance.pedidoPendientePago()).toBeNull();
+    expect(fixture.componentInstance.pedidosPendientesPago()).toHaveLength(0);
     expect(fixture.componentInstance.errorPago()).toContain('dentro del plazo');
     expect(carritoFalso.obtenerCarrito).toHaveBeenCalledOnce();
   });

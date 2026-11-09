@@ -331,33 +331,10 @@ export class Carrito implements OnInit {
     
     const lotesAComprar = this.lotesPorVendedor().filter(l => seleccionados.includes(l.vendedor));
     const lotesNoComprados = this.lotesPorVendedor().filter(l => !seleccionados.includes(l.vendedor));
-    const pedidosGenerados: PedidoCreado[] = [];
 
     try {
-      // Orquestación Frontend: Creamos pedidos por separado vaciando y llenando la cesta dinámicamente
-      for (const lote of lotesAComprar) {
-        await firstValueFrom(this.carritoService.vaciar());
-        for (const item of lote.items) {
-          await firstValueFrom(this.carritoService.anadirProducto(item.productoId));
-          if (item.cantidad > 1) {
-            await firstValueFrom(this.carritoService.actualizarCantidad(item.productoId, item.cantidad));
-          }
-        }
-        const pedido = await firstValueFrom(this.pedidosService.crear(datosFormato));
-        pedidosGenerados.push(pedido);
-      }
-
-      // Restaurar lo que no se ha comprado
-      await firstValueFrom(this.carritoService.vaciar());
-      for (const lote of lotesNoComprados) {
-        for (const item of lote.items) {
-          await firstValueFrom(this.carritoService.anadirProducto(item.productoId));
-          if (item.cantidad > 1) {
-            await firstValueFrom(this.carritoService.actualizarCantidad(item.productoId, item.cantidad));
-          }
-        }
-      }
-
+      const pedidosGenerados = await this.crearPedidosPorLote(lotesAComprar, datosFormato);
+      await this.restaurarLotesNoComprados(lotesNoComprados);
       this.pedidosPendientesPago.set(pedidosGenerados);
       this.creandoPedido.set(false);
       this.cargarCarrito();
@@ -366,6 +343,37 @@ export class Carrito implements OnInit {
       this.errorPedido.set('Error procesando los lotes. Es posible que algún producto se haya agotado en este instante.');
       this.creandoPedido.set(false);
       this.cargarCarrito();
+    }
+  }
+
+  private async crearPedidosPorLote(
+    lotes: { items: (ItemCarrito & { vendedor: string })[] }[],
+    datosFormato: CrearPedidoRequest,
+  ): Promise<PedidoCreado[]> {
+    const pedidosGenerados: PedidoCreado[] = [];
+    for (const lote of lotes) {
+      await firstValueFrom(this.carritoService.vaciar());
+      await this.anadirItemsAlCarrito(lote.items);
+      pedidosGenerados.push(await firstValueFrom(this.pedidosService.crear(datosFormato)));
+    }
+    return pedidosGenerados;
+  }
+
+  private async restaurarLotesNoComprados(
+    lotes: { items: (ItemCarrito & { vendedor: string })[] }[],
+  ): Promise<void> {
+    await firstValueFrom(this.carritoService.vaciar());
+    for (const lote of lotes) {
+      await this.anadirItemsAlCarrito(lote.items);
+    }
+  }
+
+  private async anadirItemsAlCarrito(items: (ItemCarrito & { vendedor: string })[]): Promise<void> {
+    for (const item of items) {
+      await firstValueFrom(this.carritoService.anadirProducto(item.productoId));
+      if (item.cantidad > 1) {
+        await firstValueFrom(this.carritoService.actualizarCantidad(item.productoId, item.cantidad));
+      }
     }
   }
 

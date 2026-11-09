@@ -333,6 +333,12 @@ h1 {
   font: inherit;
 }
 
+.lote-checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--esi-ink);
+}
+
 .quantity-control input:focus-visible,
 .quantity-control button:focus-visible,
 .continue-link:focus-visible,
@@ -714,11 +720,6 @@ h1 {
   align-items: center;
   gap: 12px;
   cursor: pointer;
-}
-.lote-checkbox input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--esi-ink);
 }
 .lote-info {
   display: flex;

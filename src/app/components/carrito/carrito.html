@@ -88,7 +88,7 @@
                 <h2>{{ item.nombre }}</h2>
                 <p class="unit-price">{{ formatearPrecio(item.precioCent) }} <span>por unidad</span></p>
                 <div class="item-actions">
-                  <label [for]="'cantidad-' + item.productoId">Cantidad</label>
+                  <label for="cantidad-{{ item.productoId }}">Cantidad</label>
                   <div class="quantity-control">
                     <button
                       type="button"
@@ -97,7 +97,7 @@
                       (click)="actualizarCantidad(item, item.cantidad - 1)"
                     >−</button>
                     <input
-                      [id]="'cantidad-' + item.productoId"
+                      id="cantidad-{{ item.productoId }}"
                       [attr.aria-label]="'Cantidad de ' + item.nombre"
                       type="number"
                       min="1"
