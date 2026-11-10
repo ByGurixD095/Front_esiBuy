@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { firstValueFrom, forkJoin, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ProductService } from '../../services/product.service';
+import { firstValueFrom, forkJoin } from 'rxjs';
+
+
 import { CarritoService, ItemCarrito } from '../../services/carrito.service';
 import { DireccionGuardada, DireccionesService } from '../../services/direcciones.service';
 import { MetodoPago, MetodosPagoService } from '../../services/metodos-pago-service/metodos-pago';
@@ -29,8 +29,7 @@ export class Carrito implements OnInit {
   private metodoPagoPreferido: string | null = null;
   private direccionPreferida: string | null = null;
 
-  // Inyectamos ProductService para poder consultar el vendedor de cada item
-  private readonly productoService = inject(ProductService);
+
 
   readonly items = signal<(ItemCarrito & { vendedor: string })[]>([]);
   readonly cargando = signal(true);
@@ -99,20 +98,12 @@ export class Carrito implements OnInit {
   cargarCarrito(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.carritoService.obtenerCarrito().pipe(
-      switchMap(items => {
-        if (items.length === 0) return of([]);
-        // Consultamos la información de cada producto para averiguar su vendedor
-        const peticiones = items.map(item =>
-          this.productoService.obtenerInfo(item.productoId).pipe(
-            map(info => ({ ...item, vendedor: info.vendedor })),
-            catchError(() => of({ ...item, vendedor: 'Vendedor Desconocido' }))
-          )
-        );
-        return forkJoin(peticiones);
-      })
-    ).subscribe({
-      next: (itemsConVendedor) => {
+    this.carritoService.obtenerCarrito().subscribe({
+      next: (items) => {
+        const itemsConVendedor = items.map((item) => ({
+          ...item,
+          vendedor: item.vendedor || 'Vendedor Desconocido',
+        }));
         this.items.set(itemsConVendedor);
         this.cargando.set(false);
       },

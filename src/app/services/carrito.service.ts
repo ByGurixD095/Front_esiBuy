@@ -9,6 +9,8 @@ export interface ItemCarrito {
   precioCent: number;
   urlImagen: string | null;
   cantidad: number;
+  idVendedor?: string;
+  vendedor?: string;
 }
 
 @Injectable({ providedIn: 'root' })
