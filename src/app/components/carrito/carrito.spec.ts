@@ -7,7 +7,6 @@ import { AuthService } from '../../services/auth.service';
 import { CarritoService, ItemCarrito } from '../../services/carrito.service';
 import { DireccionGuardada, DireccionesService } from '../../services/direcciones.service';
 import { MetodoPago, MetodosPagoService } from '../../services/metodos-pago-service/metodos-pago';
-import { ProductService } from '../../services/product.service';
 import { PedidosService } from '../../services/pedidos.service';
 import { Carrito } from './carrito';
 
@@ -22,7 +21,6 @@ describe('Carrito', () => {
   };
   const direccionesFalso = { listar: vi.fn() };
   const metodosPagoFalso = { listar: vi.fn() };
-  const productoFalso = { obtenerInfo: vi.fn() };
   const pedidosFalso = { crear: vi.fn(), pagar: vi.fn(), listarActivos: vi.fn() };
   const authFalso = {
     isAuthenticated: () => true,
@@ -39,7 +37,6 @@ describe('Carrito', () => {
         { provide: CarritoService, useValue: carritoFalso },
         { provide: DireccionesService, useValue: direccionesFalso },
         { provide: MetodosPagoService, useValue: metodosPagoFalso },
-        { provide: ProductService, useValue: productoFalso },
         { provide: PedidosService, useValue: pedidosFalso },
         { provide: AuthService, useValue: authFalso },
       ],
@@ -60,7 +57,6 @@ describe('Carrito', () => {
     carritoFalso.eliminarProducto.mockReset();
     carritoFalso.vaciar.mockReset();
     carritoFalso.vaciar.mockReturnValue(of(undefined));
-    productoFalso.obtenerInfo.mockReset().mockReturnValue(of({ vendedor: 'Tienda ESI' }));
     direccionesFalso.listar.mockReset();
     direccionesFalso.listar.mockReturnValue(of([]));
     metodosPagoFalso.listar.mockReset();
